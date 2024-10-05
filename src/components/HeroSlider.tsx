@@ -12,6 +12,7 @@ const HeroSlider = () => {
 
     useEffect(() => {
         const fetchTrending = async () => {
+            setLoading(true);
             const data = await getTrending("movie");
             setTrendingItems(data.results.slice(0, 5));
             setLoading(false);
