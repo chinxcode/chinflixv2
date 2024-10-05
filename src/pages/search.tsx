@@ -6,24 +6,10 @@ import MovieCard from "@/components/MovieCard";
 import Skeleton from "@/components/Skeleton";
 import { handleSearch, handleFilter } from "@/lib/searchUtils";
 import { getTrending } from "@/lib/api";
-
-interface FilterOptions {
-    genre: string;
-    year: string;
-    sort_by: string;
-    with_origin_country: string;
-    [key: string]: string;
-}
+import { FilterOptions, ResultItem } from "@/types";
 
 export default function Search() {
     const router = useRouter();
-    interface ResultItem {
-        id: number;
-        title?: string;
-        name: string;
-        poster_path: string;
-        vote_average: number;
-    }
 
     const [results, setResults] = useState<ResultItem[]>([]);
     const [loading, setLoading] = useState(false);
