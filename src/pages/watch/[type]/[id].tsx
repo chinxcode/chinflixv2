@@ -27,7 +27,7 @@ export default function Watch() {
     return (
         <>
             <Head>
-                <title>{details.title || details.name} | MovieFlix</title>
+                <title>{details.title || details.name} | ChinFlix</title>
                 <meta name="description" content={details.overview} />
             </Head>
             <main>
