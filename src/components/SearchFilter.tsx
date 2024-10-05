@@ -2,13 +2,7 @@ import { useState, useEffect } from "react";
 import { MagnifyingGlassIcon, AdjustmentsHorizontalIcon } from "@heroicons/react/24/outline";
 import { motion, AnimatePresence } from "framer-motion";
 import { getGenres, getCountries } from "@/lib/api";
-
-interface FilterOptions {
-    genre: string;
-    year: string;
-    sort_by: string;
-    with_origin_country: string;
-}
+import { FilterOptions } from "@/types"; // Import from shared types
 
 interface SearchFilterProps {
     onSearch: (query: string) => void;
@@ -172,7 +166,7 @@ const FilterSelect: React.FC<FilterSelectProps> = ({ label, options, value, onCh
                 backgroundSize: "1.5em 1.5em",
             }}
         >
-            {options.map((option) => (
+            {options.map((option: Option) => (
                 <option key={option.id || option.value} value={option.id || option.value}>
                     {option.name || option.label || option.english_name}
                 </option>
