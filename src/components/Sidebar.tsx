@@ -11,7 +11,6 @@ const Sidebar = () => {
         { icon: FilmIcon, label: "Movies", path: "/search?type=movie" },
         { icon: TvIcon, label: "TV Shows", path: "/search?type=tv" },
         { icon: HeartIcon, label: "Watchlist", path: "/watchlist" },
-        { icon: Cog6ToothIcon, label: "Settings", path: "/settings" },
     ];
 
     const isActive = (path: string) => {
@@ -25,8 +24,8 @@ const Sidebar = () => {
     };
 
     return (
-        <aside className="w-64 bg-black p-4 flex flex-col items-center space-y-8 h-screen fixed left-0 top-0 z-50">
-            <Link href="/" className="text-2xl font-bold hover:text-[#FF4D4D] smoothie">
+        <aside className="w-64 bg-black pt-7 pb-2 px-2 flex flex-col items-center space-y-8 h-screen fixed left-0 top-0 z-50">
+            <Link href="/" className="text-4xl font-bold hover:text-[#FF4D4D] smoothie">
                 ChinFlix
             </Link>
             <div className="flex flex-col gap-2 size-full items-center justify-center">
