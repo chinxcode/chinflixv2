@@ -20,8 +20,8 @@ const BottomNav = () => {
     return (
         <nav className="bg-black text-white py-2">
             <div className="flex justify-around items-center">
-                <NavItem href="/" icon={HomeIcon} label="Home" isActive={isActive("/")} />
-                <NavItem href="/search" icon={MagnifyingGlassIcon} label="Search" isActive={isActive("/search")} />
+                <NavItem href="/" icon={HomeIcon} label="Home" isActive={isActive("/")} onClick={() => {}} />
+                <NavItem href="/search" icon={MagnifyingGlassIcon} label="Search" isActive={isActive("/search")} onClick={() => {}} />
                 <button onClick={() => setShowMoreMenu(!showMoreMenu)} className="flex flex-col items-center">
                     <EllipsisHorizontalIcon className="w-6 h-6" />
                     <span className="text-xs">More</span>
