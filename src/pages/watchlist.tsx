@@ -4,8 +4,8 @@ export default function Watchlist() {
     return (
         <>
             <Head>
-                <title>Watchlist | MovieFlix</title>
-                <meta name="description" content="Your personal watchlist on MovieFlix" />
+                <title>Watchlist | ChinFlix</title>
+                <meta name="description" content="Your personal watchlist on ChinFlix" />
             </Head>
             <main className="p-8">
                 <h1 className="text-4xl font-bold mb-8">Watchlist</h1>
