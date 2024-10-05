@@ -8,14 +8,27 @@ interface TrendingSectionProps {
 }
 
 const TrendingSection: React.FC<TrendingSectionProps> = ({ type }) => {
-    const [trendingItems, setTrendingItems] = useState([]);
+    const [trendingItems, setTrendingItems] = useState<
+        { id: number; title: string; name: string; poster_path: string; vote_average: number; overview: string }[]
+    >([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchTrending = async () => {
             setLoading(true);
             const data = await getTrending(type);
-            setTrendingItems(data.results);
+            setTrendingItems(
+                data.results.map(
+                    (item: { id: number; title?: string; name?: string; poster_path: string; vote_average: number; overview: string }) => ({
+                        id: item.id,
+                        title: item.title || item.name,
+                        name: item.name || item.title,
+                        poster_path: item.poster_path,
+                        vote_average: item.vote_average,
+                        overview: item.overview,
+                    })
+                )
+            );
             setLoading(false);
         };
         fetchTrending();

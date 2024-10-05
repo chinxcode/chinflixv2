@@ -12,6 +12,7 @@ interface FilterOptions {
     year: string;
     sort_by: string;
     with_origin_country: string;
+    [key: string]: string;
 }
 
 export default function Search() {

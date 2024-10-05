@@ -55,7 +55,15 @@ const BottomNav = () => {
     );
 };
 
-const NavItem = ({ href, icon: Icon, label, isActive, onClick }) => (
+interface NavItemProps {
+    href: string;
+    icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+    label: string;
+    isActive: boolean;
+    onClick: () => void;
+}
+
+const NavItem = ({ href, icon: Icon, label, isActive, onClick }: NavItemProps) => (
     <Link href={href} className={`flex flex-col items-center ${isActive ? "text-[#FF4D4D]" : ""}`} onClick={onClick}>
         <Icon className="w-6 h-6" />
         <span className="text-xs">{label}</span>

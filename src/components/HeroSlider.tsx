@@ -6,7 +6,9 @@ import { getTrending } from "@/lib/api";
 import Skeleton from "./Skeleton";
 
 const HeroSlider = () => {
-    const [trendingItems, setTrendingItems] = useState([]);
+    const [trendingItems, setTrendingItems] = useState<
+        { id: number; title?: string; name?: string; backdrop_path: string; overview: string }[]
+    >([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [loading, setLoading] = useState(true);
 
@@ -28,7 +30,7 @@ const HeroSlider = () => {
     }, [trendingItems]);
 
     if (loading) {
-        return <Skeleton className="w-full aspect-video md:aspect-[2.4/1] rounded-lg" />;
+        return <Skeleton className="w-full aspect-[2/.63] lg:aspect-[2/.6] md:aspect-[2.4/1] rounded-lg" />;
     }
 
     if (trendingItems.length === 0) return null;
@@ -36,7 +38,7 @@ const HeroSlider = () => {
     const item = trendingItems[currentIndex];
 
     return (
-        <div className="relative bg-[#1E1E1E] rounded-lg overflow-hidden aspect-video md:aspect-[2.4/1] aspect-[2/.63] lg:aspect-[2/.6] shadow-lg">
+        <div className="relative bg-[#1E1E1E] rounded-lg overflow-hidden md:aspect-[2.4/1] aspect-[2/.63] lg:aspect-[2/.6] shadow-lg">
             <AnimatePresence initial={false}>
                 <motion.div
                     key={item.id}
@@ -48,7 +50,7 @@ const HeroSlider = () => {
                 >
                     <Image
                         src={`https://image.tmdb.org/t/p/original${item.backdrop_path}`}
-                        alt={item.title || item.name}
+                        alt={item.title || item.name || "Trending item"}
                         layout="fill"
                         objectFit="cover"
                         className="opacity-50"

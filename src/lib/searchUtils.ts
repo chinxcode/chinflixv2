@@ -3,13 +3,19 @@ import { searchMulti, discoverMovies, discoverTVShows } from "./api";
 export const handleSearch = async (query: string, type: "movie" | "tv") => {
     if (query.length >= 2) {
         const data = await searchMulti(query);
-        return data.results.filter((item) => item.media_type === type);
+        return data.results.filter((item: { media_type: string }) => item.media_type === type);
     }
     return [];
 };
 
-export const handleFilter = async (filters, type: "movie" | "tv") => {
-    const params = {
+interface Filters {
+    genre?: string;
+    year?: string;
+    [key: string]: string | undefined;
+}
+
+export const handleFilter = async (filters: Filters, type: "movie" | "tv") => {
+    const params: { [key: string]: string | undefined } = {
         ...filters,
         with_genres: filters.genre && filters.genre !== "Any" ? filters.genre : undefined,
         primary_release_year: filters.year && filters.year !== "Any" ? filters.year : undefined,
