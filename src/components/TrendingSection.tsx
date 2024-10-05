@@ -13,6 +13,7 @@ const TrendingSection: React.FC<TrendingSectionProps> = ({ type }) => {
 
     useEffect(() => {
         const fetchTrending = async () => {
+            setLoading(true);
             const data = await getTrending(type);
             setTrendingItems(data.results);
             setLoading(false);
