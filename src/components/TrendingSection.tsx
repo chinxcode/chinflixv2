@@ -22,22 +22,18 @@ const TrendingSection: React.FC<TrendingSectionProps> = ({ type }) => {
     }, [type]);
 
     return (
-        <section className="mt-8">
-            <h2 className="text-[1.35rem] font-medium mb-3 px-1">Trending {type === "movie" ? "Movies" : "Shows"}</h2>
-            <div className="flex w-full flex-wrap">
+        <section className="mt-8 px-4 lg:px-0">
+            <h2 className="text-2xl font-bold mb-4">Trending {type === "movie" ? "Movies" : "Shows"}</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                 {loading
                     ? Array(6)
                           .fill(0)
                           .map((_, i) => (
-                              <div key={i} className="w-1/6 xl:w-[14.28%] 2xl:w-[12.5%] !aspect-[1.44/2] !p-2 !shrink-0">
-                                  <Skeleton className="w-full h-full rounded-xl" />
+                              <div key={i} className="aspect-[2/3]">
+                                  <Skeleton className="w-full h-full rounded-lg" />
                               </div>
                           ))
-                    : trendingItems.map((item) => (
-                          <div key={item.id} className="w-1/6 xl:w-[14.28%] 2xl:w-[12.5%] !aspect-[1.44/2] !p-2 !shrink-0">
-                              <MovieCard item={item} />
-                          </div>
-                      ))}
+                    : trendingItems.map((item) => <MovieCard key={item.id} item={item} />)}
             </div>
         </section>
     );

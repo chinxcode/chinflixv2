@@ -10,7 +10,7 @@ export default function Home() {
                 <meta name="description" content="Discover and watch your favorite movies and TV shows on ChinFlix" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <main id="center-div" className="size-full flex flex-col gap-4 relative overflow-x-hidden overflow-y-auto">
+            <main className="size-full flex flex-col gap-4 relative overflow-x-hidden overflow-y-auto pb-16 lg:pb-0">
                 <div className="flex flex-col w-full z-0 relative px-3 2xl:px-5 py-6">
                     <HeroSlider />
                     <div className="flex flex-col">
