@@ -28,7 +28,7 @@ const HeroSlider = () => {
     }, [trendingItems]);
 
     if (loading) {
-        return <Skeleton className="w-full aspect-[2/.63] rounded-[1.4rem]" />;
+        return <Skeleton className="w-full aspect-video md:aspect-[2.4/1] rounded-lg" />;
     }
 
     if (trendingItems.length === 0) return null;
@@ -36,7 +36,7 @@ const HeroSlider = () => {
     const item = trendingItems[currentIndex];
 
     return (
-        <div className="relative bg-[#1E1E1E] rounded-[1.4rem] 2xl:rounded-3xl overflow-hidden aspect-[2/.63] lg:aspect-[2/.6] shadow">
+        <div className="relative bg-[#1E1E1E] rounded-lg overflow-hidden aspect-video md:aspect-[2.4/1] aspect-[2/.63] lg:aspect-[2/.6] shadow-lg">
             <AnimatePresence initial={false}>
                 <motion.div
                     key={item.id}
@@ -49,45 +49,29 @@ const HeroSlider = () => {
                     <Image
                         src={`https://image.tmdb.org/t/p/original${item.backdrop_path}`}
                         alt={item.title || item.name}
-                        fill
-                        style={{ objectFit: "cover" }}
+                        layout="fill"
+                        objectFit="cover"
                         className="opacity-50"
                     />
                 </motion.div>
             </AnimatePresence>
-            <div className="absolute inset-0 flex">
-                <div className="w-1/2 xl:p-10 p-6 flex z-10 flex-col gap-3 lg:gap-4 xl:gap-6 2xl:gap-8 my-auto">
+            <div className="absolute inset-0 flex items-end md:items-center">
+                <div className="w-full md:w-1/2 p-4 md:p-6 lg:p-10 flex flex-col gap-2 md:gap-4 lg:gap-6 pb-8 md:pb-0">
                     <motion.h2
                         key={`${item.id}-title`}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
-                        className="text-4xl font-bold"
+                        className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold"
                     >
                         {item.title || item.name}
                     </motion.h2>
-                    <motion.div
-                        key={`${item.id}-info`}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.2 }}
-                        className="flex items-center space-x-4 text-sm text-[#E0E0E0]"
-                    >
-                        <span>{item.media_type.toUpperCase()}</span>
-                        <span>{new Date(item.release_date || item.first_air_date).getFullYear()}</span>
-                        <span className="flex items-center">
-                            <svg className="w-4 h-4 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                            {item.vote_average.toFixed(1)}
-                        </span>
-                    </motion.div>
                     <motion.p
                         key={`${item.id}-overview`}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.4 }}
-                        className="text-[#E0E0E0] text-sm line-clamp-3"
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                        className="text-[#E0E0E0] text-xs sm:text-sm md:text-base line-clamp-2 sm:line-clamp-3"
                     >
                         {item.overview}
                     </motion.p>
@@ -95,15 +79,15 @@ const HeroSlider = () => {
                         key={`${item.id}-buttons`}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.6 }}
-                        className="flex space-x-4"
+                        transition={{ duration: 0.5, delay: 0.4 }}
+                        className="flex space-x-2 md:space-x-4"
                     >
-                        <button className="bg-white/10 rounded-full overflow-hidden active:bg-white/20 hover:bg-white/15 p-2 px-4 flex items-center space-x-2 smoothie">
-                            <PlayIcon className="h-5 w-5" />
-                            <span>Watch Now</span>
+                        <button className="bg-white/10 rounded-full overflow-hidden active:bg-white/20 hover:bg-white/15 p-1 sm:p-2 px-2 sm:px-4 flex items-center space-x-1 sm:space-x-2 transition-colors duration-200">
+                            <PlayIcon className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+                            <span className="text-xs sm:text-sm md:text-base">Watch Now</span>
                         </button>
-                        <button className="bg-white/10 rounded-full overflow-hidden active:bg-white/20 hover:bg-white/15 p-2 smoothie">
-                            <PlusIcon className="h-5 w-5" />
+                        <button className="bg-white/10 rounded-full overflow-hidden active:bg-white/20 hover:bg-white/15 p-1 sm:p-2 transition-colors duration-200">
+                            <PlusIcon className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
                         </button>
                     </motion.div>
                 </div>
