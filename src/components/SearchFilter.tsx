@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
 import { MagnifyingGlassIcon, AdjustmentsHorizontalIcon } from "@heroicons/react/24/outline";
 import { motion, AnimatePresence } from "framer-motion";
 import { getGenres, getCountries } from "@/lib/api";
@@ -7,7 +6,10 @@ import { getGenres, getCountries } from "@/lib/api";
 interface SearchFilterProps {
     onSearch: (query: string) => void;
     onFilter: (filters: FilterOptions) => void;
+    onTypeChange: (type: "movie" | "tv") => void;
     type: "movie" | "tv";
+    initialQuery: string;
+    initialFilters: any;
 }
 
 interface FilterOptions {
@@ -17,15 +19,14 @@ interface FilterOptions {
     with_origin_country: string;
 }
 
-const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch, onFilter, type }) => {
-    const router = useRouter();
-    const [query, setQuery] = useState("");
+const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch, onFilter, onTypeChange, type, initialQuery, initialFilters }) => {
+    const [query, setQuery] = useState(initialQuery || "");
     const [showFilters, setShowFilters] = useState(false);
     const [filters, setFilters] = useState<FilterOptions>({
-        genre: "",
-        year: "",
-        sort_by: "popularity.desc",
-        with_origin_country: "",
+        genre: initialFilters.genre || "",
+        year: initialFilters.year || "",
+        sort_by: initialFilters.sort_by || "popularity.desc",
+        with_origin_country: initialFilters.with_origin_country || "",
     });
     const [genres, setGenres] = useState([]);
     const [countries, setCountries] = useState([]);
@@ -38,52 +39,40 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch, onFilter, type })
             setCountries(countriesData);
         };
         fetchFilterOptions();
+    }, [type]);
 
-        const { query: urlQuery, ...urlFilters } = router.query;
-        setQuery((urlQuery as string) || "");
-        setFilters((prevFilters) => ({
-            ...prevFilters,
-            ...Object.fromEntries(Object.entries(urlFilters).filter(([key]) => key in prevFilters)),
-        }));
-    }, [type, router.query]);
-
-    const updateURL = (params: Partial<FilterOptions & { query: string }>) => {
-        const newQuery = { ...router.query, ...params, type };
-
-        if (params.query !== undefined) {
-            delete newQuery.genre;
-            delete newQuery.year;
-            delete newQuery.sort_by;
-            delete newQuery.with_origin_country;
-        }
-
-        Object.keys(newQuery).forEach((key) => !newQuery[key] && delete newQuery[key]);
-        router.push({ pathname: router.pathname, query: newQuery }, undefined, { shallow: true });
-    };
+    useEffect(() => {
+        setQuery(initialQuery || "");
+        setFilters({
+            genre: initialFilters.genre || "",
+            year: initialFilters.year || "",
+            sort_by: initialFilters.sort_by || "popularity.desc",
+            with_origin_country: initialFilters.with_origin_country || "",
+        });
+    }, [initialQuery, initialFilters]);
 
     useEffect(() => {
         if (query.length >= 2) {
             onSearch(query);
-            updateURL({ query });
-        } else if (query.length === 0) {
-            onSearch("");
-            updateURL({ query: undefined });
         }
-    }, [query]);
+    }, [query, onSearch]);
 
     const handleFilterChange = (key: keyof FilterOptions, value: string) => {
         const newFilters = { ...filters, [key]: value };
         setFilters(newFilters);
         onFilter(newFilters);
-        updateURL(newFilters);
+    };
+
+    const handleTypeChangeInternal = (newType: "movie" | "tv") => {
+        onTypeChange(newType);
     };
 
     const years = Array.from({ length: 30 }, (_, i) => new Date().getFullYear() - i);
     const sortOptions = [
         { value: "popularity.desc", label: "Most Popular" },
-        { value: "popularity.asc", label: "Least Popularity" },
-        { value: "vote_average.desc", label: "Most Rated" },
-        { value: "vote_average.asc", label: "Least Rated" },
+        { value: "popularity.asc", label: "Least Popular" },
+        { value: "vote_average.desc", label: "Highest Rated" },
+        { value: "vote_average.asc", label: "Lowest Rated" },
         { value: "release_date.desc", label: "Latest Release" },
         { value: "release_date.asc", label: "Oldest Release" },
     ];
@@ -105,7 +94,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch, onFilter, type })
                     <select
                         className="bg-gray-700 rounded-lg py-2 px-3 pr-8 text-white focus:outline-none focus:ring-2 focus:ring-white/20 appearance-none"
                         value={type}
-                        onChange={(e) => router.push(`/search?type=${e.target.value}`)}
+                        onChange={(e) => handleTypeChangeInternal(e.target.value as "movie" | "tv")}
                         style={{
                             backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
                             backgroundPosition: "right 0.5rem center",

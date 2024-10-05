@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import SearchFilter from "@/components/SearchFilter";
@@ -12,53 +12,41 @@ export default function Search() {
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searchType, setSearchType] = useState("movie");
-    const [filters, setFilters] = useState({
-        genre: "",
-        year: "",
-        sort_by: "popularity.desc",
-        with_origin_country: "",
-    });
+    const [searchQuery, setSearchQuery] = useState("");
+    const [filters, setFilters] = useState({});
+
+    const fetchData = useCallback(async (type: string, query: string, filters: any) => {
+        setLoading(true);
+        let newResults;
+        if (query && query.length >= 2) {
+            newResults = await handleSearch(query, type as "movie" | "tv");
+        } else if (Object.keys(filters).length > 0) {
+            newResults = await handleFilter(filters, type as "movie" | "tv");
+        } else {
+            const trendingData = await getTrending(type as "movie" | "tv");
+            newResults = trendingData.results;
+        }
+        setResults(newResults);
+        setLoading(false);
+    }, []);
 
     useEffect(() => {
-        const { type, query, ...urlFilters } = router.query;
-        setSearchType((type as string) || "movie");
+        const { type } = router.query;
+        const currentType = (type as string) || "movie";
+        setSearchType(currentType);
+        fetchData(currentType, searchQuery, filters);
+    }, [router.query.type, searchQuery, filters, fetchData]);
 
-        if (query) {
-            handleSearchAll(query as string);
-        } else if (Object.keys(urlFilters).length > 0) {
-            const newFilters = {
-                genre: (urlFilters.genre as string) || "",
-                year: (urlFilters.year as string) || "",
-                sort_by: (urlFilters.sort_by as string) || "popularity.desc",
-                with_origin_country: (urlFilters.with_origin_country as string) || "",
-            };
-            setFilters(newFilters);
-            handleFilterAll(newFilters);
-        } else {
-            fetchTrending();
-        }
-    }, [router.query]);
-
-    const fetchTrending = async () => {
-        setLoading(true);
-        const data = await getTrending(searchType as "movie" | "tv");
-        setResults(data.results);
-        setLoading(false);
+    const handleSearchAll = (query: string) => {
+        setSearchQuery(query);
     };
 
-    const handleSearchAll = async (query: string) => {
-        setLoading(true);
-        const searchResults = await handleSearch(query, searchType as "movie" | "tv");
-        setResults(searchResults);
-        setLoading(false);
-    };
-
-    const handleFilterAll = async (newFilters) => {
-        setLoading(true);
+    const handleFilterAll = (newFilters: any) => {
         setFilters(newFilters);
-        const filterResults = await handleFilter(newFilters, searchType as "movie" | "tv");
-        setResults(filterResults);
-        setLoading(false);
+    };
+
+    const handleTypeChange = (newType: "movie" | "tv") => {
+        router.push({ pathname: router.pathname, query: { type: newType } }, undefined, { shallow: true });
     };
 
     return (
@@ -69,7 +57,14 @@ export default function Search() {
             </Head>
             <main className="p-8">
                 <h1 className="text-4xl font-bold mb-8">Search {searchType === "movie" ? "Movies" : "TV Shows"}</h1>
-                <SearchFilter onSearch={handleSearchAll} onFilter={handleFilterAll} type={searchType as "movie" | "tv"} />
+                <SearchFilter
+                    onSearch={handleSearchAll}
+                    onFilter={handleFilterAll}
+                    type={searchType as "movie" | "tv"}
+                    onTypeChange={handleTypeChange}
+                    initialQuery={searchQuery}
+                    initialFilters={filters}
+                />
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
                     {loading ? (
                         Array(12)
