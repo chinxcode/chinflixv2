@@ -3,15 +3,6 @@ import { MagnifyingGlassIcon, AdjustmentsHorizontalIcon } from "@heroicons/react
 import { motion, AnimatePresence } from "framer-motion";
 import { getGenres, getCountries } from "@/lib/api";
 
-interface SearchFilterProps {
-    onSearch: (query: string) => void;
-    onFilter: (filters: FilterOptions) => void;
-    onTypeChange: (type: "movie" | "tv") => void;
-    type: "movie" | "tv";
-    initialQuery: string;
-    initialFilters: any;
-}
-
 interface FilterOptions {
     genre: string;
     year: string;
@@ -19,17 +10,29 @@ interface FilterOptions {
     with_origin_country: string;
 }
 
+interface SearchFilterProps {
+    onSearch: (query: string) => void;
+    onFilter: (filters: FilterOptions) => void;
+    onTypeChange: (type: "movie" | "tv") => void;
+    type: "movie" | "tv";
+    initialQuery: string;
+    initialFilters: FilterOptions;
+}
+
+interface Option {
+    id?: string;
+    value?: string;
+    name?: string;
+    label?: string;
+    english_name?: string;
+}
+
 const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch, onFilter, onTypeChange, type, initialQuery, initialFilters }) => {
     const [query, setQuery] = useState(initialQuery || "");
     const [showFilters, setShowFilters] = useState(false);
-    const [filters, setFilters] = useState<FilterOptions>({
-        genre: initialFilters.genre || "",
-        year: initialFilters.year || "",
-        sort_by: initialFilters.sort_by || "popularity.desc",
-        with_origin_country: initialFilters.with_origin_country || "",
-    });
-    const [genres, setGenres] = useState([]);
-    const [countries, setCountries] = useState([]);
+    const [filters, setFilters] = useState<FilterOptions>(initialFilters);
+    const [genres, setGenres] = useState<Option[]>([]);
+    const [countries, setCountries] = useState<Option[]>([]);
 
     useEffect(() => {
         const fetchFilterOptions = async () => {
@@ -43,12 +46,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch, onFilter, onTypeC
 
     useEffect(() => {
         setQuery(initialQuery || "");
-        setFilters({
-            genre: initialFilters.genre || "",
-            year: initialFilters.year || "",
-            sort_by: initialFilters.sort_by || "popularity.desc",
-            with_origin_country: initialFilters.with_origin_country || "",
-        });
+        setFilters(initialFilters);
     }, [initialQuery, initialFilters]);
 
     useEffect(() => {
@@ -68,7 +66,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch, onFilter, onTypeC
     };
 
     const years = Array.from({ length: 30 }, (_, i) => new Date().getFullYear() - i);
-    const sortOptions = [
+    const sortOptions: Option[] = [
         { value: "popularity.desc", label: "Most Popular" },
         { value: "popularity.asc", label: "Least Popular" },
         { value: "vote_average.desc", label: "Highest Rated" },
@@ -142,7 +140,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch, onFilter, onTypeC
                         />
                         <FilterSelect
                             label="Country"
-                            options={[{ iso_3166_1: "", english_name: "Any" }, ...countries]}
+                            options={[{ english_name: "Any" }, ...countries]}
                             value={filters.with_origin_country}
                             onChange={(value) => handleFilterChange("with_origin_country", value)}
                         />
@@ -153,7 +151,14 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch, onFilter, onTypeC
     );
 };
 
-const FilterSelect = ({ label, options, value, onChange }) => (
+interface FilterSelectProps {
+    label: string;
+    options: Option[];
+    value: string;
+    onChange: (value: string) => void;
+}
+
+const FilterSelect: React.FC<FilterSelectProps> = ({ label, options, value, onChange }) => (
     <div className="flex flex-col">
         <label className="text-sm text-gray-400 mb-1">{label}</label>
         <select

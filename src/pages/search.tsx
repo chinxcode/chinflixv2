@@ -7,23 +7,35 @@ import Skeleton from "@/components/Skeleton";
 import { handleSearch, handleFilter } from "@/lib/searchUtils";
 import { getTrending } from "@/lib/api";
 
+interface FilterOptions {
+    genre: string;
+    year: string;
+    sort_by: string;
+    with_origin_country: string;
+}
+
 export default function Search() {
     const router = useRouter();
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [searchType, setSearchType] = useState("movie");
+    const [searchType, setSearchType] = useState<"movie" | "tv">("movie");
     const [searchQuery, setSearchQuery] = useState("");
-    const [filters, setFilters] = useState({});
+    const [filters, setFilters] = useState<FilterOptions>({
+        genre: "",
+        year: "",
+        sort_by: "popularity.desc",
+        with_origin_country: "",
+    });
 
-    const fetchData = useCallback(async (type: string, query: string, filters: any) => {
+    const fetchData = useCallback(async (type: "movie" | "tv", query: string, filters: FilterOptions) => {
         setLoading(true);
         let newResults;
         if (query && query.length >= 2) {
-            newResults = await handleSearch(query, type as "movie" | "tv");
-        } else if (Object.keys(filters).length > 0) {
-            newResults = await handleFilter(filters, type as "movie" | "tv");
+            newResults = await handleSearch(query, type);
+        } else if (Object.values(filters).some((value) => value !== "")) {
+            newResults = await handleFilter(filters, type);
         } else {
-            const trendingData = await getTrending(type as "movie" | "tv");
+            const trendingData = await getTrending(type);
             newResults = trendingData.results;
         }
         setResults(newResults);
@@ -32,16 +44,16 @@ export default function Search() {
 
     useEffect(() => {
         const { type } = router.query;
-        const currentType = (type as string) || "movie";
+        const currentType = (type as "movie" | "tv") || "movie";
         setSearchType(currentType);
         fetchData(currentType, searchQuery, filters);
-    }, [router.query.type, searchQuery, filters, fetchData]);
+    }, [router.query, searchQuery, filters, fetchData]);
 
     const handleSearchAll = (query: string) => {
         setSearchQuery(query);
     };
 
-    const handleFilterAll = (newFilters: any) => {
+    const handleFilterAll = (newFilters: FilterOptions) => {
         setFilters(newFilters);
     };
 
@@ -60,7 +72,7 @@ export default function Search() {
                 <SearchFilter
                     onSearch={handleSearchAll}
                     onFilter={handleFilterAll}
-                    type={searchType as "movie" | "tv"}
+                    type={searchType}
                     onTypeChange={handleTypeChange}
                     initialQuery={searchQuery}
                     initialFilters={filters}
