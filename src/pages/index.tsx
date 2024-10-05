@@ -6,8 +6,8 @@ export default function Home() {
     return (
         <>
             <Head>
-                <title>MovieFlix - Discover and Watch Movies & TV Shows</title>
-                <meta name="description" content="Discover and watch your favorite movies and TV shows on MovieFlix" />
+                <title>ChinFlix - Discover and Watch Movies & TV Shows</title>
+                <meta name="description" content="Discover and watch your favorite movies and TV shows on ChinFlix" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <main id="center-div" className="size-full flex flex-col gap-4 relative overflow-x-hidden overflow-y-auto">
