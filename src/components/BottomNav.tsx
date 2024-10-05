@@ -1,13 +1,16 @@
-import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { HomeIcon, MagnifyingGlassIcon, EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
 import { FilmIcon, TvIcon, HeartIcon } from "@heroicons/react/24/outline";
 import { motion, AnimatePresence } from "framer-motion";
+interface BottomNavProps {
+    showMoreMenu: boolean;
 
-const BottomNav = () => {
+    setShowMoreMenu: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const BottomNav: React.FC<BottomNavProps> = ({ showMoreMenu, setShowMoreMenu }) => {
     const router = useRouter();
-    const [showMoreMenu, setShowMoreMenu] = useState(false);
 
     const isActive = (path: string) => router.pathname === path;
 

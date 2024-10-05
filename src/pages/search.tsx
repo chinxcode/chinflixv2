@@ -17,7 +17,15 @@ interface FilterOptions {
 
 export default function Search() {
     const router = useRouter();
-    const [results, setResults] = useState([]);
+    interface ResultItem {
+        id: number;
+        title?: string;
+        name: string;
+        poster_path: string;
+        vote_average: number;
+    }
+
+    const [results, setResults] = useState<ResultItem[]>([]);
     const [loading, setLoading] = useState(false);
     const [searchType, setSearchType] = useState<"movie" | "tv">("movie");
     const [searchQuery, setSearchQuery] = useState("");
@@ -84,7 +92,15 @@ export default function Search() {
                             .fill(0)
                             .map((_, i) => <Skeleton key={i} className="aspect-[2/3] rounded-xl" />)
                     ) : results && results.length > 0 ? (
-                        results.map((item) => <MovieCard key={item.id} item={item} />)
+                        results.map((item) => (
+                            <MovieCard
+                                key={item.id}
+                                item={{
+                                    ...item,
+                                    title: item.title ?? "Untitled",
+                                }}
+                            />
+                        ))
                     ) : (
                         <p className="col-span-full text-center text-gray-400">No results found.</p>
                     )}
