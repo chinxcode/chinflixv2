@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { HomeIcon, MagnifyingGlassIcon, FilmIcon, TvIcon, HeartIcon, Cog6ToothIcon } from "@heroicons/react/24/outline";
+import { HomeIcon, MagnifyingGlassIcon, FilmIcon, TvIcon, HeartIcon } from "@heroicons/react/24/outline";
 
 const Sidebar = () => {
     const router = useRouter();

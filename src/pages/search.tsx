@@ -4,7 +4,6 @@ import Head from "next/head";
 import SearchFilter from "@/components/SearchFilter";
 import MovieCard from "@/components/MovieCard";
 import Skeleton from "@/components/Skeleton";
-import Pagination from "@/components/Pagination";
 import { handleSearch, handleFilter } from "@/lib/searchUtils";
 import { getTrending } from "@/lib/api";
 
@@ -13,8 +12,6 @@ export default function Search() {
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searchType, setSearchType] = useState("movie");
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
     const [filters, setFilters] = useState({
         genre: "",
         year: "",
@@ -56,18 +53,12 @@ export default function Search() {
         setLoading(false);
     };
 
-    const handleFilterAll = async (filters) => {
+    const handleFilterAll = async (newFilters) => {
         setLoading(true);
-        const filterResults = await handleFilter(filters, searchType as "movie" | "tv");
+        setFilters(newFilters);
+        const filterResults = await handleFilter(newFilters, searchType as "movie" | "tv");
         setResults(filterResults);
         setLoading(false);
-    };
-
-    const handlePageChange = (page: number) => {
-        router.push({
-            pathname: router.pathname,
-            query: { ...router.query, page },
-        });
     };
 
     return (
@@ -80,13 +71,16 @@ export default function Search() {
                 <h1 className="text-4xl font-bold mb-8">Search {searchType === "movie" ? "Movies" : "TV Shows"}</h1>
                 <SearchFilter onSearch={handleSearchAll} onFilter={handleFilterAll} type={searchType as "movie" | "tv"} />
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-                    {loading
-                        ? Array(12)
-                              .fill(0)
-                              .map((_, i) => <Skeleton key={i} className="aspect-[2/3] rounded-xl" />)
-                        : results.map((item) => <MovieCard key={item.id} item={item} />)}
+                    {loading ? (
+                        Array(12)
+                            .fill(0)
+                            .map((_, i) => <Skeleton key={i} className="aspect-[2/3] rounded-xl" />)
+                    ) : results && results.length > 0 ? (
+                        results.map((item) => <MovieCard key={item.id} item={item} />)
+                    ) : (
+                        <p className="col-span-full text-center text-gray-400">No results found.</p>
+                    )}
                 </div>
-                <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
             </main>
         </>
     );

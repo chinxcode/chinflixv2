@@ -6,13 +6,18 @@ export const getTrending = async (type: "movie" | "tv") => {
     return response.json();
 };
 
-export const getPopularMovies = async (page = 1) => {
-    const response = await fetch(`${BASE_URL}/movie/popular?api_key=${API_KEY}&page=${page}`);
+export const getPopularMovies = async () => {
+    const response = await fetch(`${BASE_URL}/movie/popular?api_key=${API_KEY}`);
     return response.json();
 };
 
-export const getPopularTVShows = async (page = 1) => {
-    const response = await fetch(`${BASE_URL}/tv/popular?api_key=${API_KEY}&page=${page}`);
+export const getPopularTVShows = async () => {
+    const response = await fetch(`${BASE_URL}/tv/popular?api_key=${API_KEY}`);
+    return response.json();
+};
+
+export const searchMulti = async (query: string) => {
+    const response = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
     return response.json();
 };
 
@@ -26,19 +31,14 @@ export const getCountries = async () => {
     return response.json();
 };
 
-export const searchMulti = async (query: string, page = 1) => {
-    const response = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=${page}`);
-    return response.json();
-};
-
-export const discoverMovies = async (params: object, page = 1) => {
-    const queryParams = new URLSearchParams({ ...params, api_key: API_KEY, page: page.toString() }).toString();
+export const discoverMovies = async (params: object) => {
+    const queryParams = new URLSearchParams({ ...params, api_key: API_KEY }).toString();
     const response = await fetch(`${BASE_URL}/discover/movie?${queryParams}`);
     return response.json();
 };
 
-export const discoverTVShows = async (params: object, page = 1) => {
-    const queryParams = new URLSearchParams({ ...params, api_key: API_KEY, page: page.toString() }).toString();
+export const discoverTVShows = async (params: object) => {
+    const queryParams = new URLSearchParams({ ...params, api_key: API_KEY }).toString();
     const response = await fetch(`${BASE_URL}/discover/tv?${queryParams}`);
     return response.json();
 };
