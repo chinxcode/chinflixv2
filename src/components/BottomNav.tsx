@@ -21,7 +21,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ showMoreMenu, setShowMoreMenu }) 
     ];
 
     return (
-        <nav className="bg-black text-white py-2">
+        <nav className="bg-gradient-to-t from-black/80 to-black/60 backdrop-blur-md text-white py-2">
             <div className="flex justify-around items-center">
                 <NavItem href="/" icon={HomeIcon} label="Home" isActive={isActive("/")} onClick={() => {}} />
                 <NavItem href="/search" icon={MagnifyingGlassIcon} label="Search" isActive={isActive("/search")} onClick={() => {}} />
@@ -37,7 +37,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ showMoreMenu, setShowMoreMenu }) 
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 20 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute bottom-full left-0 right-0 bg-black p-4 rounded-t-lg"
+                        className="absolute bottom-full left-0 right-0 bg-gradient-to-t from-black/80 to-black/60 backdrop-blur-md p-4 rounded-t-lg"
                     >
                         <div className="flex justify-around">
                             {moreMenuItems.map((item) => (
