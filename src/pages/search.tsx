@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
+import Link from "next/link";
 import SearchFilter from "@/components/SearchFilter";
 import MovieCard from "@/components/MovieCard";
 import Skeleton from "@/components/Skeleton";
@@ -79,13 +80,14 @@ export default function Search() {
                             .map((_, i) => <Skeleton key={i} className="aspect-[2/3] rounded-xl" />)
                     ) : results && results.length > 0 ? (
                         results.map((item) => (
-                            <MovieCard
-                                key={item.id}
-                                item={{
-                                    ...item,
-                                    title: item.title ?? "Untitled",
-                                }}
-                            />
+                            <Link href={`/watch/${searchType}/${item.id}`} key={item.id} className="size-full bubbly">
+                                <MovieCard
+                                    item={{
+                                        ...item,
+                                        title: item.title || item.name || "Untitled",
+                                    }}
+                                />
+                            </Link>
                         ))
                     ) : (
                         <p className="col-span-full text-center text-gray-400">No results found.</p>

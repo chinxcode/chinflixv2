@@ -53,13 +53,13 @@ const TrendingSection: React.FC<TrendingSectionProps> = ({ type }) => {
             <div className="relative">
                 <button
                     onClick={() => scroll("left")}
-                    className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-black/80 p-2 rounded-full lg:hidden"
+                    className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-black/50 p-2 rounded-full lg:hidden"
                 >
                     <ChevronLeftIcon className="h-6 w-6 text-white" />
                 </button>
                 <div
                     ref={scrollContainerRef}
-                    className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6"
+                    className="flex lg:grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 lg:gap-4 w-full overflow-x-auto lg:overflow-x-visible scrollbar-hide"
                 >
                     {loading
                         ? Array(6)
@@ -74,17 +74,15 @@ const TrendingSection: React.FC<TrendingSectionProps> = ({ type }) => {
                                   key={item.id}
                                   className="w-[32%] sm:w-[22%] md:w-[19%] lg:w-full !aspect-[1.44/2] !p-2 !shrink-0 lg:!p-0"
                               >
-                                  <div className="flex size-full cursor-pointer rounded-xl shadow overflow-hidden relative bg-white/10">
-                                      <Link href={`/watch/${type}/${item.id}`} className="size-full bubbly">
-                                          <MovieCard item={item} />
-                                      </Link>
-                                  </div>
+                                  <Link href={`/watch/${type}/${item.id}`} className="size-full bubbly">
+                                      <MovieCard item={item} />
+                                  </Link>
                               </div>
                           ))}
                 </div>
                 <button
                     onClick={() => scroll("right")}
-                    className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-black/80 p-2 rounded-full lg:hidden"
+                    className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-black/50 p-2 rounded-full lg:hidden"
                 >
                     <ChevronRightIcon className="h-6 w-6 text-white" />
                 </button>
