@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { MagnifyingGlassIcon, AdjustmentsHorizontalIcon } from "@heroicons/react/24/outline";
 import { motion, AnimatePresence } from "framer-motion";
 import { getGenres, getCountries } from "@/lib/api";
-import { FilterOptions } from "@/types"; // Import from shared types
+import { FilterOptions } from "@/types";
 
 interface SearchFilterProps {
     onSearch: (query: string) => void;
