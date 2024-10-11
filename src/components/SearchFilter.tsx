@@ -75,7 +75,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch, onFilter, onTypeC
                 <div className="w-full relative">
                     <input
                         type="text"
-                        className="w-full bg-white/10 rounded-full py-2 px-4 pl-10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/20"
+                        className="w-full bg-white/10 rounded-lg py-2 px-4 pl-10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/20"
                         placeholder={`Search ${type === "movie" ? "movies" : "TV shows"}...`}
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
