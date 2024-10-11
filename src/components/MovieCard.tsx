@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { StarIcon } from "@heroicons/react/24/solid";
-import { motion } from "framer-motion";
 import { useState } from "react";
 import { useInView } from "react-intersection-observer";
 
@@ -22,34 +21,31 @@ const MovieCard: React.FC<MovieCardProps> = ({ item }) => {
     });
 
     return (
-        <motion.div
-            ref={ref}
-            className="relative aspect-[2/3] rounded-lg overflow-hidden shadow-lg"
-            whileHover={{ scale: 1.05 }}
-            transition={{ duration: 0.2 }}
-        >
-            {!imageLoaded && <div className="absolute inset-0 bg-gray-800 animate-pulse rounded-lg" />}
-            {inView && (
-                <Image
-                    src={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
-                    alt={item.title || item.name}
-                    layout="fill"
-                    objectFit="cover"
-                    className={`rounded-lg transition-opacity duration-300 ${imageLoaded ? "opacity-100" : "opacity-0"}`}
-                    onLoad={() => setImageLoaded(true)}
-                    loading="lazy"
-                />
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-                <h3 className="text-white font-semibold text-lg truncate">{item.title || item.name}</h3>
-                <div className="flex items-center mt-2">
-                    <StarIcon className="h-4 w-4 text-yellow-400 mr-1" />
-                    <span className="text-white text-sm">
+        <div className="flex flex-col gap-1 sm:gap-2">
+            <div ref={ref} className="relative aspect-[1.45/2] rounded-xl shadow overflow-hidden bg-white/10 cursor-pointer">
+                {!imageLoaded && <div className="absolute inset-0 bg-gray-800 animate-pulse rounded-xl" />}
+                {inView && (
+                    <Image
+                        src={`https://image.tmdb.org/t/p/w342${item.poster_path}`}
+                        alt={item.title || item.name}
+                        layout="fill"
+                        objectFit="cover"
+                        className={`size-full object-cover object-center !select-none shrink-0 ${
+                            imageLoaded ? "opacity-100" : "opacity-0"
+                        }`}
+                        onLoad={() => setImageLoaded(true)}
+                        loading="lazy"
+                    />
+                )}
+                <span className="flex flex-col gap-1 absolute items-end text-xs right-1 top-1 smoothie">
+                    <span className="bg-black/75 p-[.1rem] px-1 gap-1 rounded-md flex items-center">
+                        <StarIcon className="h-3 w-3 text-yellow-400" />
                         {item.vote_average && typeof item.vote_average === "number" ? item.vote_average.toFixed(1) : "N/A"}
                     </span>
-                </div>
+                </span>
             </div>
-        </motion.div>
+            <div className="flex w-full text-[.82rem] sm:text-sm font-medium !line-clamp-2 tracking-wider">{item.title || item.name}</div>
+        </div>
     );
 };
 

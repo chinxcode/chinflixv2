@@ -39,7 +39,7 @@ const TrendingSection: React.FC<TrendingSectionProps> = ({ type }) => {
 
     const scroll = (direction: "left" | "right") => {
         if (scrollContainerRef.current) {
-            const scrollAmount = scrollContainerRef.current.clientWidth * 0.2;
+            const scrollAmount = scrollContainerRef.current.clientWidth * 0.5;
             scrollContainerRef.current.scrollBy({
                 left: direction === "left" ? -scrollAmount : scrollAmount,
                 behavior: "smooth",
