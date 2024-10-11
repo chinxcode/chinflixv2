@@ -1,7 +1,8 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { getMediaDetails, getSeasonDetails } from "@/lib/api";
+import { getMediaDetails, getSeasonDetails, getStreamingLinks } from "@/lib/api";
 import { VideoPlayer, RelationInfo, MediaInfo, SeasonEpisode, CastInfo, MediaActions } from "@/components/MediaComponents";
+import StreamingServers from "@/components/StreamingServers";
 import Skeleton from "@/components/Skeleton";
 
 const WatchPage = () => {
@@ -48,6 +49,14 @@ const WatchPage = () => {
     const [loading, setLoading] = useState(true);
     const [currentSeason, setCurrentSeason] = useState(1);
     const [currentEpisode, setCurrentEpisode] = useState(1);
+    interface StreamingServer {
+        name: string;
+        url: string;
+        flag: string;
+    }
+
+    const [streamingServers, setStreamingServers] = useState<StreamingServer[]>([]);
+    const [currentServer, setCurrentServer] = useState("");
 
     useEffect(() => {
         const fetchData = async () => {
@@ -59,11 +68,14 @@ const WatchPage = () => {
                     const seasonDetails = await getSeasonDetails(id as string, currentSeason);
                     setSeasonData(seasonDetails);
                 }
+                const links = await getStreamingLinks(id as string, type as "movie" | "tv", currentSeason, currentEpisode);
+                setStreamingServers(links);
+                setCurrentServer(links[0]?.url || "");
                 setLoading(false);
             }
         };
         fetchData();
-    }, [type, id, currentSeason]);
+    }, [type, id, currentSeason, currentEpisode]);
 
     const handleSeasonChange = async (season: number) => {
         setCurrentSeason(season);
@@ -71,7 +83,14 @@ const WatchPage = () => {
         if (type === "tv" && id) {
             const seasonDetails = await getSeasonDetails(id as string, season);
             setSeasonData(seasonDetails);
+            const links = await getStreamingLinks(id as string, "tv", season, 1);
+            setStreamingServers(links);
+            setCurrentServer(links[0]?.url || "");
         }
+    };
+
+    const handleServerChange = (url: string) => {
+        setCurrentServer(url);
     };
 
     if (loading) {
@@ -92,9 +111,6 @@ const WatchPage = () => {
         );
     }
 
-    const videoSrc =
-        type === "movie" ? `https://embed.su/embed/movie/${id}` : `https://embed.su/embed/tv/${id}/${currentSeason}/${currentEpisode}`;
-
     return (
         <div className="lg:flex lg:flex-row lg:gap-2 lg:p-2 lg:h-screen">
             {/* Large screen layout */}
@@ -102,9 +118,10 @@ const WatchPage = () => {
                 <div className="lg:w-2/3 h-full rounded-lg overflow-hidden border border-gray-700 flex flex-col">
                     <div className="h-full max-h-full overflow-y-auto p-4 space-y-4">
                         <div className="bg-gray-800 rounded-lg overflow-hidden flex flex-col">
-                            <VideoPlayer src={videoSrc} />
+                            <VideoPlayer src={currentServer} />
                             <MediaActions viewCount={Number(mediaData.popularity.toFixed(0))} />
                         </div>
+                        <StreamingServers servers={streamingServers} onServerChange={handleServerChange} />
                         <div className="bg-gray-900 rounded-lg p-4">
                             <RelationInfo
                                 title="Recommended"
@@ -182,7 +199,7 @@ const WatchPage = () => {
                 </div>
                 <div className="w-full flex flex-col gap-3 mb-2">
                     <div className="flex w-full relative h-[60vh] sm:h-full sm:aspect-video rounded-lg overflow-hidden bg-white/10">
-                        <VideoPlayer src={videoSrc} />
+                        <VideoPlayer src={currentServer} />
                     </div>
                     <div className="w-full">
                         <div className="flex w-full flex-col gap-5">
@@ -195,6 +212,7 @@ const WatchPage = () => {
                             <MediaActions viewCount={parseInt(mediaData.popularity.toFixed(0))} />
                         </div>
                     </div>
+                    <StreamingServers servers={streamingServers} onServerChange={handleServerChange} />
                 </div>
                 <div className="flex flex-col w-full gap-5 mt-4">
                     <MediaInfo
