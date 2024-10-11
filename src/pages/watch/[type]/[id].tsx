@@ -7,8 +7,44 @@ import Skeleton from "@/components/Skeleton";
 const WatchPage = () => {
     const router = useRouter();
     const { type, id } = router.query;
-    const [mediaData, setMediaData] = useState(null);
-    const [seasonData, setSeasonData] = useState(null);
+    interface MediaData {
+        backdrop_path: string;
+        popularity: number;
+        recommendations: {
+            results: {
+                id: number;
+                poster_path: string;
+                title?: string;
+                name?: string;
+                vote_average: number;
+            }[];
+        };
+        seasons?: { name: string }[];
+        title?: string;
+        name?: string;
+        poster_path: string;
+        vote_average: number;
+        status: string;
+        production_companies: { name: string }[];
+        release_date?: string;
+        first_air_date?: string;
+        overview: string;
+        genres: { name: string }[];
+        credits: {
+            cast: {
+                character: string;
+                name: string;
+                profile_path: string;
+            }[];
+        };
+    }
+
+    const [mediaData, setMediaData] = useState<MediaData | null>(null);
+    interface SeasonData {
+        episodes: { name: string }[];
+    }
+
+    const [seasonData, setSeasonData] = useState<SeasonData | null>(null);
     const [loading, setLoading] = useState(true);
     const [currentSeason, setCurrentSeason] = useState(1);
     const [currentEpisode, setCurrentEpisode] = useState(1);
@@ -66,8 +102,8 @@ const WatchPage = () => {
                 <div className="lg:w-2/3 h-full rounded-lg overflow-hidden border border-gray-700 flex flex-col">
                     <div className="h-full max-h-full overflow-y-auto p-4 space-y-4">
                         <div className="bg-gray-800 rounded-lg overflow-hidden flex flex-col">
-                            <VideoPlayer src={videoSrc} poster={`https://image.tmdb.org/t/p/original${mediaData.backdrop_path}`} />
-                            <MediaActions viewCount={mediaData.popularity.toFixed(0)} />
+                            <VideoPlayer src={videoSrc} />
+                            <MediaActions viewCount={Number(mediaData.popularity.toFixed(0))} />
                         </div>
                         <div className="bg-gray-900 rounded-lg p-4">
                             <RelationInfo
@@ -75,7 +111,7 @@ const WatchPage = () => {
                                 recommendations={mediaData.recommendations.results.map((item) => ({
                                     link: `/watch/${type}/${item.id}`,
                                     image: `https://image.tmdb.org/t/p/w342${item.poster_path}`,
-                                    title: item.title || item.name,
+                                    title: item.title || item.name || "Untitled",
                                     rating: item.vote_average,
                                 }))}
                             />
@@ -88,7 +124,7 @@ const WatchPage = () => {
                         {type === "tv" && seasonData && (
                             <div className="bg-gray-900 rounded-lg p-4">
                                 <SeasonEpisode
-                                    seasons={mediaData.seasons.map((s) => s.name)}
+                                    seasons={mediaData.seasons ? mediaData.seasons.map((s) => s.name) : []}
                                     episodes={seasonData.episodes.map((e) => ({ title: e.name }))}
                                     currentSeason={currentSeason}
                                     currentEpisode={currentEpisode}
@@ -99,12 +135,12 @@ const WatchPage = () => {
                         )}
                         <div className="bg-gray-900 rounded-lg p-4">
                             <MediaInfo
-                                title={mediaData.title || mediaData.name}
+                                title={mediaData.title || mediaData.name || "Untitled"}
                                 poster={`https://image.tmdb.org/t/p/w500${mediaData.poster_path}`}
                                 rating={mediaData.vote_average}
                                 status={mediaData.status}
                                 production={mediaData.production_companies[0]?.name || "N/A"}
-                                aired={mediaData.release_date || mediaData.first_air_date}
+                                aired={mediaData.release_date || mediaData.first_air_date || "N/A"}
                                 description={mediaData.overview}
                                 genres={mediaData.genres.map((g) => g.name)}
                             />
@@ -156,18 +192,18 @@ const WatchPage = () => {
                             >
                                 {mediaData.overview}
                             </div>
-                            <MediaActions viewCount={mediaData.popularity.toFixed(0)} />
+                            <MediaActions viewCount={parseInt(mediaData.popularity.toFixed(0))} />
                         </div>
                     </div>
                 </div>
                 <div className="flex flex-col w-full gap-5 mt-4">
                     <MediaInfo
-                        title={mediaData.title || mediaData.name}
+                        title={mediaData.title || mediaData.name || "Untitled"}
                         poster={`https://image.tmdb.org/t/p/w500${mediaData.poster_path}`}
                         rating={mediaData.vote_average}
                         status={mediaData.status}
                         production={mediaData.production_companies[0]?.name || "N/A"}
-                        aired={mediaData.release_date || mediaData.first_air_date}
+                        aired={mediaData.release_date || mediaData.first_air_date || "N/A"}
                         description={mediaData.overview}
                         genres={mediaData.genres.map((g) => g.name)}
                     />
@@ -183,7 +219,7 @@ const WatchPage = () => {
                         recommendations={mediaData.recommendations.results.map((item) => ({
                             link: `/watch/${type}/${item.id}`,
                             image: `https://image.tmdb.org/t/p/w342${item.poster_path}`,
-                            title: item.title || item.name,
+                            title: item.title || item.name || "Untitled",
                             rating: item.vote_average,
                         }))}
                     />
