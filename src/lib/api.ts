@@ -42,3 +42,13 @@ export const discoverTVShows = async (params: object) => {
     const response = await fetch(`${BASE_URL}/discover/tv?${queryParams}`);
     return response.json();
 };
+
+export const getMediaDetails = async (type: "movie" | "tv", id: string) => {
+    const response = await fetch(`${BASE_URL}/${type}/${id}?api_key=${API_KEY}&append_to_response=credits,recommendations`);
+    return response.json();
+};
+
+export const getSeasonDetails = async (tvId: string, seasonNumber: number) => {
+    const response = await fetch(`${BASE_URL}/tv/${tvId}/season/${seasonNumber}?api_key=${API_KEY}`);
+    return response.json();
+};
