@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { HomeIcon, MagnifyingGlassIcon, FilmIcon, TvIcon, HeartIcon } from "@heroicons/react/24/outline";
+import { HomeIcon, MagnifyingGlassIcon, FilmIcon, TvIcon, HeartIcon, GlobeAltIcon } from "@heroicons/react/24/outline";
 
 const Sidebar = () => {
     const router = useRouter();
@@ -11,6 +11,7 @@ const Sidebar = () => {
         { icon: FilmIcon, label: "Movies", path: "/search?type=movie" },
         { icon: TvIcon, label: "TV Shows", path: "/search?type=tv" },
         { icon: HeartIcon, label: "Watchlist", path: "/watchlist" },
+        { icon: GlobeAltIcon, label: "Old ChinFlix", path: "https://chinflix-old.vercel.app" },
     ];
 
     const isActive = (path: string) => {

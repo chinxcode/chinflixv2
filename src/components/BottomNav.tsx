@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { HomeIcon, MagnifyingGlassIcon, EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
+import { HomeIcon, MagnifyingGlassIcon, EllipsisHorizontalIcon, GlobeAltIcon } from "@heroicons/react/24/outline";
 import { FilmIcon, TvIcon, HeartIcon } from "@heroicons/react/24/outline";
 import { motion, AnimatePresence } from "framer-motion";
 interface BottomNavProps {
@@ -18,6 +18,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ showMoreMenu, setShowMoreMenu }) 
         { icon: FilmIcon, label: "Movies", path: "/search?type=movie" },
         { icon: TvIcon, label: "TV Shows", path: "/search?type=tv" },
         { icon: HeartIcon, label: "Watchlist", path: "/watchlist" },
+        { icon: GlobeAltIcon, label: "Old ChinFlix", path: "https://chinflix-old.vercel.app" },
     ];
 
     return (
