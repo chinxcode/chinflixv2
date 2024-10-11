@@ -1,0 +1,125 @@
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { getMediaDetails, getSeasonDetails } from "@/lib/api";
+import { VideoPlayer, RelationInfo, MediaInfo, SeasonEpisode, CastInfo, MediaActions } from "@/components/MediaComponents";
+import Skeleton from "@/components/Skeleton";
+
+const WatchPage = () => {
+    const router = useRouter();
+    const { type, id } = router.query;
+    const [mediaData, setMediaData] = useState(null);
+    const [seasonData, setSeasonData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [currentSeason, setCurrentSeason] = useState(1);
+    const [currentEpisode, setCurrentEpisode] = useState(1);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            if (type && id) {
+                setLoading(true);
+                const data = await getMediaDetails(type as "movie" | "tv", id as string);
+                setMediaData(data);
+                if (type === "tv") {
+                    const seasonDetails = await getSeasonDetails(id as string, currentSeason);
+                    setSeasonData(seasonDetails);
+                }
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, [type, id, currentSeason]);
+
+    const handleSeasonChange = async (season: number) => {
+        setCurrentSeason(season);
+        setCurrentEpisode(1);
+        if (type === "tv" && id) {
+            const seasonDetails = await getSeasonDetails(id as string, season);
+            setSeasonData(seasonDetails);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="flex flex-col gap-4 p-4 h-screen">
+                <Skeleton className="w-full h-64" />
+                <Skeleton className="w-full h-40" />
+                <Skeleton className="w-full h-40" />
+            </div>
+        );
+    }
+
+    if (!mediaData) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <p className="text-2xl">Media not found</p>
+            </div>
+        );
+    }
+
+    const videoSrc =
+        type === "movie" ? `https://embed.su/embed/movie/${id}` : `https://embed.su/embed/tv/${id}/${currentSeason}/${currentEpisode}`;
+
+    return (
+        <div className="flex flex-col lg:flex-row gap-2 p-2 h-screen">
+            <div className="lg:w-2/3 h-full rounded-lg overflow-hidden border border-gray-700 flex flex-col">
+                <div className="h-full max-h-full overflow-y-auto p-4 space-y-4">
+                    <div className="bg-gray-800 rounded-lg overflow-hidden">
+                        <VideoPlayer src={videoSrc} poster={`https://image.tmdb.org/t/p/original${mediaData.backdrop_path}`} />
+                        <MediaActions viewCount={mediaData.popularity.toFixed(0)} />
+                    </div>
+                    <div className="bg-gray-900 rounded-lg p-4">
+                        <RelationInfo
+                            title="Recommended"
+                            recommendations={mediaData.recommendations.results.slice(0, 6).map((item) => ({
+                                link: `/watch/${type}/${item.id}`,
+                                image: `https://image.tmdb.org/t/p/w342${item.poster_path}`,
+                                title: item.title || item.name,
+                                rating: item.vote_average,
+                            }))}
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <div className="lg:w-1/3 h-full rounded-lg overflow-hidden border border-gray-700 flex flex-col">
+                <div className="h-full max-h-full overflow-y-auto p-4 space-y-4">
+                    {type === "tv" && seasonData && (
+                        <div className="bg-gray-900 rounded-lg p-4">
+                            <SeasonEpisode
+                                seasons={mediaData.seasons.map((s) => s.name)}
+                                episodes={seasonData.episodes.map((e) => ({ title: e.name }))}
+                                currentSeason={currentSeason}
+                                currentEpisode={currentEpisode}
+                                onSeasonChange={handleSeasonChange}
+                                onEpisodeChange={setCurrentEpisode}
+                            />
+                        </div>
+                    )}
+                    <div className="bg-gray-900 rounded-lg p-4">
+                        <MediaInfo
+                            title={mediaData.title || mediaData.name}
+                            poster={`https://image.tmdb.org/t/p/w500${mediaData.poster_path}`}
+                            rating={mediaData.vote_average}
+                            status={mediaData.status}
+                            production={mediaData.production_companies[0]?.name || "N/A"}
+                            aired={mediaData.release_date || mediaData.first_air_date}
+                            description={mediaData.overview}
+                            genres={mediaData.genres.map((g) => g.name)}
+                        />
+                    </div>
+                    <div className="bg-gray-900 rounded-lg p-4">
+                        <CastInfo
+                            cast={mediaData.credits.cast.slice(0, 4).map((c) => ({
+                                name: c.character,
+                                actor: c.name,
+                                image: `https://image.tmdb.org/t/p/w185${c.profile_path}`,
+                            }))}
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default WatchPage;
