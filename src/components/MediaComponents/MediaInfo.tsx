@@ -1,5 +1,6 @@
 import React from "react";
 import { StarIcon } from "@heroicons/react/24/solid";
+import Image from "next/image";
 
 interface MediaInfoProps {
     title: string;
@@ -17,7 +18,13 @@ const MediaInfo: React.FC<MediaInfoProps> = ({ title, poster, rating, status, pr
         <div className="flex flex-col w-full gap-5">
             <div className="flex gap-3 w-full">
                 <div className="w-[37%] !aspect-[1/1.4] min-w-[7rem] rounded-xl overflow-hidden bg-white/5 relative flex-grow-0 !shrink-0">
-                    <img src={poster} alt={title} className="size-full object-cover object-center !select-none shrink-0" />
+                    <Image
+                        src={poster}
+                        alt={title}
+                        layout="fill"
+                        objectFit="cover"
+                        className="size-full object-cover object-center !select-none shrink-0"
+                    />
                     <span className="bg-black/75 p-[.1rem] px-1 gap-1 rounded-md flex items-center absolute top-1 text-xs right-1">
                         <StarIcon className="h-3 w-3 text-yellow-400" />
                         {rating.toFixed(1)}
