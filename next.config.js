@@ -2,7 +2,19 @@
 const nextConfig = {
     reactStrictMode: true,
     images: {
-        domains: ["flagcdn.com", "image.tmdb.org"],
+        remotePatterns: [
+            {
+                protocol: "https",
+                hostname: "flagcdn.com",
+                pathname: "/**",
+            },
+            {
+                protocol: "https",
+                hostname: "image.tmdb.org",
+                pathname: "/**",
+            },
+        ],
+        unoptimized: true,
     },
 };
 
