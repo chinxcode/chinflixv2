@@ -15,6 +15,7 @@ const WatchPage = () => {
     const [currentEpisode, setCurrentEpisode] = useState(1);
     const [streamingServers, setStreamingServers] = useState([]);
     const [currentServer, setCurrentServer] = useState("");
+    const [selectedServerIndex, setSelectedServerIndex] = useState(0);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -28,7 +29,7 @@ const WatchPage = () => {
                 }
                 const links = await getStreamingLinks(id, type, currentSeason, currentEpisode);
                 setStreamingServers(links);
-                setCurrentServer(links[0]?.url || "");
+                setCurrentServer(links[selectedServerIndex]?.url || links[0]?.url || "");
                 setLoading(false);
             }
         };
@@ -43,20 +44,19 @@ const WatchPage = () => {
             setSeasonData(seasonDetails);
             const links = await getStreamingLinks(id, "tv", season, 1);
             setStreamingServers(links);
-            setCurrentServer(links[0]?.url || "");
+            setCurrentServer(links[selectedServerIndex]?.url || links[0]?.url || "");
         }
     };
 
-    const handleServerChange = (url) => {
+    const handleServerChange = (url, index) => {
         setCurrentServer(url);
+        setSelectedServerIndex(index);
     };
 
     if (loading) {
         return (
-            <div className="p-4 h-screen">
+            <div className="p-2 h-screen">
                 <Skeleton className="w-full h-full" />
-                <Skeleton className="w-full h-40" />
-                <Skeleton className="w-full h-40" />
             </div>
         );
     }

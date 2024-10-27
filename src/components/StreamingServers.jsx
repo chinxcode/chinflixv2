@@ -8,7 +8,7 @@ const StreamingServers = ({ servers, onServerChange }) => {
                 <button
                     key={index}
                     className="flex items-center justify-center px-2 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
-                    onClick={() => onServerChange(server.url)}
+                    onClick={() => onServerChange(server.url, index)}
                 >
                     <div className="relative w-4 h-4 mr-2">
                         <Image src={server.flag} alt={`${server.name} flag`} layout="fill" objectFit="cover" />
