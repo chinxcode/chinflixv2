@@ -70,10 +70,30 @@ const WatchPage = () => {
     }
 
     return (
-        <div className="lg:flex lg:flex-row lg:gap-2 lg:p-2 lg:h-screen overflow-hidden">
+        <div className="lg:flex lg:flex-row lg:gap-2 lg:h-screen overflow-hidden">
             {/* Large screen layout */}
             <div className="hidden lg:flex lg:flex-row lg:gap-2 lg:p-2 lg:h-screen">
                 <div className="lg:w-2/3 h-full rounded-lg overflow-hidden border border-gray-800 flex flex-col">
+                    <div className="flex gap-2 w-full h-12 items-center">
+                        <button className="w-9 h-full flex items-center shrink-0 justify-center" onClick={() => router.back()}>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="lucide lucide-arrow-left"
+                            >
+                                <path d="m12 19-7-7 7-7"></path>
+                                <path d="M19 12H5"></path>
+                            </svg>
+                        </button>
+                        <span className="!line-clamp-1 flex-grow sm:text-lg mr-2">{mediaData.title || mediaData.name}</span>
+                    </div>
                     <div className="h-full max-h-full overflow-y-auto p-4 space-y-4">
                         <div className="bg-gray-800 rounded-lg overflow-hidden flex flex-col">
                             <VideoPlayer src={currentServer} />
@@ -94,7 +114,7 @@ const WatchPage = () => {
                     </div>
                 </div>
 
-                <div className="lg:w-1/3 h-full rounded-lg overflow-hidden border border-gray-900 flex flex-col">
+                <div className="lg:w-1/3 h-full rounded-lg overflow-hidden border border-gray-800 flex flex-col">
                     <div className="h-full max-h-full overflow-y-auto p-4 space-y-4">
                         {type === "tv" && seasonData && (
                             <div className="bg-gray-900 rounded-lg p-4">

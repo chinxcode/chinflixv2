@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { HomeIcon, MagnifyingGlassIcon, EllipsisHorizontalIcon, GlobeAltIcon } from "@heroicons/react/24/outline";
+import { HomeIcon, MagnifyingGlassIcon, EllipsisHorizontalIcon, GlobeAltIcon, SparklesIcon } from "@heroicons/react/24/outline";
 import { FilmIcon, TvIcon, HeartIcon } from "@heroicons/react/24/outline";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -14,6 +14,7 @@ const BottomNav = ({ showMoreMenu, setShowMoreMenu }) => {
         { icon: TvIcon, label: "TV Shows", path: "/search?type=tv" },
         { icon: HeartIcon, label: "Watchlist", path: "/watchlist" },
         { icon: GlobeAltIcon, label: "Old ChinFlix", path: "https://chinflix-old.vercel.app" },
+        { icon: SparklesIcon, label: "AnimeFlix", path: "https://ani-dl.vercel.app" },
     ];
 
     return (
@@ -35,16 +36,17 @@ const BottomNav = ({ showMoreMenu, setShowMoreMenu }) => {
                         transition={{ duration: 0.2 }}
                         className="absolute bottom-full left-0 right-0 bg-gradient-to-t from-black/80 to-black/60 backdrop-blur-md p-4 rounded-t-lg"
                     >
-                        <div className="flex justify-around">
-                            {moreMenuItems.map((item) => (
-                                <NavItem
-                                    key={item.path}
-                                    href={item.path}
-                                    icon={item.icon}
-                                    label={item.label}
-                                    isActive={isActive(item.path)}
-                                    onClick={() => setShowMoreMenu(false)}
-                                />
+                        <div className="flex flex-wrap gap-y-4">
+                            {moreMenuItems.map((item, index) => (
+                                <div key={item.path} className="w-1/4">
+                                    <NavItem
+                                        href={item.path}
+                                        icon={item.icon}
+                                        label={item.label}
+                                        isActive={isActive(item.path)}
+                                        onClick={() => setShowMoreMenu(false)}
+                                    />
+                                </div>
                             ))}
                         </div>
                     </motion.div>
