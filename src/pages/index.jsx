@@ -9,7 +9,6 @@ export default function Home() {
         <>
             <Head>
                 <title>ChinFlix - Discover and Watch Movies & TV Shows</title>
-                <meta name="description" content="Discover and watch your favorite movies and TV shows on ChinFlix" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <header className="lg:hidden bg-gradient-to-b from-black/80 to-black/60 backdrop-blur-md py-4 px-3 fixed top-0 left-0 right-0 z-50 flex justify-between items-center">

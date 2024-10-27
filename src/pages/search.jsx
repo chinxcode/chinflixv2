@@ -60,7 +60,6 @@ export default function Search() {
         <>
             <Head>
                 <title>Search | MovieFlix</title>
-                <meta name="description" content="Search for movies and TV shows on MovieFlix" />
             </Head>
             <main className="p-8">
                 <h1 className="text-4xl font-bold mb-8">Search {searchType === "movie" ? "Movies" : "TV Shows"}</h1>
