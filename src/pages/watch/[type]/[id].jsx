@@ -53,8 +53,8 @@ const WatchPage = () => {
 
     if (loading) {
         return (
-            <div className="flex flex-col gap-4 p-4 h-screen">
-                <Skeleton className="w-full h-64" />
+            <div className="p-4 h-screen">
+                <Skeleton className="w-full h-full" />
                 <Skeleton className="w-full h-40" />
                 <Skeleton className="w-full h-40" />
             </div>
@@ -70,10 +70,10 @@ const WatchPage = () => {
     }
 
     return (
-        <div className="lg:flex lg:flex-row lg:gap-2 lg:p-2 lg:h-screen">
+        <div className="lg:flex lg:flex-row lg:gap-2 lg:p-2 lg:h-screen overflow-hidden">
             {/* Large screen layout */}
             <div className="hidden lg:flex lg:flex-row lg:gap-2 lg:p-2 lg:h-screen">
-                <div className="lg:w-2/3 h-full rounded-lg overflow-hidden border border-gray-700 flex flex-col">
+                <div className="lg:w-2/3 h-full rounded-lg overflow-hidden border border-gray-800 flex flex-col">
                     <div className="h-full max-h-full overflow-y-auto p-4 space-y-4">
                         <div className="bg-gray-800 rounded-lg overflow-hidden flex flex-col">
                             <VideoPlayer src={currentServer} />
@@ -94,7 +94,7 @@ const WatchPage = () => {
                     </div>
                 </div>
 
-                <div className="lg:w-1/3 h-full rounded-lg overflow-hidden border border-gray-700 flex flex-col">
+                <div className="lg:w-1/3 h-full rounded-lg overflow-hidden border border-gray-900 flex flex-col">
                     <div className="h-full max-h-full overflow-y-auto p-4 space-y-4">
                         {type === "tv" && seasonData && (
                             <div className="bg-gray-900 rounded-lg p-4">
@@ -147,7 +147,7 @@ const WatchPage = () => {
                             strokeWidth="2"
                             strokeLinecap="round"
                             strokeLinejoin="round"
-                            className="lucide lucide-arrow-left bubbly smoothie"
+                            className="lucide lucide-arrow-left"
                         >
                             <path d="m12 19-7-7 7-7"></path>
                             <path d="M19 12H5"></path>
@@ -155,50 +155,66 @@ const WatchPage = () => {
                     </button>
                     <span className="!line-clamp-1 flex-grow sm:text-lg mr-2">{mediaData.title || mediaData.name}</span>
                 </div>
-                <div className="w-full flex flex-col gap-3 mb-2">
-                    <div className="flex w-full relative h-[60vh] sm:h-full sm:aspect-video rounded-lg overflow-hidden bg-white/10">
-                        <VideoPlayer src={currentServer} />
-                    </div>
-                    <div className="w-full">
-                        <div className="flex w-full flex-col gap-5">
-                            <div
-                                title={mediaData.overview}
-                                className="text-gray-200 max-w-[95%] !line-clamp-2 px-1 sm:text-lg !leading-tight"
-                            >
-                                {mediaData.overview}
+
+                <div className="flex flex-col gap-4">
+                    <div className="rounded-lg overflow-hidden border border-gray-700 flex flex-col">
+                        <div className="max-h-full overflow-y-auto p-4 space-y-4">
+                            <div className="bg-gray-800 rounded-lg overflow-hidden flex flex-col">
+                                <VideoPlayer src={currentServer} />
+                                <MediaActions viewCount={Number(mediaData.popularity.toFixed(0))} />
                             </div>
-                            <MediaActions viewCount={parseInt(mediaData.popularity.toFixed(0))} />
+                            <StreamingServers servers={streamingServers} onServerChange={handleServerChange} />
                         </div>
                     </div>
-                    <StreamingServers servers={streamingServers} onServerChange={handleServerChange} />
-                </div>
-                <div className="flex flex-col w-full gap-5 mt-4">
-                    <MediaInfo
-                        title={mediaData.title || mediaData.name || "Untitled"}
-                        poster={`https://image.tmdb.org/t/p/w500${mediaData.poster_path}`}
-                        rating={mediaData.vote_average}
-                        status={mediaData.status}
-                        production={mediaData.production_companies[0]?.name || "N/A"}
-                        aired={mediaData.release_date || mediaData.first_air_date || "N/A"}
-                        description={mediaData.overview}
-                        genres={mediaData.genres.map((g) => g.name)}
-                    />
-                    <CastInfo
-                        cast={mediaData.credits.cast.map((c) => ({
-                            name: c.character,
-                            actor: c.name,
-                            image: `https://image.tmdb.org/t/p/w185${c.profile_path}`,
-                        }))}
-                    />
-                    <RelationInfo
-                        title="Recommended"
-                        recommendations={mediaData.recommendations.results.map((item) => ({
-                            link: `/watch/${type}/${item.id}`,
-                            image: `https://image.tmdb.org/t/p/w342${item.poster_path}`,
-                            title: item.title || item.name || "Untitled",
-                            rating: item.vote_average,
-                        }))}
-                    />
+
+                    <div className="rounded-lg overflow-hidden border border-gray-700 flex flex-col">
+                        <div className="max-h-full overflow-y-auto p-4 space-y-4">
+                            {type === "tv" && seasonData && (
+                                <div className="bg-gray-900 rounded-lg p-4">
+                                    <SeasonEpisode
+                                        seasons={mediaData.seasons ? mediaData.seasons.map((s) => s.name) : []}
+                                        episodes={seasonData.episodes.map((e) => ({ title: e.name }))}
+                                        currentSeason={currentSeason}
+                                        currentEpisode={currentEpisode}
+                                        onSeasonChange={handleSeasonChange}
+                                        onEpisodeChange={setCurrentEpisode}
+                                    />
+                                </div>
+                            )}
+                            <div className="bg-gray-900 rounded-lg p-4">
+                                <MediaInfo
+                                    title={mediaData.title || mediaData.name || "Untitled"}
+                                    poster={`https://image.tmdb.org/t/p/w500${mediaData.poster_path}`}
+                                    rating={mediaData.vote_average}
+                                    status={mediaData.status}
+                                    production={mediaData.production_companies[0]?.name || "N/A"}
+                                    aired={mediaData.release_date || mediaData.first_air_date || "N/A"}
+                                    description={mediaData.overview}
+                                    genres={mediaData.genres.map((g) => g.name)}
+                                />
+                            </div>
+                            <div className="bg-gray-900 rounded-lg p-4">
+                                <CastInfo
+                                    cast={mediaData.credits.cast.map((c) => ({
+                                        name: c.character,
+                                        actor: c.name,
+                                        image: `https://image.tmdb.org/t/p/w185${c.profile_path}`,
+                                    }))}
+                                />
+                            </div>
+                            <div className="bg-gray-900 rounded-lg p-4">
+                                <RelationInfo
+                                    title="Recommended"
+                                    recommendations={mediaData.recommendations.results.map((item) => ({
+                                        link: `/watch/${type}/${item.id}`,
+                                        image: `https://image.tmdb.org/t/p/w342${item.poster_path}`,
+                                        title: item.title || item.name || "Untitled",
+                                        rating: item.vote_average,
+                                    }))}
+                                />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
