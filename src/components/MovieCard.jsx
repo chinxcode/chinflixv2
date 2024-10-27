@@ -3,17 +3,7 @@ import { StarIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";
 import { useInView } from "react-intersection-observer";
 
-interface MovieCardProps {
-    item: {
-        id: number;
-        title: string;
-        name: string;
-        poster_path: string;
-        vote_average: number;
-    };
-}
-
-const MovieCard: React.FC<MovieCardProps> = ({ item }) => {
+const MovieCard = ({ item }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
     const { ref, inView } = useInView({
         triggerOnce: true,

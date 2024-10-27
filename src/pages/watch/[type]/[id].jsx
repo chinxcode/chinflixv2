@@ -8,67 +8,25 @@ import Skeleton from "@/components/Skeleton";
 const WatchPage = () => {
     const router = useRouter();
     const { type, id } = router.query;
-    interface MediaData {
-        backdrop_path: string;
-        popularity: number;
-        recommendations: {
-            results: {
-                id: number;
-                poster_path: string;
-                title?: string;
-                name?: string;
-                vote_average: number;
-            }[];
-        };
-        seasons?: { name: string }[];
-        title?: string;
-        name?: string;
-        poster_path: string;
-        vote_average: number;
-        status: string;
-        production_companies: { name: string }[];
-        release_date?: string;
-        first_air_date?: string;
-        overview: string;
-        genres: { name: string }[];
-        credits: {
-            cast: {
-                character: string;
-                name: string;
-                profile_path: string;
-            }[];
-        };
-    }
-
-    const [mediaData, setMediaData] = useState<MediaData | null>(null);
-    interface SeasonData {
-        episodes: { name: string }[];
-    }
-
-    const [seasonData, setSeasonData] = useState<SeasonData | null>(null);
+    const [mediaData, setMediaData] = useState(null);
+    const [seasonData, setSeasonData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [currentSeason, setCurrentSeason] = useState(1);
     const [currentEpisode, setCurrentEpisode] = useState(1);
-    interface StreamingServer {
-        name: string;
-        url: string;
-        flag: string;
-    }
-
-    const [streamingServers, setStreamingServers] = useState<StreamingServer[]>([]);
+    const [streamingServers, setStreamingServers] = useState([]);
     const [currentServer, setCurrentServer] = useState("");
 
     useEffect(() => {
         const fetchData = async () => {
             if (type && id) {
                 setLoading(true);
-                const data = await getMediaDetails(type as "movie" | "tv", id as string);
+                const data = await getMediaDetails(type, id);
                 setMediaData(data);
                 if (type === "tv") {
-                    const seasonDetails = await getSeasonDetails(id as string, currentSeason);
+                    const seasonDetails = await getSeasonDetails(id, currentSeason);
                     setSeasonData(seasonDetails);
                 }
-                const links = await getStreamingLinks(id as string, type as "movie" | "tv", currentSeason, currentEpisode);
+                const links = await getStreamingLinks(id, type, currentSeason, currentEpisode);
                 setStreamingServers(links);
                 setCurrentServer(links[0]?.url || "");
                 setLoading(false);
@@ -77,19 +35,19 @@ const WatchPage = () => {
         fetchData();
     }, [type, id, currentSeason, currentEpisode]);
 
-    const handleSeasonChange = async (season: number) => {
+    const handleSeasonChange = async (season) => {
         setCurrentSeason(season);
         setCurrentEpisode(1);
         if (type === "tv" && id) {
-            const seasonDetails = await getSeasonDetails(id as string, season);
+            const seasonDetails = await getSeasonDetails(id, season);
             setSeasonData(seasonDetails);
-            const links = await getStreamingLinks(id as string, "tv", season, 1);
+            const links = await getStreamingLinks(id, "tv", season, 1);
             setStreamingServers(links);
             setCurrentServer(links[0]?.url || "");
         }
     };
 
-    const handleServerChange = (url: string) => {
+    const handleServerChange = (url) => {
         setCurrentServer(url);
     };
 

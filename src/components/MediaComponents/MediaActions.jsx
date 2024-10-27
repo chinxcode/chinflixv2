@@ -1,12 +1,7 @@
-// src/components/MediaComponents/MediaActions.tsx
 import React from "react";
 import { PlusCircleIcon, ShareIcon, FlagIcon } from "@heroicons/react/24/outline";
 
-interface MediaActionsProps {
-    viewCount: number;
-}
-
-const MediaActions: React.FC<MediaActionsProps> = ({ viewCount }) => {
+const MediaActions = ({ viewCount }) => {
     return (
         <div className="w-full text-sm flex gap-2 justify-between items-center mt-2 mb-1 px-2">
             <div className="p-1 text-gray-300 h-6 px-2 text-center min-w-16 text-xs bg-white/5 rounded-md">{viewCount} views</div>

@@ -14,7 +14,7 @@ const Sidebar = () => {
         { icon: GlobeAltIcon, label: "Old ChinFlix", path: "https://chinflix-old.vercel.app" },
     ];
 
-    const isActive = (path: string) => {
+    const isActive = (path) => {
         if (path === "/search") {
             return router.pathname === "/search" && !router.query.type;
         }

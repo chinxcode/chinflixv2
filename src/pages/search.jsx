@@ -7,23 +7,22 @@ import MovieCard from "@/components/MovieCard";
 import Skeleton from "@/components/Skeleton";
 import { handleSearch, handleFilter } from "@/lib/searchUtils";
 import { getTrending } from "@/lib/api";
-import { FilterOptions, ResultItem } from "@/types";
 
 export default function Search() {
     const router = useRouter();
 
-    const [results, setResults] = useState<ResultItem[]>([]);
+    const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [searchType, setSearchType] = useState<"movie" | "tv">("movie");
+    const [searchType, setSearchType] = useState("movie");
     const [searchQuery, setSearchQuery] = useState("");
-    const [filters, setFilters] = useState<FilterOptions>({
+    const [filters, setFilters] = useState({
         genre: "",
         year: "",
         sort_by: "popularity.desc",
         with_origin_country: "",
     });
 
-    const fetchData = useCallback(async (type: "movie" | "tv", query: string, filters: FilterOptions) => {
+    const fetchData = useCallback(async (type, query, filters) => {
         setLoading(true);
         let newResults;
         if (query && query.length >= 2) {
@@ -40,20 +39,20 @@ export default function Search() {
 
     useEffect(() => {
         const { type } = router.query;
-        const currentType = (type as "movie" | "tv") || "movie";
+        const currentType = type || "movie";
         setSearchType(currentType);
         fetchData(currentType, searchQuery, filters);
     }, [router.query, searchQuery, filters, fetchData]);
 
-    const handleSearchAll = (query: string) => {
+    const handleSearchAll = (query) => {
         setSearchQuery(query);
     };
 
-    const handleFilterAll = (newFilters: FilterOptions) => {
+    const handleFilterAll = (newFilters) => {
         setFilters(newFilters);
     };
 
-    const handleTypeChange = (newType: "movie" | "tv") => {
+    const handleTypeChange = (newType) => {
         router.push({ pathname: router.pathname, query: { type: newType } }, undefined, { shallow: true });
     };
 

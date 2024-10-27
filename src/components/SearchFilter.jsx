@@ -2,31 +2,13 @@ import { useState, useEffect } from "react";
 import { MagnifyingGlassIcon, AdjustmentsHorizontalIcon } from "@heroicons/react/24/outline";
 import { motion, AnimatePresence } from "framer-motion";
 import { getGenres, getCountries } from "@/lib/api";
-import { FilterOptions } from "@/types";
 
-interface SearchFilterProps {
-    onSearch: (query: string) => void;
-    onFilter: (filters: FilterOptions) => void;
-    onTypeChange: (type: "movie" | "tv") => void;
-    type: "movie" | "tv";
-    initialQuery: string;
-    initialFilters: FilterOptions;
-}
-
-interface Option {
-    id?: string;
-    value?: string;
-    name?: string;
-    label?: string;
-    english_name?: string;
-}
-
-const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch, onFilter, onTypeChange, type, initialQuery, initialFilters }) => {
+const SearchFilter = ({ onSearch, onFilter, onTypeChange, type, initialQuery, initialFilters }) => {
     const [query, setQuery] = useState(initialQuery || "");
     const [showFilters, setShowFilters] = useState(false);
-    const [filters, setFilters] = useState<FilterOptions>(initialFilters);
-    const [genres, setGenres] = useState<Option[]>([]);
-    const [countries, setCountries] = useState<Option[]>([]);
+    const [filters, setFilters] = useState(initialFilters);
+    const [genres, setGenres] = useState([]);
+    const [countries, setCountries] = useState([]);
 
     useEffect(() => {
         const fetchFilterOptions = async () => {
@@ -49,18 +31,18 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch, onFilter, onTypeC
         }
     }, [query, onSearch]);
 
-    const handleFilterChange = (key: keyof FilterOptions, value: string) => {
+    const handleFilterChange = (key, value) => {
         const newFilters = { ...filters, [key]: value };
         setFilters(newFilters);
         onFilter(newFilters);
     };
 
-    const handleTypeChangeInternal = (newType: "movie" | "tv") => {
+    const handleTypeChangeInternal = (newType) => {
         onTypeChange(newType);
     };
 
     const years = Array.from({ length: 30 }, (_, i) => new Date().getFullYear() - i);
-    const sortOptions: Option[] = [
+    const sortOptions = [
         { value: "popularity.desc", label: "Most Popular" },
         { value: "popularity.asc", label: "Least Popular" },
         { value: "vote_average.desc", label: "Highest Rated" },
@@ -86,7 +68,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch, onFilter, onTypeC
                     <select
                         className="bg-gray-700 rounded-lg py-2 px-3 pr-8 text-white focus:outline-none focus:ring-2 focus:ring-white/20 appearance-none"
                         value={type}
-                        onChange={(e) => handleTypeChangeInternal(e.target.value as "movie" | "tv")}
+                        onChange={(e) => handleTypeChangeInternal(e.target.value)}
                         style={{
                             backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
                             backgroundPosition: "right 0.5rem center",
@@ -145,14 +127,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch, onFilter, onTypeC
     );
 };
 
-interface FilterSelectProps {
-    label: string;
-    options: Option[];
-    value: string;
-    onChange: (value: string) => void;
-}
-
-const FilterSelect: React.FC<FilterSelectProps> = ({ label, options, value, onChange }) => (
+const FilterSelect = ({ label, options, value, onChange }) => (
     <div className="flex flex-col">
         <label className="text-sm text-gray-400 mb-1">{label}</label>
         <select
@@ -166,7 +141,7 @@ const FilterSelect: React.FC<FilterSelectProps> = ({ label, options, value, onCh
                 backgroundSize: "1.5em 1.5em",
             }}
         >
-            {options.map((option: Option) => (
+            {options.map((option) => (
                 <option key={option.id || option.value} value={option.id || option.value}>
                     {option.name || option.label || option.english_name}
                 </option>

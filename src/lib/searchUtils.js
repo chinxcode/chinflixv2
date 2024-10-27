@@ -1,21 +1,15 @@
 import { searchMulti, discoverMovies, discoverTVShows } from "./api";
 
-export const handleSearch = async (query: string, type: "movie" | "tv") => {
+export const handleSearch = async (query, type) => {
     if (query.length >= 2) {
         const data = await searchMulti(query);
-        return data.results.filter((item: { media_type: string }) => item.media_type === type);
+        return data.results.filter((item) => item.media_type === type);
     }
     return [];
 };
 
-interface Filters {
-    genre?: string;
-    year?: string;
-    [key: string]: string | undefined;
-}
-
-export const handleFilter = async (filters: Filters, type: "movie" | "tv") => {
-    const params: { [key: string]: string | undefined } = {
+export const handleFilter = async (filters, type) => {
+    const params = {
         ...filters,
         with_genres: filters.genre && filters.genre !== "Any" ? filters.genre : undefined,
         primary_release_year: filters.year && filters.year !== "Any" ? filters.year : undefined,

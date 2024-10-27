@@ -2,11 +2,7 @@ import { useState } from "react";
 import Sidebar from "./Sidebar";
 import BottomNav from "./BottomNav";
 
-interface LayoutProps {
-    children: React.ReactNode;
-}
-
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout = ({ children }) => {
     const [showMoreMenu, setShowMoreMenu] = useState(false);
 
     return (

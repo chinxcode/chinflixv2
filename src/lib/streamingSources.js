@@ -1,10 +1,4 @@
-export interface StreamingSources {
-    flag: string;
-    movie: string;
-    tv: string;
-}
-
-export const streamingSources: { [key: string]: StreamingSources } = {
+export const streamingSources = {
     "Server 1": {
         flag: "https://flagcdn.com/w20/in.png",
         movie: "https://kamitor316opk.com/play/{imdbId}",

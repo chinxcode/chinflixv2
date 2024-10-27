@@ -5,39 +5,31 @@ import Skeleton from "./Skeleton";
 import Link from "next/link";
 import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
 
-interface TrendingSectionProps {
-    type: "movie" | "tv";
-}
-
-const TrendingSection: React.FC<TrendingSectionProps> = ({ type }) => {
-    const [trendingItems, setTrendingItems] = useState<
-        { id: number; title: string; name: string; poster_path: string; vote_average: number; overview: string }[]
-    >([]);
+const TrendingSection = ({ type }) => {
+    const [trendingItems, setTrendingItems] = useState([]);
     const [loading, setLoading] = useState(true);
-    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const scrollContainerRef = useRef(null);
 
     useEffect(() => {
         const fetchTrending = async () => {
             setLoading(true);
             const data = await getTrending(type);
             setTrendingItems(
-                data.results.map(
-                    (item: { id: number; title?: string; name?: string; poster_path: string; vote_average: number; overview: string }) => ({
-                        id: item.id,
-                        title: item.title || item.name,
-                        name: item.name || item.title,
-                        poster_path: item.poster_path,
-                        vote_average: item.vote_average,
-                        overview: item.overview,
-                    })
-                )
+                data.results.map((item) => ({
+                    id: item.id,
+                    title: item.title || item.name,
+                    name: item.name || item.title,
+                    poster_path: item.poster_path,
+                    vote_average: item.vote_average,
+                    overview: item.overview,
+                }))
             );
             setLoading(false);
         };
         fetchTrending();
     }, [type]);
 
-    const scroll = (direction: "left" | "right") => {
+    const scroll = (direction) => {
         if (scrollContainerRef.current) {
             const scrollAmount = scrollContainerRef.current.clientWidth * 0.5;
             scrollContainerRef.current.scrollBy({

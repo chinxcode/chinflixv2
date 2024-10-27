@@ -6,9 +6,7 @@ import { getTrending } from "@/lib/api";
 import Skeleton from "./Skeleton";
 
 const HeroSlider = () => {
-    const [trendingItems, setTrendingItems] = useState<
-        { id: number; title?: string; name?: string; backdrop_path: string; overview: string }[]
-    >([]);
+    const [trendingItems, setTrendingItems] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [loading, setLoading] = useState(true);
 

@@ -1,23 +1,7 @@
 import React from "react";
 import { PlayIcon } from "@heroicons/react/24/solid";
 
-interface SeasonEpisodeProps {
-    seasons: string[];
-    episodes: { title: string }[];
-    currentSeason: number;
-    currentEpisode: number;
-    onSeasonChange: (season: number) => void;
-    onEpisodeChange: (episode: number) => void;
-}
-
-const SeasonEpisode: React.FC<SeasonEpisodeProps> = ({
-    seasons,
-    episodes,
-    currentSeason,
-    currentEpisode,
-    onSeasonChange,
-    onEpisodeChange,
-}) => {
+const SeasonEpisode = ({ seasons, episodes, currentSeason, currentEpisode, onSeasonChange, onEpisodeChange }) => {
     return (
         <div className="w-full min-h-[50%] max-h-[70%] shrink-0 rounded-lg overflow-hidden flex flex-col gap-4">
             <div className="flex w-full gap-1 h-9 items-center bg-white/5 shrink-0">

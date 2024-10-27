@@ -3,16 +3,11 @@ import { useRouter } from "next/router";
 import { HomeIcon, MagnifyingGlassIcon, EllipsisHorizontalIcon, GlobeAltIcon } from "@heroicons/react/24/outline";
 import { FilmIcon, TvIcon, HeartIcon } from "@heroicons/react/24/outline";
 import { motion, AnimatePresence } from "framer-motion";
-interface BottomNavProps {
-    showMoreMenu: boolean;
 
-    setShowMoreMenu: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-const BottomNav: React.FC<BottomNavProps> = ({ showMoreMenu, setShowMoreMenu }) => {
+const BottomNav = ({ showMoreMenu, setShowMoreMenu }) => {
     const router = useRouter();
 
-    const isActive = (path: string) => router.pathname === path;
+    const isActive = (path) => router.pathname === path;
 
     const moreMenuItems = [
         { icon: FilmIcon, label: "Movies", path: "/search?type=movie" },
@@ -59,15 +54,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ showMoreMenu, setShowMoreMenu }) 
     );
 };
 
-interface NavItemProps {
-    href: string;
-    icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-    label: string;
-    isActive: boolean;
-    onClick: () => void;
-}
-
-const NavItem = ({ href, icon: Icon, label, isActive, onClick }: NavItemProps) => (
+const NavItem = ({ href, icon: Icon, label, isActive, onClick }) => (
     <Link href={href} className={`flex flex-col items-center ${isActive ? "text-[#FF4D4D]" : ""}`} onClick={onClick}>
         <Icon className="w-6 h-6" />
         <span className="text-xs">{label}</span>

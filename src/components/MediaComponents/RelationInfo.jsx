@@ -4,20 +4,10 @@ import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import Image from "next/image";
 
-interface RelationInfoProps {
-    title: string;
-    recommendations: {
-        link: string;
-        image: string;
-        title: string;
-        rating: number;
-    }[];
-}
+const RelationInfo = ({ title, recommendations }) => {
+    const scrollContainerRef = useRef(null);
 
-const RelationInfo: React.FC<RelationInfoProps> = ({ title, recommendations }) => {
-    const scrollContainerRef = useRef<HTMLDivElement>(null);
-
-    const scroll = (direction: "left" | "right") => {
+    const scroll = (direction) => {
         if (scrollContainerRef.current) {
             const scrollAmount = scrollContainerRef.current.clientWidth * 0.5;
             scrollContainerRef.current.scrollBy({

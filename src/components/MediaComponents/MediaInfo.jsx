@@ -2,18 +2,7 @@ import React from "react";
 import { StarIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 
-interface MediaInfoProps {
-    title: string;
-    poster: string;
-    rating: number;
-    status: string;
-    production: string;
-    aired: string;
-    description: string;
-    genres: string[];
-}
-
-const MediaInfo: React.FC<MediaInfoProps> = ({ title, poster, rating, status, production, aired, description, genres }) => {
+const MediaInfo = ({ title, poster, rating, status, production, aired, description, genres }) => {
     return (
         <div className="flex flex-col w-full gap-5">
             <div className="flex gap-3 w-full">

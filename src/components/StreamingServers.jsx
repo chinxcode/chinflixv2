@@ -1,18 +1,7 @@
 import React from "react";
 import Image from "next/image";
 
-interface StreamingServer {
-    name: string;
-    url: string;
-    flag: string;
-}
-
-interface StreamingServersProps {
-    servers: StreamingServer[];
-    onServerChange: (url: string) => void;
-}
-
-const StreamingServers: React.FC<StreamingServersProps> = ({ servers, onServerChange }) => {
+const StreamingServers = ({ servers, onServerChange }) => {
     return (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2 mb-2 p-4">
             {servers.map((server, index) => (

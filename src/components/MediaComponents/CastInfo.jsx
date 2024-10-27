@@ -1,15 +1,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 
-interface CastInfoProps {
-    cast: {
-        name: string;
-        actor: string;
-        image: string;
-    }[];
-}
-
-const CastInfo: React.FC<CastInfoProps> = ({ cast }) => {
+const CastInfo = ({ cast }) => {
     const [showAll, setShowAll] = useState(false);
     const initialDisplayCount = 4;
 
