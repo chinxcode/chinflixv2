@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { PlayIcon, PlusIcon } from "@heroicons/react/24/solid";
 import { motion, AnimatePresence } from "framer-motion";
 import { getTrending } from "@/lib/api";
@@ -82,12 +83,14 @@ const HeroSlider = () => {
                         transition={{ duration: 0.5, delay: 0.4 }}
                         className="flex space-x-2 sm:space-x-4"
                     >
-                        <button className="bg-white/10 rounded-full overflow-hidden active:bg-white/20 hover:bg-white/15 p-1 sm:p-2 px-2 sm:px-4 flex items-center space-x-1 sm:space-x-2 transition-colors duration-200">
-                            <PlayIcon className="h-3 w-3 sm:h-4 sm:w-4" />
-                            <span className="text-xs sm:text-sm">Watch Now</span>
-                        </button>
+                        <Link href={`/watch/movie/${item.id}`}>
+                            <button className="bg-white/10 rounded-full overflow-hidden active:bg-white/20 hover:bg-white/15 p-1 sm:p-2 px-2 sm:px-4 flex items-center space-x-1 sm:space-x-2 transition-colors duration-200">
+                                <PlayIcon className="h-3 w-3 sm:h-4 sm:w-4" />
+                                <span className="text-xs sm:text-sm">Watch Now</span>
+                            </button>
+                        </Link>
                         <button className="bg-white/10 rounded-full overflow-hidden active:bg-white/20 hover:bg-white/15 p-1 sm:p-2 transition-colors duration-200">
-                            <PlusIcon className="h-3 w-3 sm:h-4 sm:w-4" />
+                            <PlusIcon className="h-3 w-3 sm:h-5 sm:w-5" />
                         </button>
                     </motion.div>
                 </div>

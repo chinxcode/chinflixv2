@@ -34,6 +34,7 @@ const CreateSection = ({ type, endpoint }) => {
                     title: item.title || item.name,
                     name: item.name || item.title,
                     poster_path: item.poster_path,
+                    backdrop_path: item.backdrop_path,
                     vote_average: item.vote_average,
                     overview: item.overview,
                     release_date: item.release_date || item.first_air_date,
