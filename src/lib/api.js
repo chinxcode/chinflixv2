@@ -2,8 +2,13 @@ import { streamingSources } from "./streamingSources";
 
 const BASE_URL = "/api/tmdb";
 
-export const getTrending = async (type) => {
-    const response = await fetch(`${BASE_URL}/trending/${type}/week`);
+export const searchMulti = async (query, page = 1) => {
+    const response = await fetch(`${BASE_URL}/search/multi?query=${encodeURIComponent(query)}&page=${page}`);
+    return response.json();
+};
+
+export const getTrending = async (type, page = 1) => {
+    const response = await fetch(`${BASE_URL}/trending/${type}/week?page=${page}`);
     return response.json();
 };
 
@@ -14,11 +19,6 @@ export const getPopularMovies = async () => {
 
 export const getPopularTVShows = async () => {
     const response = await fetch(`${BASE_URL}/tv/popular`);
-    return response.json();
-};
-
-export const searchMulti = async (query) => {
-    const response = await fetch(`${BASE_URL}/search/multi?query=${encodeURIComponent(query)}`);
     return response.json();
 };
 

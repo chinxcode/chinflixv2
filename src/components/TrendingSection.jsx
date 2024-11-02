@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import MovieCard from "./MovieCard";
 import { getTrending } from "@/lib/api";
 import Skeleton from "./Skeleton";
-import Link from "next/link";
 import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
 
 const TrendingSection = ({ type }) => {
@@ -22,6 +21,8 @@ const TrendingSection = ({ type }) => {
                     poster_path: item.poster_path,
                     vote_average: item.vote_average,
                     overview: item.overview,
+                    release_date: item.release_date || item.first_air_date,
+                    media_type: type,
                 }))
             );
             setLoading(false);
@@ -70,13 +71,7 @@ const TrendingSection = ({ type }) => {
                                       <Skeleton className="w-full h-full rounded-xl" />
                                   </div>
                               ))
-                        : trendingItems.map((item) => (
-                              <div key={item.id} className="w-[32%] sm:w-[22%] md:w-[19%] lg:w-[15%] xl:w-[12%] !aspect-[1.44/2] !shrink-0">
-                                  <Link href={`/watch/${type}/${item.id}`} className="size-full bubbly">
-                                      <MovieCard item={item} />
-                                  </Link>
-                              </div>
-                          ))}
+                        : trendingItems.map((item) => <MovieCard key={item.id} item={item} type={type} />)}
                 </div>
             </div>
         </section>
