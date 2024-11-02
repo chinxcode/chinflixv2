@@ -8,20 +8,14 @@ const Sidebar = () => {
     const navItems = [
         { icon: HomeIcon, label: "Home", path: "/" },
         { icon: MagnifyingGlassIcon, label: "Search", path: "/search" },
-        { icon: FilmIcon, label: "Movies", path: "/search?type=movie" },
-        { icon: TvIcon, label: "TV Shows", path: "/search?type=tv" },
+        { icon: FilmIcon, label: "Movies", path: "/movie" },
+        { icon: TvIcon, label: "TV Shows", path: "/tv" },
         { icon: HeartIcon, label: "Watchlist", path: "/watchlist" },
         { icon: GlobeAltIcon, label: "Old ChinFlix", path: "https://chinflix-old.vercel.app" },
         { icon: SparklesIcon, label: "AnimeFlix", path: "https://ani-dl.vercel.app" },
     ];
 
     const isActive = (path) => {
-        if (path === "/search") {
-            return router.pathname === "/search" && !router.query.type;
-        }
-        if (path.startsWith("/search?type=")) {
-            return router.pathname === "/search" && router.query.type === path.split("=")[1];
-        }
         return router.pathname === path;
     };
 
