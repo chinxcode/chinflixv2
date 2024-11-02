@@ -22,38 +22,6 @@ export const getTrending = async (type, page = 1) => {
     return response.json();
 };
 
-export const getPopularMovies = async () => {
-    const response = await fetch(`${BASE_URL}/movie/popular`);
-    return response.json();
-};
-
-export const getPopularTVShows = async () => {
-    const response = await fetch(`${BASE_URL}/tv/popular`);
-    return response.json();
-};
-
-export const getGenres = async (type) => {
-    const response = await fetch(`${BASE_URL}/genre/${type}/list`);
-    return response.json();
-};
-
-export const getCountries = async () => {
-    const response = await fetch(`${BASE_URL}/configuration/countries`);
-    return response.json();
-};
-
-export const discoverMovies = async (params) => {
-    const queryParams = new URLSearchParams(params).toString();
-    const response = await fetch(`${BASE_URL}/discover/movie?${queryParams}`);
-    return response.json();
-};
-
-export const discoverTVShows = async (params) => {
-    const queryParams = new URLSearchParams(params).toString();
-    const response = await fetch(`${BASE_URL}/discover/tv?${queryParams}`);
-    return response.json();
-};
-
 export const getMediaDetails = async (type, id) => {
     const response = await fetch(`${BASE_URL}/${type}/${id}?append_to_response=credits,recommendations`);
     return response.json();
