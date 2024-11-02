@@ -1,32 +1,58 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { HomeIcon, MagnifyingGlassIcon, EllipsisHorizontalIcon, GlobeAltIcon, SparklesIcon } from "@heroicons/react/24/outline";
-import { FilmIcon, TvIcon, HeartIcon } from "@heroicons/react/24/outline";
+import {
+    HomeIcon,
+    MagnifyingGlassIcon,
+    EllipsisHorizontalIcon,
+    FilmIcon,
+    TvIcon,
+    HeartIcon,
+    GlobeAltIcon,
+    SparklesIcon,
+    BookOpenIcon,
+    GlobeAsiaAustraliaIcon,
+} from "@heroicons/react/24/outline";
 import { motion, AnimatePresence } from "framer-motion";
 
 const BottomNav = ({ showMoreMenu, setShowMoreMenu }) => {
     const router = useRouter();
 
-    const isActive = (path) => router.pathname === path;
-
-    const moreMenuItems = [
-        { icon: FilmIcon, label: "Movies", path: "/search?type=movie" },
-        { icon: TvIcon, label: "TV Shows", path: "/search?type=tv" },
-        { icon: HeartIcon, label: "Watchlist", path: "/watchlist" },
-        { icon: GlobeAltIcon, label: "Old ChinFlix", path: "https://chinflix-old.vercel.app" },
-        { icon: SparklesIcon, label: "AnimeFlix", path: "https://ani-dl.vercel.app" },
+    const mainNavItems = [
+        { icon: HomeIcon, label: "Home", path: "/" },
+        { icon: MagnifyingGlassIcon, label: "Search", path: "/search" },
     ];
+
+    const mediaNavItems = [
+        { icon: FilmIcon, label: "Movies", path: "/movie" },
+        { icon: TvIcon, label: "TV Shows", path: "/tv" },
+        { icon: SparklesIcon, label: "Anime", path: "/anime" },
+        { icon: BookOpenIcon, label: "Manga", path: "/manga" },
+        { icon: GlobeAsiaAustraliaIcon, label: "K-Drama", path: "/drama" },
+        { icon: HeartIcon, label: "Watchlist", path: "/watchlist" },
+    ];
+
+    const developerProjects = [
+        { icon: GlobeAltIcon, label: "Old ChinFlix", path: "https://chinflix-old.vercel.app" },
+        { icon: GlobeAltIcon, label: "AnimeFlix", path: "https://ani-dl.vercel.app" },
+    ];
+
+    const isActive = (path) => router.pathname === path;
 
     return (
         <nav className="bg-gradient-to-t from-black/80 to-black/60 backdrop-blur-md text-white py-2">
             <div className="flex justify-around items-center">
-                <NavItem href="/" icon={HomeIcon} label="Home" isActive={isActive("/")} onClick={() => {}} />
-                <NavItem href="/search" icon={MagnifyingGlassIcon} label="Search" isActive={isActive("/search")} onClick={() => {}} />
-                <button onClick={() => setShowMoreMenu(!showMoreMenu)} className="flex flex-col items-center">
+                {mainNavItems.map((item) => (
+                    <NavItem key={item.path} href={item.path} icon={item.icon} label={item.label} isActive={isActive(item.path)} />
+                ))}
+                <button
+                    onClick={() => setShowMoreMenu(!showMoreMenu)}
+                    className={`flex flex-col items-center ${showMoreMenu ? "text-[#FF4D4D]" : ""}`}
+                >
                     <EllipsisHorizontalIcon className="w-6 h-6" />
                     <span className="text-xs">More</span>
                 </button>
             </div>
+
             <AnimatePresence>
                 {showMoreMenu && (
                     <motion.div
@@ -34,20 +60,40 @@ const BottomNav = ({ showMoreMenu, setShowMoreMenu }) => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 20 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute bottom-full left-0 right-0 bg-gradient-to-t from-black/80 to-black/60 backdrop-blur-md p-4 rounded-t-lg"
+                        className="absolute bottom-full mb-2 left-2 right-2 bg-black/90 backdrop-blur-md rounded-2xl p-4 mx-auto max-w-md"
                     >
-                        <div className="flex flex-wrap gap-y-4">
-                            {moreMenuItems.map((item, index) => (
-                                <div key={item.path} className="w-1/4">
-                                    <NavItem
-                                        href={item.path}
-                                        icon={item.icon}
-                                        label={item.label}
-                                        isActive={isActive(item.path)}
-                                        onClick={() => setShowMoreMenu(false)}
-                                    />
+                        <div className="space-y-4">
+                            <div>
+                                <h3 className="text-xs font-medium text-[#FF4D4D] mb-2">MEDIA</h3>
+                                <div className="grid grid-cols-3 gap-4">
+                                    {mediaNavItems.map((item) => (
+                                        <NavItem
+                                            key={item.path}
+                                            href={item.path}
+                                            icon={item.icon}
+                                            label={item.label}
+                                            isActive={isActive(item.path)}
+                                            onClick={() => setShowMoreMenu(false)}
+                                        />
+                                    ))}
                                 </div>
-                            ))}
+                            </div>
+
+                            <div>
+                                <h3 className="text-xs font-medium text-[#FF4D4D] mb-2">MORE FROM DEVELOPER</h3>
+                                <div className="grid grid-cols-3 gap-4">
+                                    {developerProjects.map((item) => (
+                                        <NavItem
+                                            key={item.path}
+                                            href={item.path}
+                                            icon={item.icon}
+                                            label={item.label}
+                                            external={true}
+                                            onClick={() => setShowMoreMenu(false)}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                     </motion.div>
                 )}
@@ -56,10 +102,16 @@ const BottomNav = ({ showMoreMenu, setShowMoreMenu }) => {
     );
 };
 
-const NavItem = ({ href, icon: Icon, label, isActive, onClick }) => (
-    <Link href={href} className={`flex flex-col items-center ${isActive ? "text-[#FF4D4D]" : ""}`} onClick={onClick}>
+const NavItem = ({ href, icon: Icon, label, isActive, onClick, external }) => (
+    <Link
+        href={href}
+        className={`flex flex-col items-center ${isActive ? "text-[#FF4D4D]" : ""}`}
+        onClick={onClick}
+        target={external ? "_blank" : "_self"}
+        rel={external ? "noopener noreferrer" : ""}
+    >
         <Icon className="w-6 h-6" />
-        <span className="text-xs">{label}</span>
+        <span className="text-xs mt-1">{label}</span>
     </Link>
 );
 
