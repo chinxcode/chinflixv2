@@ -2,7 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
 import HeroSlider from "@/components/HeroSlider";
-import TrendingSection from "@/components/TrendingSection";
+import CreateSection from "@/components/CreateSection";
 
 export default function Home() {
     return (
@@ -21,8 +21,8 @@ export default function Home() {
                 <div className="flex flex-col w-full z-0 relative px-3 2xl:px-5 py-6">
                     <HeroSlider />
                     <div className="flex flex-col">
-                        <TrendingSection type="movie" />
-                        <TrendingSection type="tv" />
+                        <CreateSection type="movie" endpoint="trending" />
+                        <CreateSection type="tv" endpoint="trending" />
                     </div>
                 </div>
             </main>
