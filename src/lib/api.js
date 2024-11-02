@@ -7,6 +7,16 @@ export const searchMulti = async (query, page = 1) => {
     return response.json();
 };
 
+export const getTopRated = async (type, page = 1) => {
+    const response = await fetch(`${BASE_URL}/${type}/top_rated?page=${page}`);
+    return response.json();
+};
+
+export const getPopular = async (type, page = 1) => {
+    const response = await fetch(`${BASE_URL}/${type}/popular?page=${page}`);
+    return response.json();
+};
+
 export const getTrending = async (type, page = 1) => {
     const response = await fetch(`${BASE_URL}/trending/${type}/week?page=${page}`);
     return response.json();
