@@ -1,4 +1,6 @@
 import Head from "next/head";
+import SearchContainer from "@/components/SearchContainer";
+import CreateSection from "@/components/CreateSection";
 
 export default function Anime() {
     return (
@@ -7,11 +9,11 @@ export default function Anime() {
                 <title>Anime | ChinFlix</title>
             </Head>
             <main className="p-8">
-                <h1 className="text-4xl font-bold">Anime</h1>
-                <div className="flex items-center justify-center min-h-[40vh]">
-                    <p className="text-gray-400 text-lg">
-                        This page is currently under development. You'll be able to watch your favorite anime here soon.
-                    </p>
+                <SearchContainer type="anime" showDropdown={false} />
+
+                <div className="mt-12 space-y-12">
+                    <CreateSection type="anime" endpoint="popular" />
+                    <CreateSection type="anime" endpoint="trending" />
                 </div>
             </main>
         </>
