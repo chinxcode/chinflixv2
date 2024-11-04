@@ -5,6 +5,7 @@ import MovieCard from "./MovieCard";
 import Skeleton from "./Skeleton";
 import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
 import { searchMulti, getTrending } from "@/lib/api";
+import { searchAnime, getTrendingAnime } from "@/lib/anime-api";
 
 const SearchContainer = ({ type, showDropdown = true, isSearchPage = false }) => {
     const router = useRouter();
@@ -16,9 +17,15 @@ const SearchContainer = ({ type, showDropdown = true, isSearchPage = false }) =>
 
     const handleSearch = async (query, currentPage) => {
         if (query.length >= 2) {
-            const data = await searchMulti(query, currentPage);
-            setTotalPages(data.total_pages);
-            return data.results.filter((item) => item.media_type === type);
+            if (type === "anime") {
+                const data = await searchAnime(query, currentPage);
+                setTotalPages(data.total_pages);
+                return data.results;
+            } else {
+                const data = await searchMulti(query, currentPage);
+                setTotalPages(data.total_pages);
+                return data.results.filter((item) => item.media_type === type);
+            }
         }
         return [];
     };
@@ -30,9 +37,15 @@ const SearchContainer = ({ type, showDropdown = true, isSearchPage = false }) =>
             if (query && query.length >= 2) {
                 newResults = await handleSearch(query, currentPage);
             } else {
-                const trendingData = await getTrending(type, currentPage);
-                setTotalPages(trendingData.total_pages);
-                newResults = trendingData.results;
+                if (type === "anime") {
+                    const trendingData = await getTrendingAnime(currentPage);
+                    setTotalPages(trendingData.total_pages);
+                    newResults = trendingData.results;
+                } else {
+                    const trendingData = await getTrending(type, currentPage);
+                    setTotalPages(trendingData.total_pages);
+                    newResults = trendingData.results;
+                }
             }
             setResults(newResults);
             setLoading(false);
@@ -50,6 +63,10 @@ const SearchContainer = ({ type, showDropdown = true, isSearchPage = false }) =>
     const handleSearchAll = (query) => {
         setSearchQuery(query);
         setPage(1);
+        router.push({
+            pathname: router.pathname,
+            query: { ...router.query, page: 1 },
+        });
     };
 
     const handleTypeChange = (newType) => {
@@ -76,16 +93,27 @@ const SearchContainer = ({ type, showDropdown = true, isSearchPage = false }) =>
         );
     };
 
+    const getContentType = () => {
+        switch (type) {
+            case "movie":
+                return "Movies";
+            case "tv":
+                return "TV Shows";
+            case "anime":
+                return "Anime";
+            default:
+                return "Content";
+        }
+    };
+
     return (
         <>
             <h1 className="text-4xl font-bold mb-8">
                 {searchQuery && searchQuery.length >= 2
                     ? `Search Results for "${searchQuery}"`
                     : isSearchPage
-                    ? `Search ${type === "movie" ? "Movies" : "TV Shows"}`
-                    : type === "movie"
-                    ? "Movies"
-                    : "TV Shows"}
+                    ? `Search ${getContentType()}`
+                    : getContentType()}
             </h1>
 
             <SearchFilter
@@ -98,7 +126,9 @@ const SearchContainer = ({ type, showDropdown = true, isSearchPage = false }) =>
 
             <div className="flex flex-col w-full gap-2">
                 <div className="flex items-center justify-between w-full pl-1 sm:px-2 text-sm">
-                    <h2 className="text-[1.35rem] font-medium px-1">Trending {type === "movie" ? "Movies" : "TV Shows"}</h2>
+                    <h2 className="text-[1.35rem] font-medium px-1">
+                        {searchQuery && searchQuery.length >= 2 ? "Search Results" : `Trending ${getContentType()}`}
+                    </h2>
                     <div className="flex items-center max-w-full text-sm">
                         <button className="flex items-center rounded-lg overflow-hidden justify-center gap-1 min-w-16 p-2 hover:bg-white/10 lg:hover:bg-white/5 px-3">
                             {page} - {totalPages}

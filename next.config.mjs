@@ -13,6 +13,21 @@ const nextConfig = {
                 hostname: "image.tmdb.org",
                 pathname: "/**",
             },
+            {
+                protocol: "https",
+                hostname: "artworks.thetvdb.com",
+                pathname: "/**",
+            },
+            {
+                protocol: "https",
+                hostname: "s4.anilist.co",
+                pathname: "/**",
+            },
+            {
+                protocol: "https",
+                hostname: "gogocdn.net",
+                pathname: "/**",
+            },
         ],
         unoptimized: true,
     },
