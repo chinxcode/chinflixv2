@@ -14,6 +14,19 @@ const SearchFilter = ({ onSearch, onTypeChange, type, initialQuery, showDropdown
         onSearch(newQuery);
     };
 
+    const getPlaceholderText = () => {
+        switch (type) {
+            case "movie":
+                return "Search movies...";
+            case "tv":
+                return "Search TV shows...";
+            case "anime":
+                return "Search anime...";
+            default:
+                return "Search...";
+        }
+    };
+
     return (
         <div className="w-full mb-8">
             <div className="flex flex-col sm:flex-row items-center gap-4 mb-4">
@@ -21,7 +34,7 @@ const SearchFilter = ({ onSearch, onTypeChange, type, initialQuery, showDropdown
                     <input
                         type="text"
                         className="w-full bg-white/10 rounded-lg py-2 px-4 pl-10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/20"
-                        placeholder={`Search ${type === "movie" ? "movies" : "TV shows"}...`}
+                        placeholder={getPlaceholderText()}
                         value={query}
                         onChange={handleInputChange}
                     />
@@ -41,6 +54,7 @@ const SearchFilter = ({ onSearch, onTypeChange, type, initialQuery, showDropdown
                     >
                         <option value="movie">Movies</option>
                         <option value="tv">TV Shows</option>
+                        <option value="anime">Anime</option>
                     </select>
                 )}
             </div>
