@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import MovieCard from "./MovieCard";
 import { getTrending, getTopRated, getPopular } from "@/lib/api";
+import { getTrendingAnime, getPopularAnime } from "@/lib/anime-api";
 import Skeleton from "./Skeleton";
 import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
 
@@ -14,33 +15,48 @@ const CreateSection = ({ type, endpoint }) => {
             setLoading(true);
             let data;
 
-            switch (endpoint) {
-                case "trending":
-                    data = await getTrending(type);
-                    break;
-                case "top_rated":
-                    data = await getTopRated(type);
-                    break;
-                case "popular":
-                    data = await getPopular(type);
-                    break;
-                default:
-                    data = await getTrending(type);
+            if (type === "anime") {
+                switch (endpoint) {
+                    case "trending":
+                        data = await getTrendingAnime();
+                        setItems(data.results || []);
+                        break;
+                    case "popular":
+                        data = await getPopularAnime();
+                        setItems(data.results || []);
+                        break;
+                    default:
+                        data = await getTrendingAnime();
+                        setItems(data.results || []);
+                }
+            } else {
+                switch (endpoint) {
+                    case "trending":
+                        data = await getTrending(type);
+                        break;
+                    case "top_rated":
+                        data = await getTopRated(type);
+                        break;
+                    case "popular":
+                        data = await getPopular(type);
+                        break;
+                    default:
+                        data = await getTrending(type);
+                }
+                setItems(
+                    data.results.map((item) => ({
+                        id: item.id,
+                        title: item.title || item.name,
+                        name: item.name || item.title,
+                        poster_path: item.poster_path,
+                        backdrop_path: item.backdrop_path,
+                        vote_average: item.vote_average,
+                        overview: item.overview,
+                        release_date: item.release_date || item.first_air_date,
+                        media_type: type,
+                    }))
+                );
             }
-
-            setItems(
-                data.results.map((item) => ({
-                    id: item.id,
-                    title: item.title || item.name,
-                    name: item.name || item.title,
-                    poster_path: item.poster_path,
-                    backdrop_path: item.backdrop_path,
-                    vote_average: item.vote_average,
-                    overview: item.overview,
-                    release_date: item.release_date || item.first_air_date,
-                    media_type: type,
-                }))
-            );
             setLoading(false);
         };
         fetchData();
@@ -60,9 +76,9 @@ const CreateSection = ({ type, endpoint }) => {
         <section className="mt-8 px-4 lg:px-0 relative">
             <div className="w-full flex items-center justify-between mb-4">
                 <h2 className="text-[1.35rem] font-medium px-1">
-                    {endpoint === "trending" && `Trending ${type === "movie" ? "Movies" : "Shows"}`}
+                    {endpoint === "trending" && `Trending ${type === "anime" ? "Anime" : type === "movie" ? "Movies" : "Shows"}`}
                     {endpoint === "top_rated" && `Top Rated ${type === "movie" ? "Movies" : "Shows"}`}
-                    {endpoint === "popular" && `Popular ${type === "movie" ? "Movies" : "Shows"}`}
+                    {endpoint === "popular" && `Popular ${type === "anime" ? "Anime" : type === "movie" ? "Movies" : "Shows"}`}
                 </h2>
                 <div className="flex items-center rounded-xl overflow-hidden justify-center gap-[1px]">
                     <button
