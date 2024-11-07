@@ -31,7 +31,7 @@ const SeasonEpisode = ({ seasons, episodes, currentSeason, currentEpisode, onSea
                     />
                 </div>
             </div>
-            <div className="flex w-full gap-2 flex-col h-[400px] overflow-y-auto overflow-x-hidden rounded-md">
+            <div className="flex w-full gap-2 flex-col max-h-[400px] overflow-y-auto overflow-x-hidden rounded-md">
                 {episodes.map((episode, index) => (
                     <div
                         key={index}
