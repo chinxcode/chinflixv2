@@ -29,7 +29,11 @@ const HeroSlider = () => {
     }, [trendingItems]);
 
     if (loading) {
-        return <Skeleton className="w-full aspect-video rounded-lg" />;
+        return (
+            <div className="relative bg-[#1E1E1E] rounded-lg overflow-hidden md:aspect-[2.4/1] aspect-[16/9] lg:aspect-[2/.6] shadow-lg">
+                <Skeleton className="w-full h-full aspect-video rounded-lg" />
+            </div>
+        );
     }
 
     if (trendingItems.length === 0) return null;

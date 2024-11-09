@@ -100,7 +100,7 @@ const CreateSection = ({ type, endpoint }) => {
             <div className="relative">
                 <div ref={scrollContainerRef} className="flex gap-y-2 w-full overflow-x-auto scrollbar-hide">
                     {loading
-                        ? Array(6)
+                        ? Array(12)
                               .fill(0)
                               .map((_, i) => (
                                   <div
