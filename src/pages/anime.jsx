@@ -1,4 +1,5 @@
 import Head from "next/head";
+import DevelopmentPopup from "@/components/DevelopmentPopup";
 import SearchContainer from "@/components/SearchContainer";
 import CreateSection from "@/components/CreateSection";
 
@@ -9,6 +10,7 @@ export default function Anime() {
                 <title>Anime | ChinFlix</title>
             </Head>
             <main className="p-8">
+                <DevelopmentPopup />
                 <SearchContainer type="anime" showDropdown={false} />
 
                 <div className="mt-12 space-y-12">

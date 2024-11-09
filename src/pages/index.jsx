@@ -23,6 +23,7 @@ export default function Home() {
                     <div className="flex flex-col">
                         <CreateSection type="movie" endpoint="trending" />
                         <CreateSection type="tv" endpoint="trending" />
+                        <CreateSection type="anime" endpoint="trending" />
                         <p className="text-left py-4 text-sm text-gray-400 px-4">
                             This site does not store any files on the server, we only linked to the media which is hosted on 3rd party
                             services.
