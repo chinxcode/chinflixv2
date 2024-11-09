@@ -1,4 +1,5 @@
 import { useRouter } from "next/router";
+import Head from "next/head";
 import { useEffect, useState } from "react";
 import { getAnimeInfo, getEpisodeSources } from "@/lib/anime-api";
 import { AnimeMediaActions, AnimeMediaInfo, AnimeEpisodes, AnimePlayer } from "@/components/AnimeComponents";
@@ -53,60 +54,65 @@ const WatchAnimePage = () => {
     }
 
     return (
-        <div className="lg:flex lg:flex-row lg:gap-2 lg:h-screen overflow-hidden">
-            <div className="lg:w-2/3 h-full rounded-lg overflow-hidden border border-gray-800 flex flex-col">
-                <div className="flex gap-2 w-full h-12 items-center">
-                    <button className="w-9 h-full flex items-center shrink-0 justify-center" onClick={() => router.back()}>
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="lucide lucide-arrow-left"
-                        >
-                            <path d="m12 19-7-7 7-7"></path>
-                            <path d="M19 12H5"></path>
-                        </svg>
-                    </button>
-                    <span className="!line-clamp-1 flex-grow sm:text-lg mr-2">{animeData.title}</span>
-                </div>
-                <div className="h-full max-h-full overflow-y-auto p-4 space-y-4">
-                    <div className="bg-gray-800 rounded-lg overflow-hidden flex flex-col">
-                        <AnimePlayer src={streamingUrl} />
-                        <AnimeMediaActions viewCount={1000} />
+        <>
+            <Head>
+                <title>{`${animeData.title} | ChinFlix`}</title>
+            </Head>
+            <div className="lg:flex lg:flex-row lg:gap-2 lg:h-screen overflow-hidden">
+                <div className="lg:w-2/3 h-full rounded-lg overflow-hidden border border-gray-800 flex flex-col">
+                    <div className="flex gap-2 w-full h-12 items-center">
+                        <button className="w-9 h-full flex items-center shrink-0 justify-center" onClick={() => router.back()}>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="lucide lucide-arrow-left"
+                            >
+                                <path d="m12 19-7-7 7-7"></path>
+                                <path d="M19 12H5"></path>
+                            </svg>
+                        </button>
+                        <span className="!line-clamp-1 flex-grow sm:text-lg mr-2">{animeData.title}</span>
+                    </div>
+                    <div className="h-full max-h-full overflow-y-auto p-4 space-y-4">
+                        <div className="bg-gray-800 rounded-lg overflow-hidden flex flex-col">
+                            <AnimePlayer src={streamingUrl} />
+                            <AnimeMediaActions viewCount={1000} />
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div className="lg:w-1/3 h-full rounded-lg overflow-hidden border border-gray-800 flex flex-col">
-                <div className="h-full max-h-full overflow-y-auto p-4 space-y-4">
-                    <div className="bg-gray-900 rounded-lg p-4">
-                        <AnimeEpisodes
-                            episodes={animeData.episodes}
-                            currentEpisode={currentEpisode}
-                            onEpisodeChange={handleEpisodeChange}
-                        />
-                    </div>
-                    <div className="bg-gray-900 rounded-lg p-4">
-                        <AnimeMediaInfo
-                            title={animeData.title}
-                            image={animeData.image}
-                            status={animeData.status}
-                            releaseDate={animeData.releaseDate}
-                            description={animeData.description}
-                            genres={animeData.genres}
-                            subOrDub={animeData.subOrDub}
-                            totalEpisodes={animeData.totalEpisodes}
-                        />
+                <div className="lg:w-1/3 h-full rounded-lg overflow-hidden border border-gray-800 flex flex-col">
+                    <div className="h-full max-h-full overflow-y-auto p-4 space-y-4">
+                        <div className="bg-gray-900 rounded-lg p-4">
+                            <AnimeEpisodes
+                                episodes={animeData.episodes}
+                                currentEpisode={currentEpisode}
+                                onEpisodeChange={handleEpisodeChange}
+                            />
+                        </div>
+                        <div className="bg-gray-900 rounded-lg p-4">
+                            <AnimeMediaInfo
+                                title={animeData.title}
+                                image={animeData.image}
+                                status={animeData.status}
+                                releaseDate={animeData.releaseDate}
+                                description={animeData.description}
+                                genres={animeData.genres}
+                                subOrDub={animeData.subOrDub}
+                                totalEpisodes={animeData.totalEpisodes}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 

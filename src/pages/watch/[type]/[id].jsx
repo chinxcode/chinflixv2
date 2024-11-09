@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import Head from "next/head";
 import { getMediaDetails, getSeasonDetails, getStreamingLinks } from "@/lib/api";
 import { VideoPlayer, RelationInfo, MediaInfo, SeasonEpisode, CastInfo, MediaActions } from "@/components/MediaComponents";
 import StreamingServers from "@/components/StreamingServers";
@@ -70,129 +71,60 @@ const WatchPage = () => {
     }
 
     return (
-        <div className="lg:flex lg:flex-row lg:gap-2 lg:h-screen overflow-hidden">
-            {/* Large screen layout */}
-            <div className="hidden lg:flex lg:flex-row lg:gap-2 lg:p-2 lg:h-screen">
-                <div className="lg:w-2/3 h-full rounded-lg overflow-hidden border border-gray-800 flex flex-col">
-                    <div className="flex gap-2 w-full h-12 items-center">
-                        <button className="w-9 h-full flex items-center shrink-0 justify-center" onClick={() => router.back()}>
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="lucide lucide-arrow-left"
-                            >
-                                <path d="m12 19-7-7 7-7"></path>
-                                <path d="M19 12H5"></path>
-                            </svg>
-                        </button>
-                        <span className="!line-clamp-1 flex-grow sm:text-lg mr-2">{mediaData.title || mediaData.name}</span>
-                    </div>
-                    <div className="h-full max-h-full overflow-y-auto p-4 space-y-4">
-                        <div className="bg-gray-800 rounded-lg overflow-hidden flex flex-col">
-                            <VideoPlayer src={currentServer} />
-                            <MediaActions viewCount={Number(mediaData.popularity.toFixed(0))} />
+        <>
+            <Head>
+                <title>{`${mediaData.title || mediaData.name} | ChinFlix`}</title>
+            </Head>
+            <div className="lg:flex lg:flex-row lg:gap-2 lg:h-screen overflow-hidden">
+                {/* Large screen layout */}
+                <div className="hidden lg:flex lg:flex-row lg:gap-2 lg:p-2 lg:h-screen">
+                    <div className="lg:w-2/3 h-full rounded-lg overflow-hidden border border-gray-800 flex flex-col">
+                        <div className="flex gap-2 w-full h-12 items-center">
+                            <button className="w-9 h-full flex items-center shrink-0 justify-center" onClick={() => router.back()}>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    className="lucide lucide-arrow-left"
+                                >
+                                    <path d="m12 19-7-7 7-7"></path>
+                                    <path d="M19 12H5"></path>
+                                </svg>
+                            </button>
+                            <span className="!line-clamp-1 flex-grow sm:text-lg mr-2">{mediaData.title || mediaData.name}</span>
                         </div>
-                        <StreamingServers servers={streamingServers} onServerChange={handleServerChange} />
-                        <div className="bg-gray-900 rounded-lg p-4">
-                            <RelationInfo
-                                title="Recommended"
-                                recommendations={mediaData.recommendations.results.map((item) => ({
-                                    link: `/watch/${type}/${item.id}`,
-                                    image: `https://image.tmdb.org/t/p/w342${item.poster_path}`,
-                                    title: item.title || item.name || "Untitled",
-                                    rating: item.vote_average,
-                                }))}
-                            />
-                        </div>
-                        <p className="text-left py-4 text-sm text-gray-400 px-4">
-                            This site does not store any files on the server, we only linked to the media which is hosted on 3rd party
-                            services.
-                        </p>
-                    </div>
-                </div>
-
-                <div className="lg:w-1/3 h-full rounded-lg overflow-hidden border border-gray-800 flex flex-col">
-                    <div className="h-full max-h-full overflow-y-auto p-4 space-y-4">
-                        {type === "tv" && seasonData && (
-                            <div className="bg-gray-900 rounded-lg p-4">
-                                <SeasonEpisode
-                                    seasons={mediaData.seasons ? mediaData.seasons.map((s) => s.name) : []}
-                                    episodes={seasonData.episodes.map((e) => ({ title: e.name }))}
-                                    currentSeason={currentSeason}
-                                    currentEpisode={currentEpisode}
-                                    onSeasonChange={handleSeasonChange}
-                                    onEpisodeChange={setCurrentEpisode}
-                                />
-                            </div>
-                        )}
-                        <div className="bg-gray-900 rounded-lg p-4">
-                            <MediaInfo
-                                title={mediaData.title || mediaData.name || "Untitled"}
-                                poster={`https://image.tmdb.org/t/p/w500${mediaData.poster_path}`}
-                                rating={mediaData.vote_average}
-                                status={mediaData.status}
-                                production={mediaData.production_companies[0]?.name || "N/A"}
-                                aired={mediaData.release_date || mediaData.first_air_date || "N/A"}
-                                description={mediaData.overview}
-                                genres={mediaData.genres.map((g) => g.name)}
-                            />
-                        </div>
-                        <div className="bg-gray-900 rounded-lg p-4">
-                            <CastInfo
-                                cast={mediaData.credits.cast.map((c) => ({
-                                    name: c.character,
-                                    actor: c.name,
-                                    image: `https://image.tmdb.org/t/p/w185${c.profile_path}`,
-                                }))}
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Small screen layout */}
-            <div className="lg:hidden w-full flex flex-col gap-2 pb-28 sm:px-2">
-                <div className="flex gap-2 w-full h-12 items-center">
-                    <button className="w-9 h-full flex items-center shrink-0 justify-center" onClick={() => router.back()}>
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="lucide lucide-arrow-left"
-                        >
-                            <path d="m12 19-7-7 7-7"></path>
-                            <path d="M19 12H5"></path>
-                        </svg>
-                    </button>
-                    <span className="!line-clamp-1 flex-grow sm:text-lg mr-2">{mediaData.title || mediaData.name}</span>
-                </div>
-
-                <div className="flex flex-col gap-4">
-                    <div className="rounded-lg overflow-hidden border border-gray-700 flex flex-col">
-                        <div className="max-h-full overflow-y-auto p-4 space-y-4">
+                        <div className="h-full max-h-full overflow-y-auto p-4 space-y-4">
                             <div className="bg-gray-800 rounded-lg overflow-hidden flex flex-col">
                                 <VideoPlayer src={currentServer} />
                                 <MediaActions viewCount={Number(mediaData.popularity.toFixed(0))} />
                             </div>
                             <StreamingServers servers={streamingServers} onServerChange={handleServerChange} />
+                            <div className="bg-gray-900 rounded-lg p-4">
+                                <RelationInfo
+                                    title="Recommended"
+                                    recommendations={mediaData.recommendations.results.map((item) => ({
+                                        link: `/watch/${type}/${item.id}`,
+                                        image: `https://image.tmdb.org/t/p/w342${item.poster_path}`,
+                                        title: item.title || item.name || "Untitled",
+                                        rating: item.vote_average,
+                                    }))}
+                                />
+                            </div>
+                            <p className="text-left py-4 text-sm text-gray-400 px-4">
+                                This site does not store any files on the server, we only linked to the media which is hosted on 3rd party
+                                services.
+                            </p>
                         </div>
                     </div>
 
-                    <div className="rounded-lg overflow-hidden border border-gray-700 flex flex-col">
-                        <div className="max-h-full overflow-y-auto p-4 space-y-4">
+                    <div className="lg:w-1/3 h-full rounded-lg overflow-hidden border border-gray-800 flex flex-col">
+                        <div className="h-full max-h-full overflow-y-auto p-4 space-y-4">
                             {type === "tv" && seasonData && (
                                 <div className="bg-gray-900 rounded-lg p-4">
                                     <SeasonEpisode
@@ -226,22 +158,96 @@ const WatchPage = () => {
                                     }))}
                                 />
                             </div>
-                            <div className="bg-gray-900 rounded-lg p-4">
-                                <RelationInfo
-                                    title="Recommended"
-                                    recommendations={mediaData.recommendations.results.map((item) => ({
-                                        link: `/watch/${type}/${item.id}`,
-                                        image: `https://image.tmdb.org/t/p/w342${item.poster_path}`,
-                                        title: item.title || item.name || "Untitled",
-                                        rating: item.vote_average,
-                                    }))}
-                                />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Small screen layout */}
+                <div className="lg:hidden w-full flex flex-col gap-2 pb-28 sm:px-2">
+                    <div className="flex gap-2 w-full h-12 items-center">
+                        <button className="w-9 h-full flex items-center shrink-0 justify-center" onClick={() => router.back()}>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="lucide lucide-arrow-left"
+                            >
+                                <path d="m12 19-7-7 7-7"></path>
+                                <path d="M19 12H5"></path>
+                            </svg>
+                        </button>
+                        <span className="!line-clamp-1 flex-grow sm:text-lg mr-2">{mediaData.title || mediaData.name}</span>
+                    </div>
+
+                    <div className="flex flex-col gap-4">
+                        <div className="rounded-lg overflow-hidden border border-gray-700 flex flex-col">
+                            <div className="max-h-full overflow-y-auto p-4 space-y-4">
+                                <div className="bg-gray-800 rounded-lg overflow-hidden flex flex-col">
+                                    <VideoPlayer src={currentServer} />
+                                    <MediaActions viewCount={Number(mediaData.popularity.toFixed(0))} />
+                                </div>
+                                <StreamingServers servers={streamingServers} onServerChange={handleServerChange} />
+                            </div>
+                        </div>
+
+                        <div className="rounded-lg overflow-hidden border border-gray-700 flex flex-col">
+                            <div className="max-h-full overflow-y-auto p-4 space-y-4">
+                                {type === "tv" && seasonData && (
+                                    <div className="bg-gray-900 rounded-lg p-4">
+                                        <SeasonEpisode
+                                            seasons={mediaData.seasons ? mediaData.seasons.map((s) => s.name) : []}
+                                            episodes={seasonData.episodes.map((e) => ({ title: e.name }))}
+                                            currentSeason={currentSeason}
+                                            currentEpisode={currentEpisode}
+                                            onSeasonChange={handleSeasonChange}
+                                            onEpisodeChange={setCurrentEpisode}
+                                        />
+                                    </div>
+                                )}
+                                <div className="bg-gray-900 rounded-lg p-4">
+                                    <MediaInfo
+                                        title={mediaData.title || mediaData.name || "Untitled"}
+                                        poster={`https://image.tmdb.org/t/p/w500${mediaData.poster_path}`}
+                                        rating={mediaData.vote_average}
+                                        status={mediaData.status}
+                                        production={mediaData.production_companies[0]?.name || "N/A"}
+                                        aired={mediaData.release_date || mediaData.first_air_date || "N/A"}
+                                        description={mediaData.overview}
+                                        genres={mediaData.genres.map((g) => g.name)}
+                                    />
+                                </div>
+                                <div className="bg-gray-900 rounded-lg p-4">
+                                    <CastInfo
+                                        cast={mediaData.credits.cast.map((c) => ({
+                                            name: c.character,
+                                            actor: c.name,
+                                            image: `https://image.tmdb.org/t/p/w185${c.profile_path}`,
+                                        }))}
+                                    />
+                                </div>
+                                <div className="bg-gray-900 rounded-lg p-4">
+                                    <RelationInfo
+                                        title="Recommended"
+                                        recommendations={mediaData.recommendations.results.map((item) => ({
+                                            link: `/watch/${type}/${item.id}`,
+                                            image: `https://image.tmdb.org/t/p/w342${item.poster_path}`,
+                                            title: item.title || item.name || "Untitled",
+                                            rating: item.vote_average,
+                                        }))}
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 
