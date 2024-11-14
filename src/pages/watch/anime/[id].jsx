@@ -85,6 +85,10 @@ const WatchAnimePage = () => {
                             <AnimePlayer src={streamingUrl} />
                             <AnimeMediaActions viewCount={1000} />
                         </div>
+                        <p className="text-left py-4 text-sm text-gray-400 px-4">
+                            This site does not store any files on the server, we only linked to the media which is hosted on 3rd party
+                            services.
+                        </p>
                     </div>
                 </div>
 
