@@ -2,13 +2,19 @@ import "@/styles/globals.css";
 import Layout from "@/components/Layout";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import Head from "next/head";
 
 export default function App({ Component, pageProps }) {
     return (
-        <Layout>
-            <Component {...pageProps} />
-            <Analytics />
-            <SpeedInsights />
-        </Layout>
+        <>
+            <Head>
+                <link rel="shortcut icon" href="/logo_transparent.png" type="image/x-icon" />
+            </Head>
+            <Layout>
+                <Component {...pageProps} />
+                <Analytics />
+                <SpeedInsights />
+            </Layout>
+        </>
     );
 }
