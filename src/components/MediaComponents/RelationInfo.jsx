@@ -1,10 +1,10 @@
-import React, { useRef } from "react";
+import { useRef, memo } from "react";
 import { StarIcon } from "@heroicons/react/24/solid";
 import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import Image from "next/image";
 
-const RelationInfo = ({ title, recommendations }) => {
+const RelationInfo = memo(({ title, recommendations }) => {
     const scrollContainerRef = useRef(null);
 
     const scroll = (direction) => {
@@ -25,16 +25,16 @@ const RelationInfo = ({ title, recommendations }) => {
                     <button
                         onClick={() => scroll("left")}
                         className="w-9 h-8 bg-white/10 hover:bg-white/[.13] disabled:bg-white/5 active:bg-white/5 flex items-center smoothie justify-center"
+                        aria-label="Scroll left"
                     >
                         <ArrowLeftIcon className="size-[1.1rem]" />
-                        <span className="sr-only">Previous slide</span>
                     </button>
                     <button
                         onClick={() => scroll("right")}
                         className="w-9 h-8 bg-white/10 hover:bg-white/[.13] disabled:bg-white/5 active:bg-white/5 flex items-center smoothie justify-center"
+                        aria-label="Scroll right"
                     >
                         <ArrowRightIcon className="size-[1.1rem]" />
-                        <span className="sr-only">Next slide</span>
                     </button>
                 </div>
             </div>
@@ -47,9 +47,10 @@ const RelationInfo = ({ title, recommendations }) => {
                                     <Image
                                         src={item.image}
                                         alt={item.title}
-                                        layout="fill"
-                                        objectFit="cover"
+                                        width={200}
+                                        height={300}
                                         className="w-full h-full object-cover object-center"
+                                        loading="lazy"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-end p-2">
                                         <h3 className="text-white font-semibold text-sm truncate">{item.title}</h3>
@@ -66,6 +67,7 @@ const RelationInfo = ({ title, recommendations }) => {
             </div>
         </section>
     );
-};
+});
 
+RelationInfo.displayName = "RelationInfo";
 export default RelationInfo;
