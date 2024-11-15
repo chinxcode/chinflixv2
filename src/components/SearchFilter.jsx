@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
-const SearchFilter = ({ onSearch, onTypeChange, type, initialQuery, showDropdown = true }) => {
+const SearchFilter = memo(({ onSearch, onTypeChange, type, initialQuery, showDropdown = true }) => {
     const [query, setQuery] = useState(initialQuery || "");
 
     useEffect(() => {
@@ -14,18 +14,12 @@ const SearchFilter = ({ onSearch, onTypeChange, type, initialQuery, showDropdown
         onSearch(newQuery);
     };
 
-    const getPlaceholderText = () => {
-        switch (type) {
-            case "movie":
-                return "Search movies...";
-            case "tv":
-                return "Search TV shows...";
-            case "anime":
-                return "Search anime...";
-            default:
-                return "Search...";
-        }
-    };
+    const getPlaceholderText = () =>
+        ({
+            movie: "Search movies...",
+            tv: "Search TV shows...",
+            anime: "Search anime...",
+        }[type] || "Search...");
 
     return (
         <div className="w-full mb-8">
@@ -37,12 +31,13 @@ const SearchFilter = ({ onSearch, onTypeChange, type, initialQuery, showDropdown
                         placeholder={getPlaceholderText()}
                         value={query}
                         onChange={handleInputChange}
+                        aria-label={getPlaceholderText()}
                     />
                     <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 </div>
                 {showDropdown && (
                     <select
-                        className="bg-gray-700 rounded-lg py-2 px-3 pr-8 text-white focus:outline-none focus:ring-2 focus:ring-white/20 appearance-none"
+                        className="bg-gray-700 rounded-lg py-2 px-3 pr-8 text-white focus:outline-none focus:ring-2 focus:ring-white/20 appearance-none cursor-pointer"
                         value={type}
                         onChange={(e) => onTypeChange(e.target.value)}
                         style={{
@@ -60,6 +55,7 @@ const SearchFilter = ({ onSearch, onTypeChange, type, initialQuery, showDropdown
             </div>
         </div>
     );
-};
+});
 
+SearchFilter.displayName = "SearchFilter";
 export default SearchFilter;

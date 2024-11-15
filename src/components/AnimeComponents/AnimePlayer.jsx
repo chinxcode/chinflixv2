@@ -1,9 +1,9 @@
-import { useEffect, useRef } from "react";
-import Artplayer from "artplayer";
-import Hls from "hls.js";
-import artplayerPluginHlsQuality from "artplayer-plugin-hls-quality";
+import { useEffect, useRef, memo } from "react";
+import dynamic from "next/dynamic";
 
-const playM3u8 = (video, url, art) => {
+const playM3u8 = async (video, url, art) => {
+    const Hls = (await import("hls.js")).default;
+
     if (Hls.isSupported()) {
         if (art.hls) art.hls.destroy();
         const hls = new Hls();
@@ -18,63 +18,69 @@ const playM3u8 = (video, url, art) => {
     }
 };
 
-const AnimePlayer = ({ src }) => {
+const AnimePlayer = memo(({ src }) => {
     const artRef = useRef();
 
     useEffect(() => {
         if (!src) return;
+        let art;
 
-        const art = new Artplayer({
-            container: artRef.current,
-            url: src,
-            autoplay: false,
-            autoSize: false,
-            autoMini: true,
-            loop: false,
-            playbackRate: true,
-            fullscreen: true,
-            autoOrientation: true,
-            aspectRatio: true,
-            autoPlayback: true,
-            setting: true,
-            screenshot: true,
-            miniProgressBar: true,
-            hotkey: true,
-            pip: true,
-            airplay: true,
-            lock: true,
-            isLive: false,
-            customType: {
-                m3u8: playM3u8,
-            },
-            controls: [
-                {
-                    name: "skip-85",
-                    position: "right",
-                    html: "<div style='color:red; font-size:1.1rem; font-weight:600;'>+85s</div>",
-                    click: function () {
-                        this.seek = this.currentTime + 85;
-                    },
+        const initPlayer = async () => {
+            const [{ default: Artplayer }, { default: artplayerPluginHlsQuality }] = await Promise.all([
+                import("artplayer"),
+                import("artplayer-plugin-hls-quality"),
+            ]);
+
+            art = new Artplayer({
+                container: artRef.current,
+                url: src,
+                volume: 0.8,
+                autoplay: false,
+                autoSize: false,
+                autoMini: true,
+                loop: false,
+                flip: true,
+                playbackRate: true,
+                aspectRatio: true,
+                setting: true,
+                hotkey: true,
+                pip: true,
+                lock: true,
+                customType: {
+                    m3u8: playM3u8,
                 },
-            ],
-            plugins: [
-                artplayerPluginHlsQuality({
-                    setting: true,
-                    getResolution: (level) => `${level.height !== 0 ? level.height + "p" : "Default"}`,
-                    title: "Quality",
-                    auto: "Auto",
-                }),
-            ],
-        });
+                controls: [
+                    {
+                        name: "skip-op",
+                        position: "right",
+                        html: '<div style="color:red; font-size:1.1rem; font-weight:600;">+85s</div>',
+                        click: function () {
+                            this.seek = this.currentTime + 85;
+                        },
+                    },
+                ],
+                plugins: [
+                    artplayerPluginHlsQuality({
+                        setting: true,
+                        getResolution: (level) => (level.height ? `${level.height}p` : "Default"),
+                        title: "Quality",
+                        auto: "Auto",
+                    }),
+                ],
+            });
+        };
+
+        initPlayer();
 
         return () => {
-            if (art && art.destroy) {
+            if (art?.destroy) {
                 art.destroy(false);
             }
         };
     }, [src]);
 
     return <div ref={artRef} className="w-full aspect-video bg-black/90" />;
-};
+});
 
+AnimePlayer.displayName = "AnimePlayer";
 export default AnimePlayer;

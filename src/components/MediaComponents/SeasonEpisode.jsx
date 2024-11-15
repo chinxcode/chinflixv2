@@ -1,7 +1,7 @@
-import React from "react";
+import { memo } from "react";
 import { PlayIcon } from "@heroicons/react/24/solid";
 
-const SeasonEpisode = ({ seasons, episodes, currentSeason, currentEpisode, onSeasonChange, onEpisodeChange }) => {
+const SeasonEpisode = memo(({ seasons, episodes, currentSeason, currentEpisode, onSeasonChange, onEpisodeChange }) => {
     return (
         <div className="w-full min-h-[50%] max-h-[70%] shrink-0 rounded-lg overflow-hidden flex flex-col gap-4">
             <div className="flex w-full gap-1 h-9 items-center bg-white/5 shrink-0">
@@ -10,6 +10,7 @@ const SeasonEpisode = ({ seasons, episodes, currentSeason, currentEpisode, onSea
                         className="flex h-9 items-center justify-between rounded-lg px-3 text-sm placeholder:text-gray-300 disabled:cursor-not-allowed disabled:opacity-50 w-full !bg-gray-700"
                         value={currentSeason}
                         onChange={(e) => onSeasonChange(Number(e.target.value))}
+                        aria-label="Select Season"
                     >
                         {seasons
                             .filter((season) => season.startsWith("Season"))
@@ -28,6 +29,9 @@ const SeasonEpisode = ({ seasons, episodes, currentSeason, currentEpisode, onSea
                         placeholder="Episode No."
                         value={currentEpisode}
                         onChange={(e) => onEpisodeChange(Number(e.target.value))}
+                        min="1"
+                        max={episodes.length}
+                        aria-label="Episode Number"
                     />
                 </div>
             </div>
@@ -42,7 +46,10 @@ const SeasonEpisode = ({ seasons, episodes, currentSeason, currentEpisode, onSea
                         } w-full bg-white/5 rounded-xl overflow-hidden smoothie shrink-0`}
                         onClick={() => onEpisodeChange(index + 1)}
                     >
-                        <button className="flex w-full !line-clamp-2 rounded-lg p-3 gap-2 overflow-hidden">
+                        <button
+                            className="flex w-full !line-clamp-2 rounded-lg p-3 gap-2 overflow-hidden"
+                            aria-label={`Play Episode ${index + 1}`}
+                        >
                             <div className="!flex gap-1 flex-colw-full tracking-wide items-center !line-clamp-1 font-medium">
                                 <span className="text-sm 2xl:text-base text-gray-200 font-medium !leading-tight !shrink-0">
                                     {index + 1}.
@@ -58,6 +65,7 @@ const SeasonEpisode = ({ seasons, episodes, currentSeason, currentEpisode, onSea
             </div>
         </div>
     );
-};
+});
 
+SeasonEpisode.displayName = "SeasonEpisode";
 export default SeasonEpisode;

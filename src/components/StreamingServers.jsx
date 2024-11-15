@@ -1,7 +1,7 @@
-import React from "react";
+import { memo } from "react";
 import Image from "next/image";
 
-const StreamingServers = ({ servers, onServerChange }) => {
+const StreamingServers = memo(({ servers, onServerChange }) => {
     return (
         <>
             <p className="text-left text-sm text-gray-400 px-4">
@@ -13,9 +13,10 @@ const StreamingServers = ({ servers, onServerChange }) => {
                         key={index}
                         className="flex items-center justify-center px-2 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
                         onClick={() => onServerChange(server.url, index)}
+                        aria-label={`Play on ${server.name} server`}
                     >
                         <div className="relative w-4 h-4 mr-2">
-                            <Image src={server.flag} alt={`${server.name} flag`} layout="fill" objectFit="cover" />
+                            <Image src={server.flag} alt={`${server.name} flag`} width={16} height={16} className="object-cover" />
                         </div>
                         <span>{server.name}</span>
                     </button>
@@ -23,6 +24,7 @@ const StreamingServers = ({ servers, onServerChange }) => {
             </div>
         </>
     );
-};
+});
 
+StreamingServers.displayName = "StreamingServers";
 export default StreamingServers;
