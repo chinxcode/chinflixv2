@@ -1,14 +1,9 @@
-import React, { useState } from "react";
+import { useState, memo } from "react";
 import Image from "next/image";
 
-const CastInfo = ({ cast }) => {
+const CastInfo = memo(({ cast }) => {
     const [showAll, setShowAll] = useState(false);
     const initialDisplayCount = 4;
-
-    const toggleShowAll = () => {
-        setShowAll(!showAll);
-    };
-
     const displayedCast = showAll ? cast : cast.slice(0, initialDisplayCount);
 
     return (
@@ -17,7 +12,11 @@ const CastInfo = ({ cast }) => {
                 <div className="flex items-center w-full">
                     <span className="text-xl font-medium">Characters</span>
                     {cast.length > initialDisplayCount && (
-                        <button onClick={toggleShowAll} className="text-xs ml-auto bubbly text-gray-400 hover:text-gray-200">
+                        <button
+                            onClick={() => setShowAll(!showAll)}
+                            className="text-xs ml-auto bubbly text-gray-400 hover:text-gray-200"
+                            aria-label={showAll ? "Show less characters" : "Show all characters"}
+                        >
                             {showAll ? "view less" : "view all"}
                         </button>
                     )}
@@ -33,9 +32,10 @@ const CastInfo = ({ cast }) => {
                                 <Image
                                     src={character.image}
                                     alt={character.name}
-                                    layout="fill"
-                                    objectFit="cover"
-                                    className="size-full object-cover object-center !select-none shrink-0"
+                                    width={80}
+                                    height={80}
+                                    className="object-cover"
+                                    loading="lazy"
                                 />
                             </div>
                             <div className="flex flex-col p-2 py-3">
@@ -50,6 +50,7 @@ const CastInfo = ({ cast }) => {
             </div>
         </div>
     );
-};
+});
 
+CastInfo.displayName = "CastInfo";
 export default CastInfo;

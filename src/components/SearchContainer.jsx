@@ -1,18 +1,20 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
 import { useRouter } from "next/router";
-import SearchFilter from "./SearchFilter";
-import MovieCard from "./MovieCard";
-import Skeleton from "./Skeleton";
+import dynamic from "next/dynamic";
 import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
 import { searchMulti, getTrending } from "@/lib/api";
 import { searchAnime, getTrendingAnime } from "@/lib/anime-api";
+import Skeleton from "./Skeleton";
 
-const SearchContainer = ({ type, showDropdown = true, isSearchPage = false }) => {
+const SearchFilter = dynamic(() => import("./SearchFilter"));
+const MovieCard = dynamic(() => import("./MovieCard"));
+
+const SearchContainer = memo(({ type, showDropdown = true, isSearchPage = false }) => {
     const router = useRouter();
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(parseInt(router.query.page) || 1);
     const [totalPages, setTotalPages] = useState(1);
 
     const handleSearch = async (query, currentPage) => {
@@ -33,40 +35,39 @@ const SearchContainer = ({ type, showDropdown = true, isSearchPage = false }) =>
     const fetchData = useCallback(
         async (query, currentPage) => {
             setLoading(true);
-            let newResults;
-            if (query && query.length >= 2) {
-                newResults = await handleSearch(query, currentPage);
-            } else {
-                if (type === "anime") {
-                    const trendingData = await getTrendingAnime(currentPage);
-                    setTotalPages(trendingData.total_pages);
-                    newResults = trendingData.results;
+            try {
+                let newResults;
+                if (query && query.length >= 2) {
+                    newResults = await handleSearch(query, currentPage);
                 } else {
-                    const trendingData = await getTrending(type, currentPage);
-                    setTotalPages(trendingData.total_pages);
-                    newResults = trendingData.results;
+                    const data = type === "anime" ? await getTrendingAnime(currentPage) : await getTrending(type, currentPage);
+                    setTotalPages(data.total_pages);
+                    newResults = data.results;
                 }
+                setResults(newResults);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            } finally {
+                setLoading(false);
             }
-            setResults(newResults);
-            setLoading(false);
         },
         [type]
     );
 
     useEffect(() => {
-        const { page: pageQuery, type: typeQuery } = router.query;
-        const currentPage = parseInt(pageQuery) || 1;
+        const currentPage = parseInt(router.query.page) || 1;
         setPage(currentPage);
         fetchData(searchQuery, currentPage);
-    }, [router.query, searchQuery, fetchData]);
+    }, [router.query.page, searchQuery, fetchData]);
 
     const handleSearchAll = (query) => {
         setSearchQuery(query);
-        setPage(1);
-        router.push({
-            pathname: router.pathname,
-            query: { ...router.query, page: 1 },
-        });
+        if (router.query.page !== "1") {
+            router.push({
+                pathname: router.pathname,
+                query: { ...router.query, page: 1 },
+            });
+        }
     };
 
     const handleTypeChange = (newType) => {
@@ -93,18 +94,12 @@ const SearchContainer = ({ type, showDropdown = true, isSearchPage = false }) =>
         );
     };
 
-    const getContentType = () => {
-        switch (type) {
-            case "movie":
-                return "Movies";
-            case "tv":
-                return "TV Shows";
-            case "anime":
-                return "Anime";
-            default:
-                return "Content";
-        }
-    };
+    const getContentType = () =>
+        ({
+            movie: "Movies",
+            tv: "TV Shows",
+            anime: "Anime",
+        }[type] || "Content");
 
     return (
         <>
@@ -168,7 +163,7 @@ const SearchContainer = ({ type, showDropdown = true, isSearchPage = false }) =>
                                     <Skeleton className="w-full !aspect-[1.45/2] rounded-xl" />
                                 </div>
                             ))
-                    ) : results && results.length > 0 ? (
+                    ) : results?.length > 0 ? (
                         results.map((item) => <MovieCard key={item.id} item={item} type={type} />)
                     ) : (
                         <p className="col-span-full text-center text-gray-400">No results found.</p>
@@ -177,6 +172,7 @@ const SearchContainer = ({ type, showDropdown = true, isSearchPage = false }) =>
             </div>
         </>
     );
-};
+});
 
+SearchContainer.displayName = "SearchContainer";
 export default SearchContainer;

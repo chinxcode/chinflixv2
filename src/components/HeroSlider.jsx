@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { PlayIcon, PlusIcon } from "@heroicons/react/24/solid";
@@ -6,25 +6,33 @@ import { motion, AnimatePresence } from "framer-motion";
 import { getTrending } from "@/lib/api";
 import Skeleton from "./Skeleton";
 
-const HeroSlider = () => {
+const HeroSlider = memo(({ type = "movie" }) => {
     const [trendingItems, setTrendingItems] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchTrending = async () => {
-            setLoading(true);
-            const data = await getTrending("movie");
-            setTrendingItems(data.results.slice(0, 5));
-            setLoading(false);
+            try {
+                setLoading(true);
+                const data = await getTrending(type);
+                setTrendingItems(data.results.slice(0, 10));
+            } catch (error) {
+                console.error("Error fetching trending items:", error);
+            } finally {
+                setLoading(false);
+            }
         };
         fetchTrending();
-    }, []);
+    }, [type]);
 
     useEffect(() => {
+        if (trendingItems.length === 0) return;
+
         const timer = setInterval(() => {
             setCurrentIndex((prevIndex) => (prevIndex + 1) % trendingItems.length);
         }, 5000);
+
         return () => clearInterval(timer);
     }, [trendingItems]);
 
@@ -53,13 +61,15 @@ const HeroSlider = () => {
                 >
                     <Image
                         src={`https://image.tmdb.org/t/p/original${item.backdrop_path}`}
-                        alt={item.title || item.name || "Trending item"}
+                        alt={item.title || item.name}
                         layout="fill"
-                        objectFit="cover"
-                        className="opacity-50"
+                        priority
+                        quality={90}
+                        className="opacity-50 object-cover"
                     />
                 </motion.div>
             </AnimatePresence>
+
             <div className="absolute inset-0 flex items-center">
                 <div className="w-full lg:w-2/3 p-4 sm:p-6 lg:p-10 flex flex-col gap-2 sm:gap-4">
                     <motion.h2
@@ -71,6 +81,7 @@ const HeroSlider = () => {
                     >
                         {item.title || item.name}
                     </motion.h2>
+
                     <motion.p
                         key={`${item.id}-overview`}
                         initial={{ opacity: 0, y: 20 }}
@@ -80,6 +91,7 @@ const HeroSlider = () => {
                     >
                         {item.overview}
                     </motion.p>
+
                     <motion.div
                         key={`${item.id}-buttons`}
                         initial={{ opacity: 0, y: 20 }}
@@ -87,13 +99,16 @@ const HeroSlider = () => {
                         transition={{ duration: 0.5, delay: 0.4 }}
                         className="flex space-x-2 sm:space-x-4"
                     >
-                        <Link href={`/watch/movie/${item.id}`}>
+                        <Link href={`/watch/${type}/${item.id}`}>
                             <button className="bg-white/10 rounded-full overflow-hidden active:bg-white/20 hover:bg-white/15 p-1 sm:p-2 px-2 sm:px-4 flex items-center space-x-1 sm:space-x-2 transition-colors duration-200">
                                 <PlayIcon className="h-3 w-3 sm:h-4 sm:w-4" />
                                 <span className="text-xs sm:text-sm">Watch Now</span>
                             </button>
                         </Link>
-                        <button className="bg-white/10 rounded-full overflow-hidden active:bg-white/20 hover:bg-white/15 p-1 sm:p-2 transition-colors duration-200">
+                        <button
+                            className="bg-white/10 rounded-full overflow-hidden active:bg-white/20 hover:bg-white/15 p-1 sm:p-2 transition-colors duration-200"
+                            aria-label="Add to watchlist"
+                        >
                             <PlusIcon className="h-3 w-3 sm:h-5 sm:w-5" />
                         </button>
                     </motion.div>
@@ -101,6 +116,7 @@ const HeroSlider = () => {
             </div>
         </div>
     );
-};
+});
 
+HeroSlider.displayName = "HeroSlider";
 export default HeroSlider;
