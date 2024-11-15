@@ -1,4 +1,9 @@
 export const streamingSources = {
+    onexbet: {
+        flag: "https://flagcdn.com/w20/in.png",
+        movie: "https://kamitor316opk.com/play/{imdbId}",
+        tv: "https://kamitor316opk.com/play/{imdbId}?s={season}&e={episode}",
+    },
     vidxyz: {
         flag: "https://flagcdn.com/w20/us.png",
         movie: "https://vidsrc.xyz/embed/movie?tmdb={id}",
@@ -13,11 +18,6 @@ export const streamingSources = {
         flag: "https://flagcdn.com/w20/us.png",
         movie: "https://vidlink.pro/movie/{id}?icons=vid",
         tv: "https://vidlink.pro/tv/{id}/{season}/{episode}?icons=vid&nextbutton=true",
-    },
-    onexbet: {
-        flag: "https://flagcdn.com/w20/in.png",
-        movie: "https://kamitor316opk.com/play/{imdbId}",
-        tv: "https://kamitor316opk.com/play/{imdbId}?s={season}&e={episode}",
     },
     vidrip: {
         flag: "https://flagcdn.com/w20/gb.png",
