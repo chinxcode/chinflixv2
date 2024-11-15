@@ -1,21 +1,37 @@
+import dynamic from "next/dynamic";
+import { Suspense } from "react";
 import Head from "next/head";
-import DevelopmentPopup from "@/components/DevelopmentPopup";
-import SearchContainer from "@/components/SearchContainer";
-import CreateSection from "@/components/CreateSection";
+
+const SearchContainer = dynamic(() => import("@/components/SearchContainer"), {
+    loading: () => <div className="h-12 bg-gray-800 animate-pulse rounded" />,
+});
+
+const CreateSection = dynamic(() => import("@/components/CreateSection"), {
+    loading: () => <div className="h-64 bg-gray-800 animate-pulse rounded" />,
+});
+
+const DevelopmentPopup = dynamic(() => import("@/components/DevelopmentPopup"));
 
 export default function Anime() {
     return (
         <>
             <Head>
                 <title>Anime | ChinFlix</title>
+                <meta name="description" content="Watch your favorite anime shows on ChinFlix" />
             </Head>
             <main className="p-8">
                 <DevelopmentPopup />
-                <SearchContainer type="anime" showDropdown={false} />
+                <Suspense fallback={<div className="h-12 bg-gray-800 animate-pulse rounded" />}>
+                    <SearchContainer type="anime" showDropdown={false} />
+                </Suspense>
 
                 <div className="mt-12 space-y-12">
-                    <CreateSection type="anime" endpoint="popular" />
-                    <CreateSection type="anime" endpoint="trending" />
+                    <Suspense fallback={<div className="h-64 bg-gray-800 animate-pulse rounded" />}>
+                        <CreateSection type="anime" endpoint="popular" priority />
+                    </Suspense>
+                    <Suspense fallback={<div className="h-64 bg-gray-800 animate-pulse rounded" />}>
+                        <CreateSection type="anime" endpoint="trending" />
+                    </Suspense>
                     <p className="text-left py-4 text-sm text-gray-400 px-4">
                         This site does not store any files on the server, we only linked to the media which is hosted on 3rd party services.
                     </p>

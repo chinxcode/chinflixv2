@@ -2,39 +2,72 @@ import { streamingSources } from "./streamingSources";
 
 const BASE_URL = "/api/tmdb";
 
+const cache = new Map();
+const CACHE_TIME = 10 * 60 * 1000; // 10 minutes
+
+const fetchWithCache = async (key, fetchFn) => {
+    const cached = cache.get(key);
+    if (cached && Date.now() - cached.timestamp < CACHE_TIME) {
+        return cached.data;
+    }
+    const data = await fetchFn();
+    cache.set(key, { data, timestamp: Date.now() });
+    return data;
+};
+
+const handleApiResponse = async (response) => {
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error);
+    return data;
+};
+
 export const searchMulti = async (query, page = 1) => {
-    const response = await fetch(`${BASE_URL}/search/multi?query=${encodeURIComponent(query)}&page=${page}`);
-    return response.json();
+    return fetchWithCache(`search-${query}-${page}`, async () => {
+        const response = await fetch(`${BASE_URL}/search/multi?query=${encodeURIComponent(query)}&page=${page}`);
+        return handleApiResponse(response);
+    });
 };
 
 export const getTopRated = async (type, page = 1) => {
-    const response = await fetch(`${BASE_URL}/${type}/top_rated?page=${page}`);
-    return response.json();
+    return fetchWithCache(`toprated-${type}-${page}`, async () => {
+        const response = await fetch(`${BASE_URL}/${type}/top_rated?page=${page}`);
+        return handleApiResponse(response);
+    });
 };
 
 export const getPopular = async (type, page = 1) => {
-    const response = await fetch(`${BASE_URL}/${type}/popular?page=${page}`);
-    return response.json();
+    return fetchWithCache(`popular-${type}-${page}`, async () => {
+        const response = await fetch(`${BASE_URL}/${type}/popular?page=${page}`);
+        return handleApiResponse(response);
+    });
 };
 
 export const getTrending = async (type, page = 1) => {
-    const response = await fetch(`${BASE_URL}/trending/${type}/week?page=${page}`);
-    return response.json();
+    return fetchWithCache(`trending-${type}-${page}`, async () => {
+        const response = await fetch(`${BASE_URL}/trending/${type}/week?page=${page}`);
+        return handleApiResponse(response);
+    });
 };
 
 export const getMediaDetails = async (type, id) => {
-    const response = await fetch(`${BASE_URL}/${type}/${id}?append_to_response=credits,recommendations`);
-    return response.json();
+    return fetchWithCache(`details-${type}-${id}`, async () => {
+        const response = await fetch(`${BASE_URL}/${type}/${id}?append_to_response=credits,recommendations`);
+        return handleApiResponse(response);
+    });
 };
 
 export const getSeasonDetails = async (tvId, seasonNumber) => {
-    const response = await fetch(`${BASE_URL}/tv/${tvId}/season/${seasonNumber}`);
-    return response.json();
+    return fetchWithCache(`season-${tvId}-${seasonNumber}`, async () => {
+        const response = await fetch(`${BASE_URL}/tv/${tvId}/season/${seasonNumber}`);
+        return handleApiResponse(response);
+    });
 };
 
 export const getExternalIds = async (type, id) => {
-    const response = await fetch(`${BASE_URL}/${type}/${id}/external_ids`);
-    return response.json();
+    return fetchWithCache(`external-${type}-${id}`, async () => {
+        const response = await fetch(`${BASE_URL}/${type}/${id}/external_ids`);
+        return handleApiResponse(response);
+    });
 };
 
 export const getStreamingLinks = async (id, type, season, episode) => {
