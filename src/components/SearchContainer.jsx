@@ -153,7 +153,7 @@ const SearchContainer = memo(({ type, showDropdown = true, isSearchPage = false 
 
                 <div className="flex gap-y-2 w-full flex-wrap justify-start smoothie mb-4">
                     {loading ? (
-                        Array(12)
+                        Array(15)
                             .fill(0)
                             .map((_, i) => (
                                 <div

@@ -1,7 +1,7 @@
 import { memo } from "react";
 import Image from "next/image";
 
-const StreamingServers = memo(({ servers, onServerChange }) => {
+const StreamingServers = memo(({ servers, onServerChange, selectedServerIndex, isLoading }) => {
     return (
         <>
             <p className="text-left text-sm text-gray-400 px-4">
@@ -11,9 +11,10 @@ const StreamingServers = memo(({ servers, onServerChange }) => {
                 {servers.map((server, index) => (
                     <button
                         key={index}
-                        className="flex items-center justify-center px-2 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
-                        onClick={() => onServerChange(server.url, index)}
-                        aria-label={`Play on ${server.name} server`}
+                        className={`flex items-center justify-center px-2 py-2 rounded-lg transition-all duration-200 ${
+                            selectedServerIndex === index ? "bg-white/30 ring-2 ring-white/20" : "bg-gray-700 hover:bg-gray-600"
+                        }`}
+                        onClick={() => !isLoading && onServerChange(server.url, index)}
                     >
                         <div className="relative w-4 h-3 mr-2">
                             <Image src={server.flag} alt={`${server.name} flag`} layout="fill" objectFit="cover" />
