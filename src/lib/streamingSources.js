@@ -1,8 +1,8 @@
 export const streamingSources = {
-    onexbet: {
-        flag: "https://flagcdn.com/w20/in.png",
-        movie: "https://kamitor316opk.com/play/{imdbId}",
-        tv: "https://kamitor316opk.com/play/{imdbId}?s={season}&e={episode}",
+    vidxyz: {
+        flag: "https://flagcdn.com/w20/us.png",
+        movie: "https://vidsrc.xyz/embed/movie?tmdb={id}",
+        tv: "https://vidsrc.xyz/embed/tv?tmdb={id}&season={season}&episode={episode}",
     },
     vidpro: {
         flag: "https://flagcdn.com/w20/us.png",
@@ -14,15 +14,15 @@ export const streamingSources = {
         movie: "https://embed.su/embed/movie/{id}",
         tv: "https://embed.su/embed/tv/{id}/{season}/{episode}",
     },
-    vidxyz: {
-        flag: "https://flagcdn.com/w20/us.png",
-        movie: "https://vidsrc.xyz/embed/movie?tmdb={id}",
-        tv: "https://vidsrc.xyz/embed/tv?tmdb={id}&season={season}&episode={episode}",
-    },
     vidrip: {
         flag: "https://flagcdn.com/w20/gb.png",
         movie: "https://vidsrc.rip/embed/movie/{id}",
         tv: "https://vidsrc.rip/embed/tv/{id}/{season}/{episode}",
+    },
+    onexbet: {
+        flag: "https://flagcdn.com/w20/in.png",
+        movie: "https://kamitor316opk.com/play/{imdbId}",
+        tv: "https://kamitor316opk.com/play/{imdbId}?s={season}&e={episode}",
     },
     vidcc: {
         flag: "https://flagcdn.com/w20/gb.png",
