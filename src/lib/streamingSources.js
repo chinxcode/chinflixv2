@@ -4,20 +4,20 @@ export const streamingSources = {
         movie: "https://kamitor316opk.com/play/{imdbId}",
         tv: "https://kamitor316opk.com/play/{imdbId}?s={season}&e={episode}",
     },
-    vidxyz: {
+    vidpro: {
         flag: "https://flagcdn.com/w20/us.png",
-        movie: "https://vidsrc.xyz/embed/movie?tmdb={id}",
-        tv: "https://vidsrc.xyz/embed/tv?tmdb={id}&season={season}&episode={episode}",
+        movie: "https://vidlink.pro/movie/{id}?icons=vid",
+        tv: "https://vidlink.pro/tv/{id}/{season}/{episode}?icons=vid&nextbutton=true",
     },
     embedsu: {
         flag: "https://flagcdn.com/w20/us.png",
         movie: "https://embed.su/embed/movie/{id}",
         tv: "https://embed.su/embed/tv/{id}/{season}/{episode}",
     },
-    vidpro: {
+    vidxyz: {
         flag: "https://flagcdn.com/w20/us.png",
-        movie: "https://vidlink.pro/movie/{id}?icons=vid",
-        tv: "https://vidlink.pro/tv/{id}/{season}/{episode}?icons=vid&nextbutton=true",
+        movie: "https://vidsrc.xyz/embed/movie?tmdb={id}",
+        tv: "https://vidsrc.xyz/embed/tv?tmdb={id}&season={season}&episode={episode}",
     },
     vidrip: {
         flag: "https://flagcdn.com/w20/gb.png",

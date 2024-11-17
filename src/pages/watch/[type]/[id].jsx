@@ -17,6 +17,7 @@ const WatchPage = () => {
     const [streamingServers, setStreamingServers] = useState([]);
     const [currentServer, setCurrentServer] = useState("");
     const [selectedServerIndex, setSelectedServerIndex] = useState(0);
+    const [isChangingMedia, setIsChangingMedia] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -38,26 +39,49 @@ const WatchPage = () => {
     }, [type, id, currentSeason, currentEpisode]);
 
     const handleSeasonChange = async (season) => {
-        setCurrentSeason(season);
-        setCurrentEpisode(1);
-        if (type === "tv" && id) {
-            const seasonDetails = await getSeasonDetails(id, season);
+        if (season === currentSeason) return;
+        setIsChangingMedia(true);
+        try {
+            const [seasonDetails, links] = await Promise.all([getSeasonDetails(id, season), getStreamingLinks(id, type, season, 1)]);
+
+            setCurrentSeason(season);
+            setCurrentEpisode(1);
             setSeasonData(seasonDetails);
-            const links = await getStreamingLinks(id, "tv", season, 1);
             setStreamingServers(links);
             setCurrentServer(links[selectedServerIndex]?.url || links[0]?.url || "");
+        } catch (error) {
+            console.error("Failed to fetch season data:", error);
+        } finally {
+            setIsChangingMedia(false);
+        }
+    };
+
+    const handleEpisodeChange = async (episode) => {
+        if (episode === currentEpisode) return;
+        setIsChangingMedia(true);
+        try {
+            const links = await getStreamingLinks(id, type, currentSeason, episode);
+            setCurrentEpisode(episode);
+            setStreamingServers(links);
+            setCurrentServer(links[selectedServerIndex]?.url || links[0]?.url || "");
+        } catch (error) {
+            console.error("Failed to fetch episode data:", error);
+        } finally {
+            setIsChangingMedia(false);
         }
     };
 
     const handleServerChange = (url, index) => {
-        setCurrentServer(url);
-        setSelectedServerIndex(index);
+        if (!isChangingMedia && index !== selectedServerIndex) {
+            setCurrentServer(url);
+            setSelectedServerIndex(index);
+        }
     };
 
     if (loading) {
         return (
             <div className="p-2 h-screen">
-                <Skeleton className="w-full h-full" />
+                <Skeleton className="w-full h-full rounded-lg" withLoader />
             </div>
         );
     }
@@ -101,10 +125,15 @@ const WatchPage = () => {
                         </div>
                         <div className="h-full max-h-full overflow-y-auto p-4 space-y-4">
                             <div className="bg-gray-800 rounded-lg overflow-hidden flex flex-col">
-                                <VideoPlayer src={currentServer} />
+                                <VideoPlayer src={currentServer} isLoading={isChangingMedia} />
                                 <MediaActions viewCount={Number(mediaData.popularity.toFixed(0))} />
                             </div>
-                            <StreamingServers servers={streamingServers} onServerChange={handleServerChange} />
+                            <StreamingServers
+                                servers={streamingServers}
+                                onServerChange={handleServerChange}
+                                isLoading={isChangingMedia}
+                                selectedServerIndex={selectedServerIndex}
+                            />
                             <div className="bg-gray-900 rounded-lg p-4">
                                 <RelationInfo
                                     title="Recommended"
@@ -133,7 +162,8 @@ const WatchPage = () => {
                                         currentSeason={currentSeason}
                                         currentEpisode={currentEpisode}
                                         onSeasonChange={handleSeasonChange}
-                                        onEpisodeChange={setCurrentEpisode}
+                                        onEpisodeChange={handleEpisodeChange}
+                                        isLoading={isChangingMedia}
                                     />
                                 </div>
                             )}
@@ -189,10 +219,15 @@ const WatchPage = () => {
                         <div className="rounded-lg overflow-hidden border border-gray-700 flex flex-col">
                             <div className="max-h-full overflow-y-auto p-4 space-y-4">
                                 <div className="bg-gray-800 rounded-lg overflow-hidden flex flex-col">
-                                    <VideoPlayer src={currentServer} />
+                                    <VideoPlayer src={currentServer} isLoading={isChangingMedia} />
                                     <MediaActions viewCount={Number(mediaData.popularity.toFixed(0))} />
                                 </div>
-                                <StreamingServers servers={streamingServers} onServerChange={handleServerChange} />
+                                <StreamingServers
+                                    servers={streamingServers}
+                                    onServerChange={handleServerChange}
+                                    isLoading={isChangingMedia}
+                                    selectedServerIndex={selectedServerIndex}
+                                />
                             </div>
                         </div>
 
@@ -206,7 +241,8 @@ const WatchPage = () => {
                                             currentSeason={currentSeason}
                                             currentEpisode={currentEpisode}
                                             onSeasonChange={handleSeasonChange}
-                                            onEpisodeChange={setCurrentEpisode}
+                                            onEpisodeChange={handleEpisodeChange}
+                                            isLoading={isChangingMedia}
                                         />
                                     </div>
                                 )}
