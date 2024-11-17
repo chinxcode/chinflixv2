@@ -51,12 +51,13 @@ export default async function handler(req, res) {
             }
             break;
 
-        case "recent":
+        case "download":
             try {
-                const recent = await gogoanime.fetchRecentEpisodes(parseInt(req.query.page) || 1);
-                res.json(recent);
+                const { url } = req.query;
+                const downloadLinks = await gogoanime.fetchDirectDownloadLink(url);
+                res.json({ downloadLinks });
             } catch (error) {
-                res.status(500).json({ error: "Failed to fetch recent episodes" });
+                res.status(500).json({ error: "Failed to fetch download links" });
             }
             break;
 

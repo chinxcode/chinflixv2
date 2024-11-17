@@ -122,3 +122,9 @@ export const getEpisodeSources = async (episodeId) => {
         download: data.download,
     };
 };
+
+export const getDirectDownloadLink = async (downloadUrl) => {
+    const response = await fetch(`/api/anime/download?url=${downloadUrl}`);
+    const data = await handleApiResponse(response);
+    return data;
+};

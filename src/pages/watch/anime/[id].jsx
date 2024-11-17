@@ -21,6 +21,7 @@ const WatchAnimePage = () => {
     const [currentEpisode, setCurrentEpisode] = useState(null);
     const [streamingUrl, setStreamingUrl] = useState("");
     const [isChangingEpisode, setIsChangingEpisode] = useState(false);
+    const [downloadLink, setDownloadLink] = useState("");
 
     useEffect(() => {
         if (!id) return;
@@ -39,6 +40,7 @@ const WatchAnimePage = () => {
                     requestIdleCallback(async () => {
                         const sources = await getEpisodeSources(firstEpisode.id);
                         setStreamingUrl(sources.sources.find((s) => s.quality === "default")?.url || sources.sources[2]?.url || "");
+                        setDownloadLink(sources.download || "");
                     });
                 }
             } catch (error) {
@@ -57,6 +59,7 @@ const WatchAnimePage = () => {
             const sources = await getEpisodeSources(episodeId);
             setCurrentEpisode(episodeId);
             setStreamingUrl(sources.sources[0]?.url || "");
+            setDownloadLink(sources.download || "");
         } catch (error) {
             console.error("Failed to fetch episode sources:", error);
         } finally {
@@ -114,7 +117,7 @@ const WatchAnimePage = () => {
                     <div className="h-full max-h-full overflow-y-auto p-4 space-y-4">
                         <div className="bg-gray-800 rounded-lg overflow-hidden flex flex-col">
                             <AnimePlayer src={streamingUrl} isLoading={isChangingEpisode} />
-                            <AnimeMediaActions viewCount={1000} />
+                            <AnimeMediaActions viewCount={1000} downloadLink={downloadLink} />
                         </div>
                     </div>
                 </div>
