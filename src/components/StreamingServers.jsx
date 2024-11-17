@@ -15,8 +15,8 @@ const StreamingServers = memo(({ servers, onServerChange }) => {
                         onClick={() => onServerChange(server.url, index)}
                         aria-label={`Play on ${server.name} server`}
                     >
-                        <div className="relative w-4 h-4 mr-2">
-                            <Image src={server.flag} alt={`${server.name} flag`} width={16} height={16} className="object-cover" />
+                        <div className="relative w-4 h-3 mr-2">
+                            <Image src={server.flag} alt={`${server.name} flag`} layout="fill" objectFit="cover" />
                         </div>
                         <span>{server.name}</span>
                     </button>

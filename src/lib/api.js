@@ -3,7 +3,7 @@ import { streamingSources } from "./streamingSources";
 const BASE_URL = "/api/tmdb";
 
 const cache = new Map();
-const CACHE_TIME = 10 * 60 * 1000; // 10 minutes
+const CACHE_TIME = 1 * 24 * 60 * 60 * 1000;
 
 const fetchWithCache = async (key, fetchFn) => {
     const cached = cache.get(key);
