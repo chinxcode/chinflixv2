@@ -1,79 +1,133 @@
 import Image from "next/image";
 import Link from "next/link";
-import { StarIcon } from "@heroicons/react/24/solid";
+import { StarIcon, PlayIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";
 import { useInView } from "react-intersection-observer";
+import { motion, AnimatePresence } from "framer-motion";
 
 const MovieCard = ({ item, type }) => {
+    const [isHovered, setIsHovered] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
     const { ref, inView } = useInView({
         triggerOnce: true,
         rootMargin: "200px 0px",
     });
 
+    // Keep existing helper functions
     const getImageUrl = () => {
-        if (type === "anime") {
-            return item.image;
-        }
+        if (type === "anime") return item.image;
         return `http://image.tmdb.org/t/p/w342${item.poster_path}`;
     };
 
     const getYear = () => {
-        if (type === "anime") {
-            return item.releaseDate || "N/A";
-        }
+        if (type === "anime") return item.releaseDate || "N/A";
         return new Date(item.release_date || item.first_air_date).getFullYear();
     };
 
     const getTitle = () => {
-        if (type === "anime") {
-            return item.title;
-        }
+        if (type === "anime") return item.title;
         return item.title || item.name;
     };
 
     return (
-        <div className="w-1/3 sm:w-1/4 md:w-1/5 lg:w-1/6 xl:w-[14.28%] 2xl:w-[12.5%] p-[.4rem] sm:p-2 !shrink-0 gap-1 sm:gap-2 flex flex-col">
-            <div className="flex w-full !aspect-[1.45/2] cursor-pointer rounded-xl shadow overflow-hidden relative bg-white/10">
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: inView ? 1 : 0, y: inView ? 0 : 20 }}
+            transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+            className="w-1/3 sm:w-1/4 md:w-1/5 lg:w-1/6 xl:w-[14.28%] 2xl:w-[12.5%] p-[.4rem] sm:p-2 !shrink-0 gap-1 sm:gap-2 flex flex-col"
+        >
+            <motion.div
+                whileHover={{ scale: 1.04 }}
+                onHoverStart={() => setIsHovered(true)}
+                onHoverEnd={() => setIsHovered(false)}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className="flex w-full !aspect-[1.45/2] cursor-pointer rounded-xl shadow overflow-hidden relative bg-white/10"
+            >
                 <div ref={ref} className="size-full">
-                    <Link href={`/watch/${type}/${item.id}`} className="size-full relative group flex smoothie">
-                        {!imageLoaded && <div className="absolute inset-0 bg-gray-800 animate-pulse rounded-xl" />}
+                    <Link href={`/watch/${type}/${item.id}`} className="size-full relative group flex">
+                        {!imageLoaded && (
+                            <motion.div
+                                initial={{ opacity: 0.5 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ repeat: Infinity, duration: 1, ease: "easeInOut" }}
+                                className="absolute inset-0 bg-gray-800 rounded-xl"
+                            />
+                        )}
                         {inView && (
                             <Image
                                 fill
                                 src={getImageUrl()}
                                 alt={getTitle()}
-                                className={`size-full object-cover object-center !select-none shrink-0 ${
+                                className={`size-full object-cover object-center !select-none shrink-0 transition-opacity duration-300 ${
                                     imageLoaded ? "opacity-100" : "opacity-0"
                                 }`}
                                 onLoad={() => setImageLoaded(true)}
                                 loading="lazy"
                             />
                         )}
+
+                        <AnimatePresence>
+                            {isHovered && (
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center"
+                                >
+                                    <motion.div
+                                        initial={{ scale: 0, rotate: -180 }}
+                                        animate={{ scale: 1, rotate: 0 }}
+                                        exit={{ scale: 0, rotate: 180 }}
+                                        transition={{
+                                            type: "spring",
+                                            stiffness: 200,
+                                            damping: 15,
+                                        }}
+                                        className="bg-white/25 backdrop-blur-sm p-4 rounded-full hover:bg-white/30 transition-colors"
+                                    >
+                                        <PlayIcon className="w-8 h-8 text-white drop-shadow-lg" />
+                                    </motion.div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
                         <div className="absolute inset-0">
                             {type !== "anime" && (
-                                <span className="absolute right-1 top-1">
-                                    <span className="bg-black/75 p-[.1rem] px-1 gap-1 rounded-md flex items-center text-xs">
+                                <motion.span
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.2 }}
+                                    className="absolute right-1 top-1"
+                                >
+                                    <span className="bg-black/75 backdrop-blur-sm p-[.1rem] px-1 gap-1 rounded-md flex items-center text-xs">
                                         <StarIcon className="w-3 h-3 text-yellow-400" />
                                         {item.vote_average?.toFixed(1) || "N/A"}
                                     </span>
-                                </span>
+                                </motion.span>
                             )}
                             {type === "anime" && item.subOrDub && (
-                                <span className="absolute left-1 top-1 bg-blue-500/75 text-xs px-1.5 py-0.5 rounded">{item.subOrDub}</span>
+                                <motion.span
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    className="absolute left-1 top-1 bg-blue-500/75 backdrop-blur-sm text-xs px-1.5 py-0.5 rounded"
+                                >
+                                    {item.subOrDub}
+                                </motion.span>
                             )}
                         </div>
                     </Link>
                 </div>
-            </div>
-            <Link href={`/watch/${type}/${item.id}`} className="flex w-full flex-col gap-1">
-                <div className="flex text-xs text-gray-300 justify-between">
-                    <span className="uppercase">{type}</span>
-                    <span>{getYear()}</span>
-                </div>
-                <div className="flex w-full text-[.82rem] sm:text-sm font-medium !line-clamp-2 tracking-wider">{getTitle()}</div>
-            </Link>
-        </div>
+            </motion.div>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: inView ? 1 : 0 }} transition={{ delay: 0.2 }}>
+                <Link href={`/watch/${type}/${item.id}`} className="flex w-full flex-col gap-1">
+                    <div className="flex text-xs text-gray-300 justify-between">
+                        <span className="uppercase">{type}</span>
+                        <span>{getYear()}</span>
+                    </div>
+                    <div className="flex w-full text-[.82rem] sm:text-sm font-medium !line-clamp-2 tracking-wider">{getTitle()}</div>
+                </Link>
+            </motion.div>
+        </motion.div>
     );
 };
 

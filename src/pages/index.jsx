@@ -19,13 +19,13 @@ export default function Home() {
                 <title>ChinFlix - Discover and Watch Movies & TV Shows</title>
                 <link rel="shortcut icon" href="/icon.png" type="image/x-icon" />
             </Head>
-            <header className="lg:hidden bg-gradient-to-b from-black/80 to-black/60 backdrop-blur-md py-4 px-3 fixed top-0 left-0 right-0 z-[60] flex justify-between items-center">
+            <header className="lg:hidden bg-gradient-to-b from-black/80 to-black/60 backdrop-blur-md py-4 px-4 fixed top-0 left-0 right-0 z-[60] flex justify-between items-center">
                 <Link href="/" className="text-4xl font-bold hover:text-[#FF4D4D] smoothie">
                     ChinFlix
                 </Link>
                 <UserCircleIcon className="w-8 h-8 text-white cursor-pointer" />
             </header>
-            <main className="size-full flex flex-col gap-4 relative overflow-x-hidden overflow-y-auto pb-14 lg:pb-0 pt-20 lg:pt-0">
+            <main className="size-full flex flex-col bg-black gap-4 relative overflow-x-hidden overflow-y-auto pb-14 lg:pb-0 pt-20 lg:pt-0">
                 <div className="flex flex-col w-full z-0 relative px-3 2xl:px-5 py-6">
                     <Suspense fallback={<div className="aspect-[2.4/1] bg-gray-800 animate-pulse rounded" />}>
                         <HeroSlider />

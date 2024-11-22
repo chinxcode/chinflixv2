@@ -5,11 +5,19 @@ import { PlayIcon, PlusIcon } from "@heroicons/react/24/solid";
 import { motion, AnimatePresence } from "framer-motion";
 import { getTrending } from "@/lib/api";
 import Skeleton from "./Skeleton";
+import { useSwipeable } from "react-swipeable";
 
 const HeroSlider = memo(({ type = "movie" }) => {
     const [trendingItems, setTrendingItems] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [loading, setLoading] = useState(true);
+
+    const handlers = useSwipeable({
+        onSwipedLeft: () => setCurrentIndex((prev) => (prev + 1) % trendingItems.length),
+        onSwipedRight: () => setCurrentIndex((prev) => (prev - 1 + trendingItems.length) % trendingItems.length),
+        preventDefaultTouchmoveEvent: true,
+        trackMouse: true,
+    });
 
     useEffect(() => {
         const fetchTrending = async () => {
@@ -28,18 +36,16 @@ const HeroSlider = memo(({ type = "movie" }) => {
 
     useEffect(() => {
         if (trendingItems.length === 0) return;
-
         const timer = setInterval(() => {
             setCurrentIndex((prevIndex) => (prevIndex + 1) % trendingItems.length);
         }, 5000);
-
         return () => clearInterval(timer);
     }, [trendingItems]);
 
     if (loading) {
         return (
             <div className="relative bg-[#1E1E1E] rounded-lg overflow-hidden md:aspect-[2.4/1] aspect-[16/9] lg:aspect-[2/.6] shadow-lg">
-                <Skeleton className="w-full h-full aspect-video rounded-lg" />
+                <Skeleton className="w-full h-full aspect-video rounded-2xl" />
             </div>
         );
     }
@@ -49,14 +55,14 @@ const HeroSlider = memo(({ type = "movie" }) => {
     const item = trendingItems[currentIndex];
 
     return (
-        <div className="relative bg-[#1E1E1E] rounded-lg overflow-hidden md:aspect-[2.4/1] aspect-[16/9] lg:aspect-[2/.6] shadow-lg">
+        <div {...handlers} className="relative rounded-2xl overflow-hidden md:aspect-[2.4/1] aspect-[16/9] lg:aspect-[2/.6] shadow-2xl">
             <AnimatePresence initial={false}>
                 <motion.div
                     key={item.id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.5 }}
+                    initial={{ opacity: 0, scale: 1.1 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.7, ease: "easeOut" }}
                     className="absolute inset-0"
                 >
                     <Image
@@ -65,7 +71,7 @@ const HeroSlider = memo(({ type = "movie" }) => {
                         layout="fill"
                         priority
                         quality={90}
-                        className="opacity-50 object-cover"
+                        className="opacity-60 object-cover"
                     />
                 </motion.div>
             </AnimatePresence>
@@ -76,8 +82,8 @@ const HeroSlider = memo(({ type = "movie" }) => {
                         key={`${item.id}-title`}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                        className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold line-clamp-2"
+                        transition={{ duration: 0.7, ease: "easeOut" }}
+                        className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold line-clamp-2 text-white/90"
                     >
                         {item.title || item.name}
                     </motion.h2>
@@ -86,7 +92,7 @@ const HeroSlider = memo(({ type = "movie" }) => {
                         key={`${item.id}-overview`}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.2 }}
+                        transition={{ duration: 0.7, delay: 0.2 }}
                         className="text-[#E0E0E0] text-xs sm:text-sm md:text-base line-clamp-2 sm:line-clamp-3 lg:line-clamp-4"
                     >
                         {item.overview}
@@ -96,21 +102,27 @@ const HeroSlider = memo(({ type = "movie" }) => {
                         key={`${item.id}-buttons`}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.4 }}
-                        className="flex space-x-2 sm:space-x-4"
+                        transition={{ duration: 0.7, delay: 0.4 }}
+                        className="flex space-x-3 sm:space-x-4"
                     >
                         <Link href={`/watch/${type}/${item.id}`}>
-                            <button className="bg-white/10 rounded-full overflow-hidden active:bg-white/20 hover:bg-white/15 p-1 sm:p-2 px-2 sm:px-4 flex items-center space-x-1 sm:space-x-2 transition-colors duration-200">
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="bg-white/90 text-black rounded-full overflow-hidden hover:bg-white p-1.5 sm:p-2 px-3 sm:px-4 flex items-center space-x-1 sm:space-x-2 transition-all duration-200 shadow-lg"
+                            >
                                 <PlayIcon className="h-3 w-3 sm:h-4 sm:w-4" />
-                                <span className="text-xs sm:text-sm">Watch Now</span>
-                            </button>
+                                <span className="text-xs sm:text-sm font-medium">Watch Now</span>
+                            </motion.button>
                         </Link>
-                        <button
-                            className="bg-white/10 rounded-full overflow-hidden active:bg-white/20 hover:bg-white/15 p-1 sm:p-2 transition-colors duration-200"
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="bg-white/10 backdrop-blur-sm rounded-full overflow-hidden hover:bg-white/20 p-1.5 sm:p-2 transition-all duration-200 shadow-lg"
                             aria-label="Add to watchlist"
                         >
                             <PlusIcon className="h-3 w-3 sm:h-5 sm:w-5" />
-                        </button>
+                        </motion.button>
                     </motion.div>
                 </div>
             </div>
