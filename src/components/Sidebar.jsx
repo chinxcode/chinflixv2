@@ -31,7 +31,7 @@ const Sidebar = () => {
     ];
 
     const footerLinks = [
-        { icon: DocumentTextIcon, label: "Legal", path: "/legal" },
+        { icon: DocumentTextIcon, label: "Legal", path: "/legal", external: false },
         { icon: GlobeAltIcon, label: "Old ChinFlix", path: "https://chinflix-old.vercel.app", external: true },
         { icon: GlobeAltIcon, label: "AnimeFlix", path: "https://ani-dl.vercel.app", external: true },
     ];
@@ -45,8 +45,8 @@ const Sidebar = () => {
             <Link
                 key={item.path}
                 href={item.path}
-                target={isExternal ? "_blank" : "_self"}
-                rel={isExternal ? "noopener noreferrer" : ""}
+                target={isExternal && isExternal(item) ? "_blank" : "_self"}
+                rel={isExternal && isExternal(item) ? "noopener noreferrer" : ""}
                 className={`sidebar-link flex items-center space-x-2 p-2 rounded-lg w-full ${
                     isActive(item.path) ? "bg-white/10 text-white" : "text-[#E0E0E0] hover:text-white"
                 }`}
