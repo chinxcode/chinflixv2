@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useEffect, useRef } from "react";
 import {
     HomeIcon,
     MagnifyingGlassIcon,
@@ -11,11 +12,13 @@ import {
     SparklesIcon,
     BookOpenIcon,
     GlobeAsiaAustraliaIcon,
+    DocumentTextIcon,
 } from "@heroicons/react/24/outline";
 import { motion, AnimatePresence } from "framer-motion";
 
 const BottomNav = ({ showMoreMenu, setShowMoreMenu }) => {
     const router = useRouter();
+    const menuRef = useRef(null);
 
     const mainNavItems = [
         { icon: HomeIcon, label: "Home", path: "/" },
@@ -31,12 +34,24 @@ const BottomNav = ({ showMoreMenu, setShowMoreMenu }) => {
         { icon: HeartIcon, label: "Watchlist", path: "/watchlist" },
     ];
 
-    const developerProjects = [
-        { icon: GlobeAltIcon, label: "Old ChinFlix", path: "https://chinflix-old.vercel.app" },
-        { icon: GlobeAltIcon, label: "AnimeFlix", path: "https://ani-dl.vercel.app" },
+    const footerLinks = [
+        { icon: DocumentTextIcon, label: "Legal", path: "/legal" },
+        { icon: GlobeAltIcon, label: "Old ChinFlix", path: "https://chinflix-old.vercel.app", external: true },
+        { icon: GlobeAltIcon, label: "AnimeFlix", path: "https://ani-dl.vercel.app", external: true },
     ];
 
     const isActive = (path) => router.pathname === path;
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                setShowMoreMenu(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [setShowMoreMenu]);
 
     return (
         <nav className="bg-gradient-to-t from-black/80 to-black/60 backdrop-blur-md text-white py-2">
@@ -56,6 +71,7 @@ const BottomNav = ({ showMoreMenu, setShowMoreMenu }) => {
             <AnimatePresence>
                 {showMoreMenu && (
                     <motion.div
+                        ref={menuRef}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 20 }}
@@ -80,15 +96,15 @@ const BottomNav = ({ showMoreMenu, setShowMoreMenu }) => {
                             </div>
 
                             <div>
-                                <h3 className="text-xs font-medium text-[#FF4D4D] mb-2">MORE FROM DEVELOPER</h3>
+                                <h3 className="text-xs font-medium text-[#FF4D4D] mb-2">MORE</h3>
                                 <div className="grid grid-cols-3 gap-4">
-                                    {developerProjects.map((item) => (
+                                    {footerLinks.map((item) => (
                                         <NavItem
                                             key={item.path}
                                             href={item.path}
                                             icon={item.icon}
                                             label={item.label}
-                                            external={true}
+                                            external={item.external}
                                             onClick={() => setShowMoreMenu(false)}
                                         />
                                     ))}

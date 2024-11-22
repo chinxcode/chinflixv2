@@ -9,6 +9,7 @@ import {
     GlobeAltIcon,
     SparklesIcon,
     BookOpenIcon,
+    DocumentTextIcon,
     GlobeAsiaAustraliaIcon,
 } from "@heroicons/react/24/outline";
 
@@ -29,9 +30,10 @@ const Sidebar = () => {
         { icon: HeartIcon, label: "Watchlist", path: "/watchlist" },
     ];
 
-    const developerProjects = [
-        { icon: GlobeAltIcon, label: "Old ChinFlix", path: "https://chinflix-old.vercel.app" },
-        { icon: GlobeAltIcon, label: "AnimeFlix", path: "https://ani-dl.vercel.app" },
+    const footerLinks = [
+        { icon: DocumentTextIcon, label: "Legal", path: "/legal" },
+        { icon: GlobeAltIcon, label: "Old ChinFlix", path: "https://chinflix-old.vercel.app", external: true },
+        { icon: GlobeAltIcon, label: "AnimeFlix", path: "https://ani-dl.vercel.app", external: true },
     ];
 
     const isActive = (path) => {
@@ -69,9 +71,9 @@ const Sidebar = () => {
                         <NavSection items={mediaNavItems} />
                     </div>
 
-                    <div className="w-full mt-4">
-                        <span className="text-xs text-gray-500 px-2">MORE FROM DEVELOPER</span>
-                        <NavSection items={developerProjects} isExternal={true} />
+                    <div className="w-full">
+                        <span className="text-xs text-gray-500 px-2">MORE</span>
+                        <NavSection items={footerLinks} isExternal={(item) => item.external} />
                     </div>
                 </div>
             </div>

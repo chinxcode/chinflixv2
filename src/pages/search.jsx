@@ -24,7 +24,6 @@ export default function Search() {
         <>
             <Head>
                 <title>{`${getTitle()} Search | ChinFlix`}</title>
-                <meta name="description" content={`Search ${getTitle().toLowerCase()} on ChinFlix`} />
             </Head>
             <main className="p-8">
                 <Suspense fallback={<div className="h-screen bg-gray-800 animate-pulse rounded" />}>

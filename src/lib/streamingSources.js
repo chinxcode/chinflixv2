@@ -51,8 +51,8 @@ export const streamingSources = {
     },
     vidvip: {
         flag: "https://flagcdn.com/w20/in.png",
-        movie: "https://vidsrc.vip/embed/movie/{id}&server=3",
-        tv: "https://vidsrc.vip/embed/tv/{id}/{season}/{episode}&server=3",
+        movie: "https://vidsrc.vip/embed/movie/{id}",
+        tv: "https://vidsrc.vip/embed/tv/{id}/{season}/{episode}",
     },
     smashy: {
         flag: "https://flagcdn.com/w20/in.png",

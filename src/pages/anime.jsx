@@ -17,9 +17,8 @@ export default function Anime() {
         <>
             <Head>
                 <title>Anime | ChinFlix</title>
-                <meta name="description" content="Watch your favorite anime shows on ChinFlix" />
             </Head>
-            <main className="p-8">
+            <main className="p-8 pb-16">
                 <DevelopmentPopup />
                 <Suspense fallback={<div className="h-12 bg-gray-800 animate-pulse rounded" />}>
                     <SearchContainer type="anime" showDropdown={false} />
@@ -32,10 +31,10 @@ export default function Anime() {
                     <Suspense fallback={<div className="h-64 bg-gray-800 animate-pulse rounded" />}>
                         <CreateSection type="anime" endpoint="trending" />
                     </Suspense>
-                    <p className="text-left py-4 text-sm text-gray-400 px-4">
-                        This site does not store any files on the server, we only linked to the media which is hosted on 3rd party services.
-                    </p>
                 </div>
+                <p className="text-left text-sm text-gray-400 p-4">
+                    This site does not store any files on the server, we only linked to the media which is hosted on 3rd party services.
+                </p>
             </main>
         </>
     );

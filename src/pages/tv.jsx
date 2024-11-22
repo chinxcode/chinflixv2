@@ -15,9 +15,8 @@ export default function TVShows() {
         <>
             <Head>
                 <title>TV Shows | ChinFlix</title>
-                <meta name="description" content="Stream your favorite TV shows on ChinFlix" />
             </Head>
-            <main className="p-8">
+            <main className="p-8 pb-16">
                 <Suspense fallback={<div className="h-12 bg-gray-800 animate-pulse rounded" />}>
                     <SearchContainer type="tv" showDropdown={false} />
                 </Suspense>
@@ -28,6 +27,9 @@ export default function TVShows() {
                         <CreateSection type="tv" endpoint="top_rated" />
                     </Suspense>
                 </div>
+                <p className="text-left text-sm text-gray-400 p-4">
+                    This site does not store any files on the server, we only linked to the media which is hosted on 3rd party services.
+                </p>
             </main>
         </>
     );

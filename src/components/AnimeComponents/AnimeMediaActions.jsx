@@ -57,10 +57,10 @@ const AnimeMediaActions = ({ viewCount, episodes, currentEpisode, onEpisodeChang
                                     <div className="font-medium text-white/90 line-clamp-1">{currentEpisodeData?.title}</div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <button className="bg-white/10 p-2 rounded-lg">
+                                    <button className="bg-white/10 p-2 rounded-lg disabled:opacity-40" disabled>
                                         <PlusCircleIcon className="w-5 h-5" />
                                     </button>
-                                    <button onClick={handleShare} className="bg-white/10 p-2 rounded-lg">
+                                    <button onClick={handleShare} className="bg-white/10 p-2 rounded-lg ">
                                         <ShareIcon className="w-5 h-5" />
                                     </button>
                                     <button
@@ -86,7 +86,7 @@ const AnimeMediaActions = ({ viewCount, episodes, currentEpisode, onEpisodeChang
                     <div className="mt-2 px-1">
                         <div className="relative w-full h-1 bg-white/10 rounded-full overflow-hidden">
                             <div
-                                className="absolute left-0 top-0 h-full bg-red-500 rounded-full"
+                                className="absolute left-0 top-0 h-full bg-red-500 rounded-full transition-all duration-500 ease-in-out"
                                 style={{ width: `${((currentEpisodeIndex + 1) / episodes?.length) * 100}%` }}
                             />
                         </div>

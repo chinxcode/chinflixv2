@@ -24,91 +24,101 @@ const WatchAnimePage = () => {
     const [isChangingEpisode, setIsChangingEpisode] = useState(false);
     const [downloadLink, setDownloadLink] = useState("");
 
-    // Load initial anime data
+    // Watch for URL changes with validation
+    useEffect(() => {
+        if (!animeData || !e) return;
+        const episodeNumber = parseInt(e);
+
+        // Validate episode number
+        if (isNaN(episodeNumber) || episodeNumber < 1 || episodeNumber > animeData.episodes.length) {
+            router.replace(
+                {
+                    pathname: router.pathname,
+                    query: { id },
+                },
+                undefined,
+                { shallow: true }
+            );
+            return;
+        }
+
+        const targetEpisode = animeData.episodes[episodeNumber - 1];
+        if (targetEpisode && targetEpisode.id !== currentEpisode) {
+            handleEpisodeChange(targetEpisode.id);
+        }
+    }, [e, animeData]);
+
+    // Initial data load with validation
     useEffect(() => {
         if (!id) return;
 
-        const fetchAnimeData = async () => {
+        const fetchInitialData = async () => {
             setLoading(true);
             try {
                 const data = await getAnimeInfo(id);
                 setAnimeData(data);
-                setLoading(false);
+
+                if (data.episodes.length > 0) {
+                    let targetEpisodeNumber = 1;
+
+                    const cachedEpisode = localStorage.getItem(`anime_${id}_episode`);
+                    if (cachedEpisode) {
+                        const episodeData = JSON.parse(cachedEpisode);
+                        if (episodeData.timestamp > Date.now() - 30 * 24 * 60 * 60 * 1000) {
+                            targetEpisodeNumber = episodeData.number;
+                        }
+                    }
+
+                    if (e) {
+                        const requestedEpisode = parseInt(e);
+                        if (!isNaN(requestedEpisode) && requestedEpisode >= 1 && requestedEpisode <= data.episodes.length) {
+                            targetEpisodeNumber = requestedEpisode;
+                        }
+                    }
+
+                    const targetEpisode = data.episodes[targetEpisodeNumber - 1];
+                    if (targetEpisode) {
+                        const sources = await getEpisodeSources(targetEpisode.id);
+                        setCurrentEpisode(targetEpisode.id);
+                        setCurrentEpisodeNumber(targetEpisodeNumber);
+                        setStreamingUrl(sources.sources.find((s) => s.quality === "default")?.url || sources.sources[2]?.url || "");
+                        setDownloadLink(sources.download || "");
+
+                        router.replace(
+                            {
+                                pathname: router.pathname,
+                                query: { ...router.query, e: targetEpisodeNumber },
+                            },
+                            undefined,
+                            { shallow: true }
+                        );
+
+                        localStorage.setItem(
+                            `anime_${id}_episode`,
+                            JSON.stringify({
+                                number: targetEpisodeNumber,
+                                timestamp: Date.now(),
+                            })
+                        );
+                    }
+                }
             } catch (error) {
                 console.error("Failed to fetch anime data:", error);
-                setLoading(false);
             }
+            setLoading(false);
         };
 
-        fetchAnimeData();
+        fetchInitialData();
     }, [id]);
-
-    // Handle episode changes from URL or cache
-    useEffect(() => {
-        if (!animeData || !router.isReady) return;
-
-        const loadEpisode = async () => {
-            let targetEpisodeNumber = 1;
-
-            // Check cache
-            const cachedEpisode = localStorage.getItem(`anime_${id}_episode`);
-            if (cachedEpisode) {
-                const episodeData = JSON.parse(cachedEpisode);
-                if (episodeData.timestamp > Date.now() - 30 * 24 * 60 * 60 * 1000) {
-                    targetEpisodeNumber = episodeData.number;
-                }
-            }
-
-            // URL parameter overrides cache
-            if (e) {
-                targetEpisodeNumber = parseInt(e);
-            }
-
-            // Find episode ID
-            const targetEpisode = animeData.episodes[targetEpisodeNumber - 1];
-            if (!targetEpisode) return;
-
-            setCurrentEpisodeNumber(targetEpisodeNumber);
-            setCurrentEpisode(targetEpisode.id);
-
-            // Load episode sources
-            const sources = await getEpisodeSources(targetEpisode.id);
-            setStreamingUrl(sources.sources.find((s) => s.quality === "default")?.url || sources.sources[2]?.url || "");
-            setDownloadLink(sources.download || "");
-
-            // Update cache
-            localStorage.setItem(
-                `anime_${id}_episode`,
-                JSON.stringify({
-                    number: targetEpisodeNumber,
-                    timestamp: Date.now(),
-                })
-            );
-
-            // Update URL if needed
-            if (!e || parseInt(e) !== targetEpisodeNumber) {
-                router.replace(
-                    {
-                        pathname: router.pathname,
-                        query: { ...router.query, e: targetEpisodeNumber },
-                    },
-                    undefined,
-                    { shallow: true }
-                );
-            }
-        };
-
-        loadEpisode();
-    }, [animeData, router.isReady, e]);
 
     const handleEpisodeChange = async (episodeId) => {
         if (episodeId === currentEpisode) return;
         setIsChangingEpisode(true);
 
-        const episodeIndex = animeData.episodes.findIndex((ep) => ep.id === episodeId);
-        const episodeNumber = episodeIndex + 1;
-
         try {
+            const episodeIndex = animeData.episodes.findIndex((ep) => ep.id === episodeId);
+            const episodeNumber = episodeIndex + 1;
+
             const sources = await getEpisodeSources(episodeId);
             setCurrentEpisode(episodeId);
             setCurrentEpisodeNumber(episodeNumber);

@@ -20,66 +20,83 @@ const WatchPage = () => {
     const [selectedServerIndex, setSelectedServerIndex] = useState(0);
     const [isChangingMedia, setIsChangingMedia] = useState(false);
 
+    // Load initial data and handle cache
     useEffect(() => {
-        if (!router.isReady) return;
+        if (!type || !id || !router.isReady) return;
 
-        // Load cached values first
-        const cachedServer = localStorage.getItem("preferred_server");
-        let initialServerIndex = selectedServerIndex;
+        const loadInitialState = async () => {
+            setLoading(true);
+            try {
+                const data = await getMediaDetails(type, id);
+                setMediaData(data);
 
-        if (cachedServer) {
-            const serverData = JSON.parse(cachedServer);
-            if (serverData.timestamp > Date.now() - 30 * 24 * 60 * 60 * 1000) {
-                initialServerIndex = serverData.serverIndex;
-                setSelectedServerIndex(serverData.serverIndex);
-            }
-        }
+                let initialSeason = 1;
+                let initialEpisode = 1;
+                let initialServerIndex = 0;
 
-        let initialSeason = currentSeason;
-        let initialEpisode = currentEpisode;
-
-        if (type === "tv") {
-            const cachedEpisode = localStorage.getItem(`tv_${id}_episode`);
-            if (cachedEpisode) {
-                const episodeData = JSON.parse(cachedEpisode);
-                if (episodeData.timestamp > Date.now() - 30 * 24 * 60 * 60 * 1000) {
-                    initialSeason = episodeData.season;
-                    initialEpisode = episodeData.episode;
-                    setCurrentSeason(episodeData.season);
-                    setCurrentEpisode(episodeData.episode);
+                // Load cached preferences
+                const cachedServer = localStorage.getItem("preferred_server");
+                if (cachedServer) {
+                    const serverData = JSON.parse(cachedServer);
+                    if (serverData.timestamp > Date.now() - 30 * 24 * 60 * 60 * 1000) {
+                        initialServerIndex = serverData.serverIndex;
+                    }
                 }
+
+                if (type === "tv") {
+                    const cachedEpisode = localStorage.getItem(`tv_${id}_episode`);
+                    if (cachedEpisode) {
+                        const episodeData = JSON.parse(cachedEpisode);
+                        if (episodeData.timestamp > Date.now() - 30 * 24 * 60 * 60 * 1000) {
+                            initialSeason = episodeData.season;
+                            initialEpisode = episodeData.episode;
+                        }
+                    }
+
+                    // Validate and apply URL parameters
+                    if (s) {
+                        const seasonNum = parseInt(s);
+                        if (!isNaN(seasonNum) && seasonNum >= 1 && seasonNum <= data.seasons.length) {
+                            initialSeason = seasonNum;
+                        }
+                    }
+
+                    const seasonDetails = await getSeasonDetails(id, initialSeason);
+                    setSeasonData(seasonDetails);
+
+                    if (e) {
+                        const episodeNum = parseInt(e);
+                        if (!isNaN(episodeNum) && episodeNum >= 1 && episodeNum <= seasonDetails.episodes.length) {
+                            initialEpisode = episodeNum;
+                        }
+                    }
+                }
+
+                if (server) {
+                    const serverIndex = Object.keys(streamingSources).indexOf(server);
+                    if (serverIndex !== -1) initialServerIndex = serverIndex;
+                }
+
+                const links = await getStreamingLinks(id, type, initialSeason, initialEpisode);
+                setStreamingServers(links);
+                setCurrentServer(links[initialServerIndex]?.url || links[0]?.url || "");
+                setCurrentSeason(initialSeason);
+                setCurrentEpisode(initialEpisode);
+                setSelectedServerIndex(initialServerIndex);
+
+                // Update URL with validated values
+                updateURL(initialSeason, initialEpisode, initialServerIndex);
+                saveToCache(initialSeason, initialEpisode, initialServerIndex);
+            } catch (error) {
+                console.error("Failed to load initial data:", error);
             }
-        }
-
-        // URL params override cached values
-        if (s) initialSeason = parseInt(s);
-        if (e) initialEpisode = parseInt(e);
-        if (server) {
-            const index = Object.keys(streamingSources).indexOf(server);
-            if (index !== -1) initialServerIndex = index;
-        }
-
-        // Update URL with final values
-        const newQuery = {
-            ...router.query,
-            ...(type === "tv" && { s: initialSeason }),
-            ...(type === "tv" && { e: initialEpisode }),
-            server: Object.keys(streamingSources)[initialServerIndex],
+            setLoading(false);
         };
 
-        router.push(
-            {
-                pathname: router.pathname,
-                query: newQuery,
-            },
-            undefined,
-            { shallow: true }
-        );
-    }, [router.isReady]);
+        loadInitialState();
+    }, [type, id, router.isReady]);
 
-    // Save preferences to cache
     const saveToCache = (season, episode, serverIndex) => {
-        // Save server preference (common for both movie and tv)
         if (serverIndex !== undefined) {
             localStorage.setItem(
                 "preferred_server",
@@ -90,7 +107,6 @@ const WatchPage = () => {
             );
         }
 
-        // Save TV specific preferences
         if (type === "tv" && season && episode) {
             localStorage.setItem(
                 `tv_${id}_episode`,
@@ -103,32 +119,6 @@ const WatchPage = () => {
         }
     };
 
-    useEffect(() => {
-        const fetchData = async () => {
-            if (type && id) {
-                setLoading(true);
-                const data = await getMediaDetails(type, id);
-                setMediaData(data);
-                if (type === "tv") {
-                    const seasonDetails = await getSeasonDetails(id, currentSeason);
-                    setSeasonData(seasonDetails);
-                }
-                const links = await getStreamingLinks(id, type, currentSeason, currentEpisode);
-                setStreamingServers(links);
-                setCurrentServer(links[selectedServerIndex]?.url || links[0]?.url || "");
-                setLoading(false);
-
-                // Save current state to cache
-                if (type === "tv") {
-                    saveToCache(currentSeason, currentEpisode, selectedServerIndex);
-                } else {
-                    saveToCache(null, null, selectedServerIndex);
-                }
-            }
-        };
-        fetchData();
-    }, [type, id, currentSeason, currentEpisode]);
-
     const updateURL = (season, episode, serverIndex) => {
         const newQuery = {
             ...router.query,
@@ -136,31 +126,26 @@ const WatchPage = () => {
             ...(type === "tv" && episode && { e: episode }),
             ...(serverIndex !== undefined && { server: Object.keys(streamingSources)[serverIndex] }),
         };
-        router.push(
-            {
-                pathname: router.pathname,
-                query: newQuery,
-            },
-            undefined,
-            { shallow: true }
-        );
+        router.replace({ pathname: router.pathname, query: newQuery }, undefined, { shallow: true });
     };
 
     const handleSeasonChange = async (season) => {
         if (season === currentSeason) return;
         setIsChangingMedia(true);
         try {
-            const [seasonDetails, links] = await Promise.all([getSeasonDetails(id, season), getStreamingLinks(id, type, season, 1)]);
+            const seasonDetails = await getSeasonDetails(id, season);
+            const links = await getStreamingLinks(id, type, season, 1);
 
+            setSeasonData(seasonDetails);
             setCurrentSeason(season);
             setCurrentEpisode(1);
-            setSeasonData(seasonDetails);
             setStreamingServers(links);
             setCurrentServer(links[selectedServerIndex]?.url || links[0]?.url || "");
+
             updateURL(season, 1, selectedServerIndex);
             saveToCache(season, 1, selectedServerIndex);
         } catch (error) {
-            console.error("Failed to fetch season data:", error);
+            console.error("Failed to change season:", error);
         } finally {
             setIsChangingMedia(false);
         }
@@ -174,10 +159,11 @@ const WatchPage = () => {
             setCurrentEpisode(episode);
             setStreamingServers(links);
             setCurrentServer(links[selectedServerIndex]?.url || links[0]?.url || "");
+
             updateURL(currentSeason, episode, selectedServerIndex);
             saveToCache(currentSeason, episode, selectedServerIndex);
         } catch (error) {
-            console.error("Failed to fetch episode data:", error);
+            console.error("Failed to change episode:", error);
         } finally {
             setIsChangingMedia(false);
         }

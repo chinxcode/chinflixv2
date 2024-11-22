@@ -61,8 +61,8 @@ const MediaActions = ({ viewCount, type, id, currentSeason, currentEpisode, epis
                                     <div className="font-medium text-white/90 line-clamp-1">{currentEpisodeData?.name}</div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <button className="bg-white/10 p-2 rounded-lg">
-                                        <PlusCircleIcon className="w-5 h-5" />
+                                    <button className="bg-white/10 p-2 rounded-lg  disabled:opacity-40" disabled>
+                                        <PlusCircleIcon className="w-5 h-5 " />
                                     </button>
                                     <button onClick={handleShare} className="bg-white/10 p-2 rounded-lg">
                                         <ShareIcon className="w-5 h-5" />
@@ -91,7 +91,7 @@ const MediaActions = ({ viewCount, type, id, currentSeason, currentEpisode, epis
                     <div className="mt-2 px-1">
                         <div className="relative w-full h-1 bg-white/10 rounded-full overflow-hidden">
                             <div
-                                className="absolute left-0 top-0 h-full bg-red-500 rounded-full"
+                                className="absolute left-0 top-0 h-full bg-red-500 rounded-full transition-all duration-500 ease-in-out"
                                 style={{ width: `${(currentEpisode / episodes.length) * 100}%` }}
                             />
                         </div>
@@ -103,7 +103,7 @@ const MediaActions = ({ viewCount, type, id, currentSeason, currentEpisode, epis
                 <div className="flex items-center justify-between bg-white/5 rounded-lg px-4 py-3">
                     <div className="text-sm text-white/80">{viewCount.toLocaleString()} views</div>
                     <div className="flex items-center gap-3">
-                        <button className="bg-white/10 p-2 rounded-lg">
+                        <button className="bg-white/10 p-2 rounded-lg disabled:opacity-40" disabled>
                             <PlusCircleIcon className="w-5 h-5" />
                         </button>
                         <button onClick={handleShare} className="bg-white/10 p-2 rounded-lg">
