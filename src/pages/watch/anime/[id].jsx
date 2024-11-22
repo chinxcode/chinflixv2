@@ -208,6 +208,9 @@ const WatchAnimePage = () => {
                             onEpisodeChange={handleEpisodeChange}
                             downloadLink={downloadLink}
                             isChangingEpisode={isChangingEpisode}
+                            imageUrl={animeData.image}
+                            title={animeData.title}
+                            id={id}
                         />
                     </div>
                 </div>

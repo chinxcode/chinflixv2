@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { getTrending } from "@/lib/api";
 import Skeleton from "./Skeleton";
 import { useSwipeable } from "react-swipeable";
+import WatchlistButton from "@/components/WatchlistButton";
 
 const HeroSlider = memo(({ type = "movie" }) => {
     const [trendingItems, setTrendingItems] = useState([]);
@@ -115,14 +116,13 @@ const HeroSlider = memo(({ type = "movie" }) => {
                                 <span className="text-xs sm:text-sm font-medium">Watch Now</span>
                             </motion.button>
                         </Link>
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="bg-white/10 backdrop-blur-sm rounded-full overflow-hidden hover:bg-white/20 p-1.5 sm:p-2 transition-all duration-200 shadow-lg"
-                            aria-label="Add to watchlist"
-                        >
-                            <PlusIcon className="h-3 w-3 sm:h-5 sm:w-5" />
-                        </motion.button>
+                        <WatchlistButton
+                            mediaId={item.id}
+                            mediaType={type}
+                            title={item.title || item.name}
+                            image={`https://image.tmdb.org/t/p/w500${item.backdrop_path}`}
+                            className="bg-white/10 backdrop-blur-sm rounded-full overflow-hidden hover:bg-white/20 p-1.5 sm:p-2 transition-all duration-200 shadow-lg "
+                        />
                     </motion.div>
                 </div>
             </div>

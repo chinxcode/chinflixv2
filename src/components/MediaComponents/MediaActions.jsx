@@ -1,8 +1,9 @@
 import React from "react";
-import { PlusCircleIcon, ShareIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
+import { ShareIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import WatchlistButton from "@/components/WatchlistButton";
 
-const MediaActions = ({ viewCount, type, id, currentSeason, currentEpisode, episodes, onEpisodeChange }) => {
+const MediaActions = ({ viewCount, type, id, currentSeason, currentEpisode, episodes, onEpisodeChange, posterUrl, title }) => {
     const handleShare = async () => {
         const pageTitle = document.title;
         const shareData = {
@@ -61,9 +62,13 @@ const MediaActions = ({ viewCount, type, id, currentSeason, currentEpisode, epis
                                     <div className="font-medium text-white/90 line-clamp-1">{currentEpisodeData?.name}</div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <button className="bg-white/10 p-2 rounded-lg  disabled:opacity-40" disabled>
-                                        <PlusCircleIcon className="w-5 h-5 " />
-                                    </button>
+                                    <WatchlistButton
+                                        mediaId={id}
+                                        mediaType={type}
+                                        title={title}
+                                        image={posterUrl}
+                                        className="bg-white/10 p-2 rounded-lg"
+                                    />
                                     <button onClick={handleShare} className="bg-white/10 p-2 rounded-lg">
                                         <ShareIcon className="w-5 h-5" />
                                     </button>
@@ -103,9 +108,13 @@ const MediaActions = ({ viewCount, type, id, currentSeason, currentEpisode, epis
                 <div className="flex items-center justify-between bg-white/5 rounded-lg px-4 py-3">
                     <div className="text-sm text-white/80">{viewCount.toLocaleString()} views</div>
                     <div className="flex items-center gap-3">
-                        <button className="bg-white/10 p-2 rounded-lg disabled:opacity-40" disabled>
-                            <PlusCircleIcon className="w-5 h-5" />
-                        </button>
+                        <WatchlistButton
+                            mediaId={id}
+                            mediaType={type}
+                            title={title}
+                            image={posterUrl}
+                            className="bg-white/10 p-2 rounded-lg"
+                        />
                         <button onClick={handleShare} className="bg-white/10 p-2 rounded-lg">
                             <ShareIcon className="w-5 h-5" />
                         </button>

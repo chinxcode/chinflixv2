@@ -19,7 +19,7 @@ export default function Anime() {
                 <title>Anime | ChinFlix</title>
             </Head>
             <main className="p-8 pb-16">
-                <DevelopmentPopup />
+                {/* <DevelopmentPopup /> */}
                 <Suspense fallback={<div className="h-12 bg-gray-800 animate-pulse rounded" />}>
                     <SearchContainer type="anime" showDropdown={false} />
                 </Suspense>

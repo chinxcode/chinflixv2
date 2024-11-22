@@ -235,6 +235,8 @@ const WatchPage = () => {
                                 currentEpisode={currentEpisode}
                                 episodes={seasonData?.episodes}
                                 onEpisodeChange={handleEpisodeChange}
+                                posterUrl={`https://image.tmdb.org/t/p/w342${mediaData.poster_path}`}
+                                title={mediaData.title || mediaData.name}
                             />
                             <StreamingServers
                                 servers={streamingServers}
@@ -337,6 +339,8 @@ const WatchPage = () => {
                                     currentEpisode={currentEpisode}
                                     episodes={seasonData?.episodes}
                                     onEpisodeChange={handleEpisodeChange}
+                                    posterUrl={`https://image.tmdb.org/t/p/w342${mediaData.poster_path}`}
+                                    title={mediaData.title || mediaData.name}
                                 />
                                 <StreamingServers
                                     servers={streamingServers}
