@@ -126,7 +126,13 @@ const WatchPage = () => {
                         <div className="h-full max-h-full overflow-y-auto p-4 space-y-4">
                             <div className="bg-gray-800 rounded-lg overflow-hidden flex flex-col">
                                 <VideoPlayer src={currentServer} isLoading={isChangingMedia} />
-                                <MediaActions viewCount={Number(mediaData.popularity.toFixed(0))} />
+                                <MediaActions
+                                    viewCount={Number(mediaData.popularity.toFixed(0))}
+                                    type={type}
+                                    id={id}
+                                    currentSeason={currentSeason}
+                                    currentEpisode={currentEpisode}
+                                />
                             </div>
                             <StreamingServers
                                 servers={streamingServers}
@@ -220,7 +226,13 @@ const WatchPage = () => {
                             <div className="max-h-full overflow-y-auto p-4 space-y-4">
                                 <div className="bg-gray-800 rounded-lg overflow-hidden flex flex-col">
                                     <VideoPlayer src={currentServer} isLoading={isChangingMedia} />
-                                    <MediaActions viewCount={Number(mediaData.popularity.toFixed(0))} />
+                                    <MediaActions
+                                        viewCount={Number(mediaData.popularity.toFixed(0))}
+                                        type={type}
+                                        id={id}
+                                        currentSeason={currentSeason}
+                                        currentEpisode={currentEpisode}
+                                    />
                                 </div>
                                 <StreamingServers
                                     servers={streamingServers}

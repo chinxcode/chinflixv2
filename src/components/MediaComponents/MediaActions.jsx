@@ -1,7 +1,7 @@
 import React from "react";
-import { PlusCircleIcon, ShareIcon } from "@heroicons/react/24/outline";
+import { PlusCircleIcon, ShareIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 
-const MediaActions = ({ viewCount }) => {
+const MediaActions = ({ viewCount, type, id, currentSeason, currentEpisode }) => {
     const handleShare = async () => {
         const pageTitle = document.title;
         const shareData = {
@@ -21,6 +21,14 @@ const MediaActions = ({ viewCount }) => {
         }
     };
 
+    const getDownloadUrl = () => {
+        if (type === "movie") {
+            return `https://dl.vidsrc.vip/movie/${id}`;
+        } else {
+            return `https://dl.vidsrc.vip/tv/${id}/${currentSeason}/${currentEpisode}`;
+        }
+    };
+
     return (
         <div className="w-full text-sm flex gap-2 justify-between items-center my-2 px-2">
             <div className="p-1 text-gray-300 h-6 px-2 text-center min-w-16 text-xs bg-white/5 rounded-md">{viewCount} views</div>
@@ -36,6 +44,15 @@ const MediaActions = ({ viewCount }) => {
                     <ShareIcon className="w-5 h-5" />
                     <span className="hidden lg:inline">Share</span>
                 </button>
+                <a
+                    href={getDownloadUrl()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-white/5 hover:bg-white/10 active:bg-white/5 smoothie rounded-md py-2 text-sm px-3 flex items-center gap-2 transition-all duration-200"
+                >
+                    <ArrowDownTrayIcon className="w-5 h-5" />
+                    <span className="hidden lg:inline">Download</span>
+                </a>
             </div>
         </div>
     );
