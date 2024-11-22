@@ -117,8 +117,15 @@ const WatchAnimePage = () => {
                     <div className="h-full max-h-full overflow-y-auto p-4 space-y-4">
                         <div className="bg-gray-800 rounded-lg overflow-hidden flex flex-col">
                             <AnimePlayer src={streamingUrl} isLoading={isChangingEpisode} />
-                            <AnimeMediaActions viewCount={1000} downloadLink={downloadLink} />
                         </div>
+                        <AnimeMediaActions
+                            viewCount={1000}
+                            episodes={animeData.episodes}
+                            currentEpisode={currentEpisode}
+                            onEpisodeChange={handleEpisodeChange}
+                            downloadLink={downloadLink}
+                            isChangingEpisode={isChangingEpisode}
+                        />
                     </div>
                 </div>
 

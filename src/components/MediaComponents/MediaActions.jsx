@@ -1,7 +1,8 @@
 import React from "react";
 import { PlusCircleIcon, ShareIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 
-const MediaActions = ({ viewCount, type, id, currentSeason, currentEpisode }) => {
+const MediaActions = ({ viewCount, type, id, currentSeason, currentEpisode, episodes, onEpisodeChange }) => {
     const handleShare = async () => {
         const pageTitle = document.title;
         const shareData = {
@@ -29,31 +30,91 @@ const MediaActions = ({ viewCount, type, id, currentSeason, currentEpisode }) =>
         }
     };
 
+    const currentEpisodeData = episodes?.find((ep, index) => index + 1 === currentEpisode);
+
     return (
-        <div className="w-full text-sm flex gap-2 justify-between items-center my-2 px-2">
-            <div className="p-1 text-gray-300 h-6 px-2 text-center min-w-16 text-xs bg-white/5 rounded-md">{viewCount} views</div>
-            <div className="flex items-center gap-2">
-                <button className="bg-white/5 hover:bg-white/10 active:bg-white/5 smoothie rounded-md py-2 text-sm px-3 flex items-center gap-2 transition-all duration-200">
-                    <PlusCircleIcon className="w-5 h-5" />
-                    <span className="hidden lg:inline">Add to Watchlist</span>
-                </button>
-                <button
-                    onClick={handleShare}
-                    className="bg-white/5 hover:bg-white/10 active:bg-white/5 smoothie rounded-md py-2 text-sm px-3 flex items-center gap-2 transition-all duration-200"
-                >
-                    <ShareIcon className="w-5 h-5" />
-                    <span className="hidden lg:inline">Share</span>
-                </button>
-                <a
-                    href={getDownloadUrl()}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-white/5 hover:bg-white/10 active:bg-white/5 smoothie rounded-md py-2 text-sm px-3 flex items-center gap-2 transition-all duration-200"
-                >
-                    <ArrowDownTrayIcon className="w-5 h-5" />
-                    <span className="hidden lg:inline">Download</span>
-                </a>
-            </div>
+        <div className="w-full flex flex-col gap-3">
+            {type === "tv" && episodes && (
+                <div className="flex flex-col">
+                    <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                            <div className="text-sm font-medium text-white/80">Season {currentSeason}</div>
+                            <div className="w-1 h-1 rounded-full bg-white/20" />
+                            <div className="text-sm font-medium text-white/80">Episode {currentEpisode}</div>
+                        </div>
+                        <div className="text-sm text-white/50">{episodes.length} Episodes</div>
+                    </div>
+
+                    <div className="flex items-stretch gap-2">
+                        <button
+                            onClick={() => onEpisodeChange(currentEpisode - 1)}
+                            disabled={currentEpisode <= 1}
+                            className="flex items-center px-3 bg-white/5 rounded-lg disabled:opacity-40"
+                        >
+                            <ChevronLeftIcon className="w-5 h-5" />
+                        </button>
+
+                        <div className="flex-grow bg-white/5 rounded-lg px-4 py-3">
+                            <div className="flex items-center justify-between">
+                                <div className="flex flex-col">
+                                    <div className="text-sm text-white/50">Now Playing</div>
+                                    <div className="font-medium text-white/90 line-clamp-1">{currentEpisodeData?.name}</div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <button className="bg-white/10 p-2 rounded-lg">
+                                        <PlusCircleIcon className="w-5 h-5" />
+                                    </button>
+                                    <button onClick={handleShare} className="bg-white/10 p-2 rounded-lg">
+                                        <ShareIcon className="w-5 h-5" />
+                                    </button>
+                                    <a
+                                        href={getDownloadUrl()}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="bg-white/10 p-2 rounded-lg"
+                                    >
+                                        <ArrowDownTrayIcon className="w-5 h-5" />
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={() => onEpisodeChange(currentEpisode + 1)}
+                            disabled={currentEpisode >= episodes.length}
+                            className="flex items-center px-3 bg-white/5 rounded-lg disabled:opacity-40"
+                        >
+                            <ChevronRightIcon className="w-5 h-5" />
+                        </button>
+                    </div>
+
+                    <div className="mt-2 px-1">
+                        <div className="relative w-full h-1 bg-white/10 rounded-full overflow-hidden">
+                            <div
+                                className="absolute left-0 top-0 h-full bg-red-500 rounded-full"
+                                style={{ width: `${(currentEpisode / episodes.length) * 100}%` }}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {type === "movie" && (
+                <div className="flex items-center justify-between bg-white/5 rounded-lg px-4 py-3">
+                    <div className="text-sm text-white/80">{viewCount.toLocaleString()} views</div>
+                    <div className="flex items-center gap-3">
+                        <button className="bg-white/10 p-2 rounded-lg">
+                            <PlusCircleIcon className="w-5 h-5" />
+                        </button>
+                        <button onClick={handleShare} className="bg-white/10 p-2 rounded-lg">
+                            <ShareIcon className="w-5 h-5" />
+                        </button>
+                        <a href={getDownloadUrl()} target="_blank" rel="noopener noreferrer" className="bg-white/10 p-2 rounded-lg">
+                            <ArrowDownTrayIcon className="w-5 h-5" />
+                        </a>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
