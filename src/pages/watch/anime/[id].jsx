@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import Head from "next/head";
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { getAnimeInfo, getEpisodeSources } from "@/lib/anime-api";
 import Skeleton from "@/components/Skeleton";
@@ -15,51 +15,124 @@ const AnimeEpisodes = dynamic(() => import("@/components/AnimeComponents/AnimeEp
 
 const WatchAnimePage = () => {
     const router = useRouter();
-    const { id } = router.query;
+    const { id, e } = router.query;
     const [animeData, setAnimeData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [currentEpisode, setCurrentEpisode] = useState(null);
+    const [currentEpisodeNumber, setCurrentEpisodeNumber] = useState(1);
     const [streamingUrl, setStreamingUrl] = useState("");
     const [isChangingEpisode, setIsChangingEpisode] = useState(false);
     const [downloadLink, setDownloadLink] = useState("");
 
+    // Load initial anime data
     useEffect(() => {
         if (!id) return;
 
-        const fetchInitialData = async () => {
+        const fetchAnimeData = async () => {
             setLoading(true);
             try {
                 const data = await getAnimeInfo(id);
                 setAnimeData(data);
-
-                if (data.episodes.length > 0) {
-                    const firstEpisode = data.episodes[0];
-                    setCurrentEpisode(firstEpisode.id);
-
-                    // Load episode source after initial render
-                    requestIdleCallback(async () => {
-                        const sources = await getEpisodeSources(firstEpisode.id);
-                        setStreamingUrl(sources.sources.find((s) => s.quality === "default")?.url || sources.sources[2]?.url || "");
-                        setDownloadLink(sources.download || "");
-                    });
-                }
+                setLoading(false);
             } catch (error) {
                 console.error("Failed to fetch anime data:", error);
+                setLoading(false);
             }
-            setLoading(false);
         };
 
-        fetchInitialData();
+        fetchAnimeData();
     }, [id]);
+
+    // Handle episode changes from URL or cache
+    useEffect(() => {
+        if (!animeData || !router.isReady) return;
+
+        const loadEpisode = async () => {
+            let targetEpisodeNumber = 1;
+
+            // Check cache
+            const cachedEpisode = localStorage.getItem(`anime_${id}_episode`);
+            if (cachedEpisode) {
+                const episodeData = JSON.parse(cachedEpisode);
+                if (episodeData.timestamp > Date.now() - 30 * 24 * 60 * 60 * 1000) {
+                    targetEpisodeNumber = episodeData.number;
+                }
+            }
+
+            // URL parameter overrides cache
+            if (e) {
+                targetEpisodeNumber = parseInt(e);
+            }
+
+            // Find episode ID
+            const targetEpisode = animeData.episodes[targetEpisodeNumber - 1];
+            if (!targetEpisode) return;
+
+            setCurrentEpisodeNumber(targetEpisodeNumber);
+            setCurrentEpisode(targetEpisode.id);
+
+            // Load episode sources
+            const sources = await getEpisodeSources(targetEpisode.id);
+            setStreamingUrl(sources.sources.find((s) => s.quality === "default")?.url || sources.sources[2]?.url || "");
+            setDownloadLink(sources.download || "");
+
+            // Update cache
+            localStorage.setItem(
+                `anime_${id}_episode`,
+                JSON.stringify({
+                    number: targetEpisodeNumber,
+                    timestamp: Date.now(),
+                })
+            );
+
+            // Update URL if needed
+            if (!e || parseInt(e) !== targetEpisodeNumber) {
+                router.replace(
+                    {
+                        pathname: router.pathname,
+                        query: { ...router.query, e: targetEpisodeNumber },
+                    },
+                    undefined,
+                    { shallow: true }
+                );
+            }
+        };
+
+        loadEpisode();
+    }, [animeData, router.isReady, e]);
 
     const handleEpisodeChange = async (episodeId) => {
         if (episodeId === currentEpisode) return;
         setIsChangingEpisode(true);
+
+        const episodeIndex = animeData.episodes.findIndex((ep) => ep.id === episodeId);
+        const episodeNumber = episodeIndex + 1;
+
         try {
             const sources = await getEpisodeSources(episodeId);
             setCurrentEpisode(episodeId);
+            setCurrentEpisodeNumber(episodeNumber);
             setStreamingUrl(sources.sources[0]?.url || "");
             setDownloadLink(sources.download || "");
+
+            // Update URL
+            router.replace(
+                {
+                    pathname: router.pathname,
+                    query: { ...router.query, e: episodeNumber },
+                },
+                undefined,
+                { shallow: true }
+            );
+
+            // Update cache
+            localStorage.setItem(
+                `anime_${id}_episode`,
+                JSON.stringify({
+                    number: episodeNumber,
+                    timestamp: Date.now(),
+                })
+            );
         } catch (error) {
             console.error("Failed to fetch episode sources:", error);
         } finally {
