@@ -17,7 +17,6 @@ export default function Home() {
         <>
             <Head>
                 <title>ChinFlix - Discover and Watch Movies & TV Shows</title>
-                <link rel="shortcut icon" href="/icon.png" type="image/x-icon" />
             </Head>
             <header className="lg:hidden bg-gradient-to-b from-black/80 to-black/60 backdrop-blur-md py-4 px-4 fixed top-0 left-0 right-0 z-[60] flex justify-between items-center">
                 <Link href="/" className="text-4xl font-bold hover:text-[#FF4D4D] smoothie">

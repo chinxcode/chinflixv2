@@ -8,7 +8,7 @@ export default function App({ Component, pageProps }) {
     return (
         <>
             <Head>
-                <link rel="shortcut icon" href="/icon.png" type="image/x-icon" />
+                <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
             </Head>
             <Layout>
                 <Component {...pageProps} />
