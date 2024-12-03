@@ -106,7 +106,10 @@ const MediaActions = ({ viewCount, type, id, currentSeason, currentEpisode, epis
 
             {type === "movie" && (
                 <div className="flex items-center justify-between bg-white/5 rounded-lg px-4 py-3">
-                    <div className="text-sm text-white/80">{viewCount.toLocaleString()} views</div>
+                    <div className="flex flex-col">
+                        <div className="text-sm text-white/50">Now Playing</div>
+                        <div className="font-medium text-white/90 line-clamp-1">{title}</div>
+                    </div>
                     <div className="flex items-center gap-3">
                         <WatchlistButton
                             mediaId={id}

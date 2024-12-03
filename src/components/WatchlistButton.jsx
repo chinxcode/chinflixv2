@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from "react";
-import { PlusCircleIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
+import { PlusIcon, CheckIcon } from "@heroicons/react/24/outline";
 import WatchlistModal from "./WatchlistModal";
 
 const WatchlistButton = ({ mediaId, mediaType, title, image, className, iconClassName = "h-5 w-5 " }) => {
@@ -37,7 +37,7 @@ const WatchlistButton = ({ mediaId, mediaType, title, image, className, iconClas
     return (
         <>
             <button ref={buttonRef} onClick={() => setIsModalOpen(true)} className={className}>
-                {status ? <CheckCircleIcon className={iconClassName} /> : <PlusCircleIcon className={iconClassName} />}
+                {status ? <CheckIcon className={iconClassName} /> : <PlusIcon className={iconClassName} />}
             </button>
 
             <WatchlistModal

@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BookmarkIcon, EyeIcon, PauseIcon, XMarkIcon, CheckIcon, PlayIcon } from "@heroicons/react/24/outline";
+import { BookmarkIcon, EyeIcon, PauseIcon, XMarkIcon, CheckIcon } from "@heroicons/react/24/outline";
 
 const watchlistOptions = [
     { id: "planning", label: "Plan to Watch", icon: BookmarkIcon },
-    { id: "watching", label: "Watching", icon: PlayIcon },
+    { id: "watching", label: "Watching", icon: EyeIcon },
     { id: "onHold", label: "On Hold", icon: PauseIcon },
     { id: "completed", label: "Finished", icon: CheckIcon },
     { id: "dropped", label: "Dropped", icon: XMarkIcon },

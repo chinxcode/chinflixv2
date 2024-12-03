@@ -79,6 +79,6 @@ export const getStreamingLinks = async (id, type, season, episode) => {
         if (type === "tv" && season && episode) {
             url = url.replace("{season}", season.toString()).replace("{episode}", episode.toString());
         }
-        return { name, url, flag: urls.flag };
+        return { name, url, flag: urls.flag, working: urls.working };
     });
 };

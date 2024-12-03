@@ -19,7 +19,12 @@ const StreamingServers = memo(({ servers, onServerChange, selectedServerIndex, i
                         <div className="relative w-4 h-3 mr-2">
                             <Image src={server.flag} alt={`${server.name} flag`} layout="fill" objectFit="cover" />
                         </div>
-                        <span>{server.name}</span>
+                        <span> {server.name}</span>
+                        {server.working ? (
+                            <div className="w-2 h-2 ml-2 rounded-full bg-green-500" />
+                        ) : (
+                            <div className="w-2 h-2 ml-2 rounded-full bg-red-500" />
+                        )}
                     </button>
                 ))}
             </div>
