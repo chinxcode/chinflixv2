@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { getAnimeInfo, getEpisodeSources } from "@/lib/anime-api";
 import Skeleton from "@/components/Skeleton";
+import { VideoPlayer } from "@/components/MediaComponents";
 
-const AnimePlayer = dynamic(() => import("@/components/AnimeComponents/AnimePlayer"), {
-    ssr: false,
-});
+// const AnimePlayer = dynamic(() => import("@/components/AnimeComponents/AnimePlayer"), {
+//     ssr: false,
+// });
 
 const AnimeMediaActions = dynamic(() => import("@/components/AnimeComponents/AnimeMediaActions"));
 const AnimeMediaInfo = dynamic(() => import("@/components/AnimeComponents/AnimeMediaInfo"));
@@ -199,7 +200,8 @@ const WatchAnimePage = () => {
                     </div>
                     <div className="h-full max-h-full overflow-y-auto p-4 space-y-4">
                         <div className="bg-gray-800 rounded-lg overflow-hidden flex flex-col">
-                            <AnimePlayer src={streamingUrl} isLoading={isChangingEpisode} />
+                            {/* <AnimePlayer src={streamingUrl} isLoading={isChangingEpisode} /> */}
+                            <VideoPlayer src={`https://ani-playerr.vercel.app/play?url=${streamingUrl}`} isLoading={isChangingEpisode} />
                         </div>
                         <AnimeMediaActions
                             viewCount={1000}

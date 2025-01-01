@@ -17,12 +17,7 @@ export const streamingSources = {
         tv: "https://embed.su/embed/tv/{id}/{season}/{episode}",
         working: true,
     },
-    vidrip: {
-        flag: "https://flagcdn.com/w20/gb.png",
-        movie: "https://vidsrc.rip/embed/movie/{id}",
-        tv: "https://vidsrc.rip/embed/tv/{id}/{season}/{episode}",
-        working: false,
-    },
+
     onexbet: {
         flag: "https://flagcdn.com/w20/in.png",
         movie: "https://vd.1xplayer.com/play/{imdbId}",
@@ -33,6 +28,30 @@ export const streamingSources = {
         flag: "https://flagcdn.com/w20/gb.png",
         movie: "https://vidsrc.cc/v2/embed/movie/{id}",
         tv: "https://vidsrc.cc/v2/embed/tv/{id}/{season}/{episode}",
+        working: true,
+    },
+    flicky: {
+        flag: "https://flagcdn.com/w20/in.png",
+        movie: "https://flicky.host/embed/movie/?id={id}",
+        tv: "https://flicky.host/embed/tv/?id={id}/{season}/{episode}",
+        working: true,
+    },
+    movieclub: {
+        flag: "https://flagcdn.com/w20/in.png",
+        movie: "https://moviesapi.club/movie/{id}",
+        tv: "https://moviesapi.club/tv/{id}-{season}-{episode}",
+        working: true,
+    },
+    autocc: {
+        flag: "https://flagcdn.com/w20/in.png",
+        movie: "https://player.autoembed.cc/embed/movie/{id}",
+        tv: "https://player.autoembed.cc/embed/tv/{id}/{season}/{episode}",
+        working: true,
+    },
+    vidvip: {
+        flag: "https://flagcdn.com/w20/in.png",
+        movie: "https://vidsrc.vip/embed/movie/{id}",
+        tv: "https://vidsrc.vip/embed/tv/{id}/{season}/{episode}",
         working: true,
     },
     embedcc: {
@@ -53,28 +72,22 @@ export const streamingSources = {
         tv: "https://multiembed.mov/?video_id={id}&tmdb={season}&s=1&e={episode}",
         working: true,
     },
-    autocc: {
-        flag: "https://flagcdn.com/w20/in.png",
-        movie: "https://player.autoembed.cc/embed/movie/{id}",
-        tv: "https://player.autoembed.cc/embed/tv/{id}/{season}/{episode}",
-        working: true,
-    },
-    vidvip: {
-        flag: "https://flagcdn.com/w20/in.png",
-        movie: "https://vidsrc.vip/embed/movie/{id}",
-        tv: "https://vidsrc.vip/embed/tv/{id}/{season}/{episode}",
-        working: true,
-    },
     smashy: {
         flag: "https://flagcdn.com/w20/in.png",
         movie: "https://player.smashy.stream/movie/{id}",
         tv: "https://player.smashy.stream/tv/{id}?s={season}&e={episode}",
         working: true,
     },
+    vidrip: {
+        flag: "https://flagcdn.com/w20/gb.png",
+        movie: "https://vidsrc.rip/embed/movie/{id}",
+        tv: "https://vidsrc.rip/embed/tv/{id}/{season}/{episode}",
+        working: false,
+    },
     vidbinge: {
         flag: "https://flagcdn.com/w20/us.png",
-        movie: "https://www.vidbinge.com/media/tmdb-movie-{id}",
-        tv: "https://www.vidbinge.com/media/tmdb-tv-{id}/{seasonId}/{episodeId}",
+        movie: "https://player.vidbinge.com/media/tmdb-movie-{id}",
+        tv: "https://player.vidbinge.com/media/tmdb-tv-{id}/{seasonId}/{episodeId}",
         working: false,
     },
 };
