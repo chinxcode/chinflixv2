@@ -1,5 +1,6 @@
 import { memo } from "react";
 import Image from "next/image";
+import { SparklesIcon } from "@heroicons/react/20/solid";
 
 const StreamingServers = memo(({ servers, onServerChange, selectedServerIndex, isLoading }) => {
     return (
@@ -11,15 +12,20 @@ const StreamingServers = memo(({ servers, onServerChange, selectedServerIndex, i
                 {servers.map((server, index) => (
                     <button
                         key={index}
-                        className={`flex items-center justify-center px-2 py-2 rounded-lg transition-all duration-200 ${
+                        className={`group relative flex items-center justify-center px-2 py-2 rounded-lg transition-all duration-200 ${
                             selectedServerIndex === index ? "bg-white/30 ring-2 ring-white/20" : "bg-gray-700 hover:bg-gray-600"
                         }`}
                         onClick={() => !isLoading && onServerChange(server.url, index)}
                     >
+                        {server.recommended && (
+                            <div className="absolute top-1 left-1">
+                                <SparklesIcon className="w-3.5 h-3.5 text-[#ff4d4d]" />
+                            </div>
+                        )}
                         <div className="relative w-4 h-3 mr-2">
                             <Image src={server.flag} alt={`${server.name} flag`} layout="fill" objectFit="cover" />
                         </div>
-                        <span> {server.name}</span>
+                        <span>{server.name}</span>
                         {server.working ? (
                             <div className="w-2 h-2 ml-2 rounded-full bg-green-500" />
                         ) : (
