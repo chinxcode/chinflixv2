@@ -98,6 +98,11 @@ export const streamingSources = {
         working: true,
         recommended: false,
     },
+};
+
+/*
+
+    
     vidrip: {
         flag: "https://flagcdn.com/w20/gb.png",
         movie: "https://vidsrc.rip/embed/movie/{id}",
@@ -112,9 +117,6 @@ export const streamingSources = {
         working: false,
         recommended: false,
     },
-};
-
-/*
 
     "Server 8": {
         flag: "https://flagcdn.com/w20/gb.png",
