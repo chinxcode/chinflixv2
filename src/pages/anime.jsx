@@ -18,8 +18,8 @@ export default function Anime() {
             <Head>
                 <title>Anime | ChinFlix</title>
             </Head>
-            <main className="p-8 pb-16">
-                {/* <DevelopmentPopup /> */}
+            {/* <main className="p-8 pb-16">
+                <DevelopmentPopup />
                 <Suspense fallback={<div className="h-12 bg-gray-800 animate-pulse rounded" />}>
                     <SearchContainer type="anime" showDropdown={false} />
                 </Suspense>
@@ -35,6 +35,14 @@ export default function Anime() {
                 <p className="text-left text-sm text-gray-400 p-4">
                     This site does not store any files on the server, we only linked to the media which is hosted on 3rd party services.
                 </p>
+            </main> */}
+            <main className="p-8">
+                <h1 className="text-4xl font-bold">K-Drama</h1>
+                <div className="flex items-center justify-center min-h-[40vh]">
+                    <p className="text-gray-400 text-lg">
+                        This page is currently under development. You'll be able to watch your favorite Anime here soon.
+                    </p>
+                </div>
             </main>
         </>
     );
