@@ -97,16 +97,16 @@ const CreateSection = memo(({ type, endpoint, priority = false }) => {
                 </div>
             </div>
             <div className="relative">
-                <div ref={scrollContainerRef} className="flex gap-y-2 w-full h-full overflow-x-auto overflow-y-hidden scrollbar-hide">
+                <div ref={scrollContainerRef} className="flex gap-y-2 w-full smoothie overflow-x-auto overflow-y-hidden scrollbar-hide">
                     {loading
                         ? Array(12)
                               .fill(0)
                               .map((_, i) => (
                                   <div
                                       key={i}
-                                      className="w-1/3 sm:w-1/4 md:w-1/5 lg:w-1/6 xl:w-[14.28%] 2xl:w-[12.5%] !aspect-[1.44/2] !shrink-0 sm:p-2 gap-1"
+                                      className="w-1/3 sm:w-1/4 md:w-1/5 lg:w-1/6 xl:w-[14.28%] 2xl:w-[12.5%] p-[.4rem] sm:p-2 !shrink-0"
                                   >
-                                      <Skeleton className="w-full h-full rounded-xl" />
+                                      <Skeleton className="w-full !aspect-[1.45/2] rounded-xl" />
                                   </div>
                               ))
                         : items.map((item) => <MovieCard key={item.id} item={item} type={type} priority={priority} />)}
