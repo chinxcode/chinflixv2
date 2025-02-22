@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 
 const Layout = ({ children }) => {
     const [showMoreMenu, setShowMoreMenu] = useState(false);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
@@ -36,10 +37,10 @@ const Layout = ({ children }) => {
 
     return (
         <div className="flex bg-[#121212] text-white min-h-screen">
-            <div className="hidden lg:block">
-                <Sidebar />
+            <div className={`hidden lg:block ${isSidebarCollapsed ? "w-20" : "w-56"} transition-all duration-300`}>
+                <Sidebar isCollapsed={isSidebarCollapsed} setIsCollapsed={setIsSidebarCollapsed} />
             </div>
-            <div className="flex-1 lg:ml-64 overflow-x-hidden will-change-transform">{children}</div>
+            <div className={`flex-1 overflow-x-hidden will-change-transform transition-all duration-300`}>{children}</div>
             <div className="lg:hidden fixed bottom-0 left-0 right-0">
                 <BottomNav showMoreMenu={showMoreMenu} setShowMoreMenu={setShowMoreMenu} />
             </div>

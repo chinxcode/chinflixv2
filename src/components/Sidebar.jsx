@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
+import Image from "next/image";
 import {
     HomeIcon,
     MagnifyingGlassIcon,
@@ -11,9 +12,11 @@ import {
     BookOpenIcon,
     DocumentTextIcon,
     GlobeAsiaAustraliaIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
 } from "@heroicons/react/24/outline";
 
-const Sidebar = () => {
+const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
     const router = useRouter();
 
     const mainNavItems = [
@@ -47,37 +50,61 @@ const Sidebar = () => {
                 href={item.path}
                 target={isExternal && isExternal(item) ? "_blank" : "_self"}
                 rel={isExternal && isExternal(item) ? "noopener noreferrer" : ""}
-                className={`sidebar-link flex items-center space-x-2 p-2 rounded-lg w-full ${
+                className={`sidebar-link flex items-center gap-3 p-2 rounded-lg w-full hover:bg-white/5 transition-colors ${
                     isActive(item.path) ? "bg-white/10 text-white" : "text-[#E0E0E0] hover:text-white"
                 }`}
+                title={isCollapsed ? item.label : ""}
             >
-                <item.icon className="w-6 h-6" />
-                <span>{item.label}</span>
+                <item.icon className="w-6 h-6 min-w-6" />
+                {!isCollapsed && <span className="truncate">{item.label}</span>}
             </Link>
         ));
 
     return (
-        <aside className="w-64 bg-black pt-7 pb-2 px-2 flex flex-col items-center space-y-8 h-screen fixed left-0 top-0 z-50">
-            <Link href="/" className="text-4xl font-bold hover:text-[#FF4D4D] smoothie">
-                ChinFlix
-            </Link>
-            <div className="flex flex-col gap-2 size-full items-center justify-center">
-                <div className="w-full flex flex-col p-3 gap-2 rounded-lg xl:rounded-xl bg-white/[.07] shrink-0">
-                    <NavSection items={mainNavItems} />
+        <div>
+            <aside
+                className={`${
+                    isCollapsed ? "w-20" : "w-56"
+                } bg-black pt-7 pb-2 flex flex-col space-y-8 h-screen fixed left-0 top-0 z-5 transition-all duration-300`}
+            >
+                <div className="flex items-center justify-center">
+                    <Link href="/" className="text-4xl font-bold hover:text-[#FF4D4D] smoothie">
+                        {isCollapsed ? <Image src="/icon.png" alt="ChinFlix" width={32} height={32} /> : "ChinFlix"}
+                    </Link>
                 </div>
-                <div className="w-full flex flex-col items-center flex-grow p-3 gap-2 rounded-lg overflow-y-auto xl:rounded-xl bg-white/[.07] custom-scrollbar">
-                    <div className="w-full">
-                        <span className="text-xs text-gray-500 px-2">MEDIA</span>
-                        <NavSection items={mediaNavItems} />
+
+                <div className="flex flex-col gap-2 px-2">
+                    <div className="flex flex-col gap-1 p-2 rounded-lg bg-white/[.07]">
+                        <NavSection items={mainNavItems} />
                     </div>
 
-                    <div className="w-full">
-                        <span className="text-xs text-gray-500 px-2">MORE</span>
-                        <NavSection items={footerLinks} isExternal={(item) => item.external} />
+                    <div className="flex flex-col gap-1 p-2 rounded-lg bg-white/[.07] flex-grow overflow-hidden">
+                        <div className="space-y-1">
+                            <div className="px-2 py-1">
+                                <span className="text-xs font-medium text-gray-400">MEDIA</span>
+                            </div>
+                            <NavSection items={mediaNavItems} />
+                        </div>
+
+                        <div className="space-y-1 ">
+                            <div className="px-2 py-1">
+                                <span className="text-xs font-medium text-gray-400">MORE</span>
+                            </div>
+                            <NavSection items={footerLinks} isExternal={(item) => item.external} />
+                        </div>
                     </div>
                 </div>
-            </div>
-        </aside>
+            </aside>
+            <button
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                className={`fixed top-1/2 -translate-y-5 z-50 bg-gray-800 hover:bg-gray-700 transition-all duration-300 py-7 rounded-r-lg ${
+                    isCollapsed ? "left-20" : "left-56"
+                }`}
+                title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+                {isCollapsed ? <ChevronRightIcon className="w-5 h-5" /> : <ChevronLeftIcon className="w-5 h-5" />}
+            </button>
+        </div>
     );
 };
 

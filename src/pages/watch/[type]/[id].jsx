@@ -6,6 +6,7 @@ import { VideoPlayer, RelationInfo, MediaInfo, SeasonEpisode, CastInfo, MediaAct
 import StreamingServers from "@/components/StreamingServers";
 import Skeleton from "@/components/Skeleton";
 import { streamingSources } from "@/lib/streamingSources";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
 const WatchPage = () => {
     const router = useRouter();
@@ -19,6 +20,7 @@ const WatchPage = () => {
     const [currentServer, setCurrentServer] = useState("");
     const [selectedServerIndex, setSelectedServerIndex] = useState(0);
     const [isChangingMedia, setIsChangingMedia] = useState(false);
+    const [isInfoPanelCollapsed, setIsInfoPanelCollapsed] = useState(false);
 
     // Load initial data and handle cache
     useEffect(() => {
@@ -201,8 +203,12 @@ const WatchPage = () => {
             </Head>
             <div className="lg:flex lg:flex-row lg:gap-2 lg:h-screen overflow-hidden">
                 {/* Large screen layout */}
-                <div className="hidden lg:flex lg:flex-row lg:gap-2 lg:p-2 lg:h-screen">
-                    <div className="lg:w-2/3 h-full rounded-lg overflow-hidden border border-gray-800 flex flex-col">
+                <div className="hidden lg:flex lg:flex-row lg:gap-2 lg:p-2 lg:h-screen relative">
+                    <div
+                        className={`${
+                            isInfoPanelCollapsed ? "lg:w-[calc(100%-4rem)]" : "lg:w-2/3"
+                        } h-full rounded-lg overflow-hidden border border-gray-800 flex flex-col transition-all duration-300`}
+                    >
                         <div className="flex gap-2 w-full h-12 items-center">
                             <button className="w-9 h-full flex items-center shrink-0 justify-center" onClick={() => router.back()}>
                                 <svg
@@ -262,7 +268,23 @@ const WatchPage = () => {
                         </div>
                     </div>
 
-                    <div className="lg:w-1/3 h-full rounded-lg overflow-hidden border border-gray-800 flex flex-col">
+                    {/* Floating toggle button */}
+                    <button
+                        onClick={() => setIsInfoPanelCollapsed(!isInfoPanelCollapsed)}
+                        className={`fixed  top-1/2 -translate-y-5 z-50 py-7 rounded-r-lg bg-gray-800 hover:bg-gray-700 transition-all duration-300 ${
+                            isInfoPanelCollapsed ? "right-12" : "right-[31.5%]"
+                        }`}
+                        title={isInfoPanelCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                    >
+                        {isInfoPanelCollapsed ? <ChevronLeftIcon className="w-5 h-5" /> : <ChevronRightIcon className="w-5 h-5" />}
+                    </button>
+
+                    {/* Info panel */}
+                    <div
+                        className={`${
+                            isInfoPanelCollapsed ? "lg:w-12 opacity-0 invisible" : "lg:w-1/3 opacity-100 visible"
+                        } h-full rounded-lg overflow-hidden border border-gray-800 flex flex-col transition-all duration-300`}
+                    >
                         <div className="h-full max-h-full overflow-y-auto p-4 space-y-4">
                             {type === "tv" && seasonData && (
                                 <div className="bg-gray-900 rounded-lg p-4">
