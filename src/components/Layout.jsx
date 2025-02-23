@@ -37,7 +37,7 @@ const Layout = ({ children }) => {
 
     return (
         <div className="flex bg-[#121212] text-white min-h-screen">
-            <div className={`hidden lg:block ${isSidebarCollapsed ? "w-20" : "w-56"} transition-all duration-300`}>
+            <div className={`hidden lg:block ${isSidebarCollapsed ? "w-20" : "w-64"} transition-all duration-300`}>
                 <Sidebar isCollapsed={isSidebarCollapsed} setIsCollapsed={setIsSidebarCollapsed} />
             </div>
             <div className={`flex-1 overflow-x-hidden will-change-transform transition-all duration-300`}>{children}</div>
