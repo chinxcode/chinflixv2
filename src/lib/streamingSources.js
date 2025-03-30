@@ -37,8 +37,8 @@ export const streamingSources = {
     },
     rive: {
         flag: "https://flagcdn.com/w20/us.png",
-        movie: "https://rivestream.live/embed?type=movie&id={id}",
-        tv: "https://rivestream.live/embed?type=tv&id={id}&season={season}&episode={episode}",
+        movie: "https://rivestream.org/embed?type=movie&id={id}",
+        tv: "https://rivestream.org/embed?type=tv&id={id}&season={season}&episode={episode}",
         working: true,
         recommended: true,
     },
