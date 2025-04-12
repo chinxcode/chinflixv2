@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic";
-import { Suspense } from "react";
 import Head from "next/head";
+import { Suspense } from "react";
 
 const SearchContainer = dynamic(() => import("@/components/SearchContainer"), {
     loading: () => <div className="h-12 bg-gray-800 animate-pulse rounded" />,
@@ -10,39 +10,28 @@ const CreateSection = dynamic(() => import("@/components/CreateSection"), {
     loading: () => <div className="h-64 bg-gray-800 animate-pulse rounded" />,
 });
 
-const DevelopmentPopup = dynamic(() => import("@/components/DevelopmentPopup"));
-
 export default function Anime() {
     return (
         <>
             <Head>
                 <title>Anime | ChinFlix</title>
+                <meta name="description" content="Watch your favorite anime series and movies with high quality streaming" />
             </Head>
-            {/* <main className="p-8 pb-16">
-                <DevelopmentPopup />
+            <main className="p-8 pb-16">
                 <Suspense fallback={<div className="h-12 bg-gray-800 animate-pulse rounded" />}>
                     <SearchContainer type="anime" showDropdown={false} />
                 </Suspense>
 
                 <div className="mt-12 space-y-12">
                     <Suspense fallback={<div className="h-64 bg-gray-800 animate-pulse rounded" />}>
-                        <CreateSection type="anime" endpoint="popular" priority />
-                    </Suspense>
-                    <Suspense fallback={<div className="h-64 bg-gray-800 animate-pulse rounded" />}>
-                        <CreateSection type="anime" endpoint="trending" />
+                        <CreateSection type="anime" endpoint="trending" title="Trending Anime" priority />
+                        <CreateSection type="anime" endpoint="popular" title="Popular Anime" />
+                        <CreateSection type="anime" endpoint="top-rated" title="Top Rated Anime" />
                     </Suspense>
                 </div>
                 <p className="text-left text-sm text-gray-400 p-4">
                     This site does not store any files on the server, we only linked to the media which is hosted on 3rd party services.
                 </p>
-            </main> */}
-            <main className="p-8">
-                <h1 className="text-4xl font-bold">Anime</h1>
-                <div className="flex items-center justify-center min-h-[40vh]">
-                    <p className="text-gray-400 text-lg">
-                        This page is currently under development. You'll be able to watch your favorite Anime here soon.
-                    </p>
-                </div>
             </main>
         </>
     );

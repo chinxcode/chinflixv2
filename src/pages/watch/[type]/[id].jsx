@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Head from "next/head";
 import { getMediaDetails, getSeasonDetails, getStreamingLinks } from "@/lib/api";
-import { VideoPlayer, RelationInfo, MediaInfo, SeasonEpisode, CastInfo, MediaActions } from "@/components/MediaComponents";
+import { VideoPlayer, RelationInfo, MediaInfo, SeasonEpisode, CastInfo, MediaActions, AnimeRelations } from "@/components/MediaComponents";
 import StreamingServers from "@/components/StreamingServers";
 import Skeleton from "@/components/Skeleton";
 import { streamingSources } from "@/lib/streamingSources";
@@ -45,8 +45,10 @@ const WatchPage = () => {
                     }
                 }
 
-                if (type === "tv") {
-                    const cachedEpisode = localStorage.getItem(`tv_${id}_episode`);
+                // Handle TV shows and anime episode selection
+                if (type === "tv" || type === "anime") {
+                    const storageKey = `${type}_${id}_episode`;
+                    const cachedEpisode = localStorage.getItem(storageKey);
                     if (cachedEpisode) {
                         const episodeData = JSON.parse(cachedEpisode);
                         if (episodeData.timestamp > Date.now() - 30 * 24 * 60 * 60 * 1000) {
@@ -58,17 +60,27 @@ const WatchPage = () => {
                     // Validate and apply URL parameters
                     if (s) {
                         const seasonNum = parseInt(s);
-                        if (!isNaN(seasonNum) && seasonNum >= 1 && seasonNum <= data.seasons.length) {
+                        if (
+                            !isNaN(seasonNum) &&
+                            seasonNum >= 1 &&
+                            ((type === "tv" && data.seasons && seasonNum <= data.seasons.length) ||
+                                (type === "anime" && data.number_of_seasons && seasonNum <= data.number_of_seasons))
+                        ) {
                             initialSeason = seasonNum;
                         }
                     }
 
-                    const seasonDetails = await getSeasonDetails(id, initialSeason);
+                    const seasonDetails = await getSeasonDetails(id, initialSeason, type);
                     setSeasonData(seasonDetails);
 
                     if (e) {
                         const episodeNum = parseInt(e);
-                        if (!isNaN(episodeNum) && episodeNum >= 1 && episodeNum <= seasonDetails.episodes.length) {
+                        if (
+                            !isNaN(episodeNum) &&
+                            episodeNum >= 1 &&
+                            seasonDetails.episodes &&
+                            episodeNum <= seasonDetails.episodes.length
+                        ) {
                             initialEpisode = episodeNum;
                         }
                     }
@@ -109,9 +121,9 @@ const WatchPage = () => {
             );
         }
 
-        if (type === "tv" && season && episode) {
+        if ((type === "tv" || type === "anime") && season && episode) {
             localStorage.setItem(
-                `tv_${id}_episode`,
+                `${type}_${id}_episode`,
                 JSON.stringify({
                     season,
                     episode,
@@ -124,8 +136,8 @@ const WatchPage = () => {
     const updateURL = (season, episode, serverIndex) => {
         const newQuery = {
             ...router.query,
-            ...(type === "tv" && season && { s: season }),
-            ...(type === "tv" && episode && { e: episode }),
+            ...((type === "tv" || type === "anime") && season && { s: season }),
+            ...((type === "tv" || type === "anime") && episode && { e: episode }),
             ...(serverIndex !== undefined && { server: Object.keys(streamingSources)[serverIndex] }),
         };
         router.replace({ pathname: router.pathname, query: newQuery }, undefined, { shallow: true });
@@ -135,7 +147,7 @@ const WatchPage = () => {
         if (season === currentSeason) return;
         setIsChangingMedia(true);
         try {
-            const seasonDetails = await getSeasonDetails(id, season);
+            const seasonDetails = await getSeasonDetails(id, season, type);
             const links = await getStreamingLinks(id, type, season, 1);
 
             setSeasonData(seasonDetails);
@@ -196,10 +208,39 @@ const WatchPage = () => {
         );
     }
 
+    // Format recommendations based on media type
+    const formattedRecommendations =
+        mediaData.recommendations?.results?.map((item) => ({
+            link: `/watch/${item.media_type || type}/${item.id}`,
+            image: item.poster_path,
+            title: item.title || item.name || "Untitled",
+            rating: item.vote_average,
+        })) || [];
+
+    // Format cast information based on media type
+    const formattedCast = (mediaData.credits?.cast || []).map((c) => ({
+        name: c.character,
+        actor: c.name,
+        image: c.profile_path,
+    }));
+
+    // Get seasons list based on media type
+    const seasonsList =
+        type === "anime"
+            ? (mediaData.seasons || []).map((s, index) => s.name || `Season ${index + 1}`)
+            : (mediaData.seasons || []).map((s) => s.name);
+
+    // Get production name based on media type
+    const productionName =
+        type === "anime"
+            ? mediaData.studios?.nodes?.[0]?.name || mediaData.production_companies?.[0]?.name || "N/A"
+            : mediaData.production_companies?.[0]?.name || "N/A";
+
     return (
         <>
             <Head>
                 <title>{`${mediaData.title || mediaData.name} | ChinFlix`}</title>
+                <meta name="description" content={mediaData.overview?.substring(0, 160) || `Watch ${mediaData.title || mediaData.name}`} />
             </Head>
             <div className="lg:flex lg:flex-row lg:gap-2 lg:h-screen overflow-hidden">
                 {/* Large screen layout */}
@@ -234,14 +275,14 @@ const WatchPage = () => {
                                 <VideoPlayer src={currentServer} isLoading={isChangingMedia} />
                             </div>
                             <MediaActions
-                                viewCount={Number(mediaData.popularity.toFixed(0))}
+                                viewCount={Number(mediaData.popularity?.toFixed(0)) || 0}
                                 type={type}
                                 id={id}
                                 currentSeason={currentSeason}
                                 currentEpisode={currentEpisode}
                                 episodes={seasonData?.episodes}
                                 onEpisodeChange={handleEpisodeChange}
-                                posterUrl={`https://image.tmdb.org/t/p/w342${mediaData.poster_path}`}
+                                posterUrl={mediaData.poster_path}
                                 title={mediaData.title || mediaData.name}
                             />
                             <StreamingServers
@@ -251,16 +292,9 @@ const WatchPage = () => {
                                 selectedServerIndex={selectedServerIndex}
                             />
                             <div className="bg-gray-900 rounded-lg p-4">
-                                <RelationInfo
-                                    title="Recommended"
-                                    recommendations={mediaData.recommendations.results.map((item) => ({
-                                        link: `/watch/${type}/${item.id}`,
-                                        image: `https://image.tmdb.org/t/p/w342${item.poster_path}`,
-                                        title: item.title || item.name || "Untitled",
-                                        rating: item.vote_average,
-                                    }))}
-                                />
+                                <RelationInfo title="Recommended" recommendations={formattedRecommendations} />
                             </div>
+                            {type === "anime" && mediaData.relations && <AnimeRelations relations={mediaData.relations} />}
                             <p className="text-left py-4 text-sm text-gray-400 px-4">
                                 This site does not store any files on the server, we only linked to the media which is hosted on 3rd party
                                 services.
@@ -271,7 +305,7 @@ const WatchPage = () => {
                     {/* Floating toggle button */}
                     <button
                         onClick={() => setIsInfoPanelCollapsed(!isInfoPanelCollapsed)}
-                        className={`fixed  top-1/2 -translate-y-5 z-50 py-7 rounded-r-lg bg-gray-800 hover:bg-gray-700 transition-all duration-300 ${
+                        className={`fixed top-1/2 -translate-y-5 z-50 py-7 rounded-r-lg bg-gray-800 hover:bg-gray-700 transition-all duration-300 ${
                             isInfoPanelCollapsed ? "right-12" : "right-[31.5%]"
                         }`}
                         title={isInfoPanelCollapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -286,10 +320,10 @@ const WatchPage = () => {
                         } h-full rounded-lg overflow-hidden border border-gray-800 flex flex-col transition-all duration-300`}
                     >
                         <div className="h-full max-h-full overflow-y-auto p-4 space-y-4">
-                            {type === "tv" && seasonData && (
+                            {(type === "tv" || type === "anime") && seasonData && (
                                 <div className="bg-gray-900 rounded-lg p-4">
                                     <SeasonEpisode
-                                        seasons={mediaData.seasons ? mediaData.seasons.map((s) => s.name) : []}
+                                        seasons={seasonsList}
                                         episodes={seasonData.episodes.map((e) => ({ title: e.name }))}
                                         currentSeason={currentSeason}
                                         currentEpisode={currentEpisode}
@@ -302,24 +336,32 @@ const WatchPage = () => {
                             <div className="bg-gray-900 rounded-lg p-4">
                                 <MediaInfo
                                     title={mediaData.title || mediaData.name || "Untitled"}
-                                    poster={`https://image.tmdb.org/t/p/w500${mediaData.poster_path}`}
+                                    poster={mediaData.poster_path}
                                     rating={mediaData.vote_average}
                                     status={mediaData.status}
-                                    production={mediaData.production_companies[0]?.name || "N/A"}
+                                    production={productionName}
                                     aired={mediaData.release_date || mediaData.first_air_date || "N/A"}
                                     description={mediaData.overview}
-                                    genres={mediaData.genres.map((g) => g.name)}
+                                    genres={mediaData.genres?.map((g) => g.name || g) || []}
                                 />
                             </div>
-                            <div className="bg-gray-900 rounded-lg p-4">
-                                <CastInfo
-                                    cast={mediaData.credits.cast.map((c) => ({
-                                        name: c.character,
-                                        actor: c.name,
-                                        image: `https://image.tmdb.org/t/p/w185${c.profile_path}`,
-                                    }))}
-                                />
-                            </div>
+                            {formattedCast.length > 0 && (
+                                <div className="bg-gray-900 rounded-lg p-4">
+                                    <CastInfo cast={formattedCast} />
+                                </div>
+                            )}
+                            {type === "anime" && mediaData.staff && mediaData.staff.length > 0 && (
+                                <div className="bg-gray-900 rounded-lg p-4">
+                                    <CastInfo
+                                        cast={mediaData.staff.map((s) => ({
+                                            name: s.role,
+                                            actor: s.name,
+                                            image: s.profile_path,
+                                        }))}
+                                        title="Staff"
+                                    />
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -354,14 +396,14 @@ const WatchPage = () => {
                                     <VideoPlayer src={currentServer} isLoading={isChangingMedia} />
                                 </div>
                                 <MediaActions
-                                    viewCount={Number(mediaData.popularity.toFixed(0))}
+                                    viewCount={Number(mediaData.popularity?.toFixed(0)) || 0}
                                     type={type}
                                     id={id}
                                     currentSeason={currentSeason}
                                     currentEpisode={currentEpisode}
                                     episodes={seasonData?.episodes}
                                     onEpisodeChange={handleEpisodeChange}
-                                    posterUrl={`https://image.tmdb.org/t/p/w342${mediaData.poster_path}`}
+                                    posterUrl={mediaData.poster_path}
                                     title={mediaData.title || mediaData.name}
                                 />
                                 <StreamingServers
@@ -375,10 +417,10 @@ const WatchPage = () => {
 
                         <div className="rounded-lg overflow-hidden border border-gray-700 flex flex-col">
                             <div className="max-h-full overflow-y-auto p-4 space-y-4">
-                                {type === "tv" && seasonData && (
+                                {(type === "tv" || type === "anime") && seasonData && (
                                     <div className="bg-gray-900 rounded-lg p-4">
                                         <SeasonEpisode
-                                            seasons={mediaData.seasons ? mediaData.seasons.map((s) => s.name) : []}
+                                            seasons={seasonsList}
                                             episodes={seasonData.episodes.map((e) => ({ title: e.name }))}
                                             currentSeason={currentSeason}
                                             currentEpisode={currentEpisode}
@@ -391,35 +433,36 @@ const WatchPage = () => {
                                 <div className="bg-gray-900 rounded-lg p-4">
                                     <MediaInfo
                                         title={mediaData.title || mediaData.name || "Untitled"}
-                                        poster={`https://image.tmdb.org/t/p/w500${mediaData.poster_path}`}
+                                        poster={mediaData.poster_path}
                                         rating={mediaData.vote_average}
                                         status={mediaData.status}
-                                        production={mediaData.production_companies[0]?.name || "N/A"}
+                                        production={productionName}
                                         aired={mediaData.release_date || mediaData.first_air_date || "N/A"}
                                         description={mediaData.overview}
-                                        genres={mediaData.genres.map((g) => g.name)}
+                                        genres={mediaData.genres?.map((g) => g.name || g) || []}
                                     />
                                 </div>
+                                {formattedCast.length > 0 && (
+                                    <div className="bg-gray-900 rounded-lg p-4">
+                                        <CastInfo cast={formattedCast} />
+                                    </div>
+                                )}
+                                {type === "anime" && mediaData.staff && mediaData.staff.length > 0 && (
+                                    <div className="bg-gray-900 rounded-lg p-4">
+                                        <CastInfo
+                                            cast={mediaData.staff.map((s) => ({
+                                                name: s.role,
+                                                actor: s.name,
+                                                image: s.profile_path,
+                                            }))}
+                                            title="Staff"
+                                        />
+                                    </div>
+                                )}
                                 <div className="bg-gray-900 rounded-lg p-4">
-                                    <CastInfo
-                                        cast={mediaData.credits.cast.map((c) => ({
-                                            name: c.character,
-                                            actor: c.name,
-                                            image: `https://image.tmdb.org/t/p/w185${c.profile_path}`,
-                                        }))}
-                                    />
+                                    <RelationInfo title="Recommended" recommendations={formattedRecommendations} />
                                 </div>
-                                <div className="bg-gray-900 rounded-lg p-4">
-                                    <RelationInfo
-                                        title="Recommended"
-                                        recommendations={mediaData.recommendations.results.map((item) => ({
-                                            link: `/watch/${type}/${item.id}`,
-                                            image: `https://image.tmdb.org/t/p/w342${item.poster_path}`,
-                                            title: item.title || item.name || "Untitled",
-                                            rating: item.vote_average,
-                                        }))}
-                                    />
-                                </div>
+                                {type === "anime" && mediaData.relations && <AnimeRelations relations={mediaData.relations} />}
                             </div>
                         </div>
                     </div>

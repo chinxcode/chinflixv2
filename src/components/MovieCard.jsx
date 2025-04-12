@@ -13,20 +13,37 @@ const MovieCard = ({ item, type }) => {
         rootMargin: "200px 0px",
     });
 
-    // Keep existing helper functions
+    // Helper function to get image URL, handling both TMDB and AniList paths
     const getImageUrl = () => {
-        if (type === "anime") return item.image;
-        return `http://image.tmdb.org/t/p/w342${item.poster_path}`;
+        if (!item.poster_path) {
+            return "/placeholder-poster.png";
+        }
+
+        // If the URL already includes http/https, it's from AniList
+        if (item.poster_path.startsWith("http")) {
+            return item.poster_path;
+        }
+
+        // Otherwise it's a TMDB path
+        return `https://image.tmdb.org/t/p/w342${item.poster_path}`;
     };
 
+    // Helper function to extract year from release date
     const getYear = () => {
-        if (type === "anime") return item.releaseDate || "N/A";
-        return new Date(item.release_date || item.first_air_date).getFullYear();
+        if (!item.release_date && !item.first_air_date) {
+            return "N/A";
+        }
+
+        try {
+            return new Date(item.release_date || item.first_air_date).getFullYear();
+        } catch (e) {
+            return "N/A";
+        }
     };
 
+    // Helper function to get title
     const getTitle = () => {
-        if (type === "anime") return item.title;
-        return item.title || item.name;
+        return item.title || item.name || "Untitled";
     };
 
     return (
@@ -92,28 +109,17 @@ const MovieCard = ({ item, type }) => {
                         </AnimatePresence>
 
                         <div className="absolute inset-0">
-                            {type !== "anime" && (
-                                <motion.span
-                                    initial={{ opacity: 0, y: -10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.2 }}
-                                    className="absolute right-1 top-1"
-                                >
-                                    <span className="bg-black/75 backdrop-blur-sm p-[.1rem] px-1 gap-1 rounded-md flex items-center text-xs">
-                                        <StarIcon className="w-3 h-3 text-yellow-400" />
-                                        {item.vote_average?.toFixed(1) || "N/A"}
-                                    </span>
-                                </motion.span>
-                            )}
-                            {type === "anime" && item.subOrDub && (
-                                <motion.span
-                                    initial={{ opacity: 0, x: -10 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    className="absolute left-1 top-1 bg-blue-500/75 backdrop-blur-sm text-xs px-1.5 py-0.5 rounded"
-                                >
-                                    {item.subOrDub}
-                                </motion.span>
-                            )}
+                            <motion.span
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.2 }}
+                                className="absolute right-1 top-1"
+                            >
+                                <span className="bg-black/75 backdrop-blur-sm p-[.1rem] px-1 gap-1 rounded-md flex items-center text-xs">
+                                    <StarIcon className="w-3 h-3 text-yellow-400" />
+                                    {item.vote_average?.toFixed(1) || "N/A"}
+                                </span>
+                            </motion.span>
                         </div>
                     </Link>
                 </div>
@@ -125,6 +131,13 @@ const MovieCard = ({ item, type }) => {
                         <span>{getYear()}</span>
                     </div>
                     <div className="flex w-full text-[.82rem] sm:text-sm font-medium !line-clamp-2 tracking-wider">{getTitle()}</div>
+
+                    {/* Show episodes count for anime */}
+                    {type === "anime" && item.total_episodes > 0 && (
+                        <div className="text-xs text-gray-300">
+                            {item.total_episodes} Episode{item.total_episodes !== 1 ? "s" : ""}
+                        </div>
+                    )}
                 </Link>
             </motion.div>
         </motion.div>

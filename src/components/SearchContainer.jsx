@@ -2,8 +2,7 @@ import { useState, useEffect, useCallback, memo } from "react";
 import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
 import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
-import { searchMulti, getTrending } from "@/lib/api";
-import { searchAnime, getTrendingAnime } from "@/lib/anime-api";
+import { searchMulti, getTrending, searchMedia } from "@/lib/api";
 import Skeleton from "./Skeleton";
 
 const SearchFilter = dynamic(() => import("./SearchFilter"));
@@ -19,8 +18,9 @@ const SearchContainer = memo(({ type, showDropdown = true, isSearchPage = false 
 
     const handleSearch = async (query, currentPage) => {
         if (query.length >= 2) {
+            // Use the appropriate search method based on media type
             if (type === "anime") {
-                const data = await searchAnime(query, currentPage);
+                const data = await searchMedia(query, "anime", currentPage);
                 setTotalPages(data.total_pages);
                 return data.results;
             } else {
@@ -40,7 +40,7 @@ const SearchContainer = memo(({ type, showDropdown = true, isSearchPage = false 
                 if (query && query.length >= 2) {
                     newResults = await handleSearch(query, currentPage);
                 } else {
-                    const data = type === "anime" ? await getTrendingAnime(currentPage) : await getTrending(type, currentPage);
+                    const data = await getTrending(type, currentPage);
                     setTotalPages(data.total_pages);
                     newResults = data.results;
                 }

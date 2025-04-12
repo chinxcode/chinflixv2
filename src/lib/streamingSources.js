@@ -17,6 +17,7 @@ export const streamingSources = {
         flag: "https://flagcdn.com/w20/us.png",
         movie: "https://embed.su/embed/movie/{id}",
         tv: "https://embed.su/embed/tv/{id}/{season}/{episode}",
+        anime: "https://embed.su/embed/anilist/{id}/{episode}?color=ffffff",
         working: true,
         recommended: true,
     },

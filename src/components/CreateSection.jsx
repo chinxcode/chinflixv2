@@ -2,12 +2,11 @@ import { useState, useEffect, useRef, memo } from "react";
 import dynamic from "next/dynamic";
 import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
 import { getTrending, getTopRated, getPopular } from "@/lib/api";
-import { getTrendingAnime, getPopularAnime } from "@/lib/anime-api";
 import Skeleton from "./Skeleton";
 
 const MovieCard = dynamic(() => import("./MovieCard"));
 
-const CreateSection = memo(({ type, endpoint, priority = false }) => {
+const CreateSection = memo(({ type, endpoint, priority = false, title }) => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const scrollContainerRef = useRef(null);
@@ -17,40 +16,23 @@ const CreateSection = memo(({ type, endpoint, priority = false }) => {
             setLoading(true);
             try {
                 let data;
-                if (type === "anime") {
-                    data = endpoint === "trending" ? await getTrendingAnime() : await getPopularAnime();
-                } else {
-                    switch (endpoint) {
-                        case "trending":
-                            data = await getTrending(type);
-                            break;
-                        case "top_rated":
-                            data = await getTopRated(type);
-                            break;
-                        case "popular":
-                            data = await getPopular(type);
-                            break;
-                        default:
-                            data = await getTrending(type);
-                    }
+
+                switch (endpoint) {
+                    case "trending":
+                        data = await getTrending(type);
+                        break;
+                    case "top_rated":
+                    case "top-rated":
+                        data = await getTopRated(type);
+                        break;
+                    case "popular":
+                        data = await getPopular(type);
+                        break;
+                    default:
+                        data = await getTrending(type);
                 }
 
-                const formattedData =
-                    type === "anime"
-                        ? data.results
-                        : data.results.map((item) => ({
-                              id: item.id,
-                              title: item.title || item.name,
-                              name: item.name || item.title,
-                              poster_path: item.poster_path,
-                              backdrop_path: item.backdrop_path,
-                              vote_average: item.vote_average,
-                              overview: item.overview,
-                              release_date: item.release_date || item.first_air_date,
-                              media_type: type,
-                          }));
-
-                setItems(formattedData);
+                setItems(data.results);
             } catch (error) {
                 console.error("Error fetching data:", error);
             } finally {
@@ -71,14 +53,22 @@ const CreateSection = memo(({ type, endpoint, priority = false }) => {
         }
     };
 
+    // Determine section title
+    const getSectionTitle = () => {
+        if (title) return title;
+
+        if (endpoint === "trending") return `Trending ${type === "anime" ? "Anime" : type === "movie" ? "Movies" : "Shows"}`;
+        if (endpoint === "top_rated" || endpoint === "top-rated")
+            return `Top Rated ${type === "anime" ? "Anime" : type === "movie" ? "Movies" : "Shows"}`;
+        if (endpoint === "popular") return `Popular ${type === "anime" ? "Anime" : type === "movie" ? "Movies" : "Shows"}`;
+
+        return "Featured Content";
+    };
+
     return (
         <section className="mt-8 px-4 lg:px-0 relative">
             <div className="w-full flex items-center justify-between mb-4">
-                <h2 className="text-[1.35rem] font-medium px-1">
-                    {endpoint === "trending" && `Trending ${type === "anime" ? "Anime" : type === "movie" ? "Movies" : "Shows"}`}
-                    {endpoint === "top_rated" && `Top Rated ${type === "movie" ? "Movies" : "Shows"}`}
-                    {endpoint === "popular" && `Popular ${type === "anime" ? "Anime" : type === "movie" ? "Movies" : "Shows"}`}
-                </h2>
+                <h2 className="text-[1.35rem] font-medium px-1">{getSectionTitle()}</h2>
                 <div className="flex items-center rounded-xl overflow-hidden justify-center gap-[1px]">
                     <button
                         onClick={() => scroll("left")}
@@ -109,7 +99,7 @@ const CreateSection = memo(({ type, endpoint, priority = false }) => {
                                       <Skeleton className="w-full !aspect-[1.45/2] rounded-xl" />
                                   </div>
                               ))
-                        : items.map((item) => <MovieCard key={item.id} item={item} type={type} priority={priority} />)}
+                        : items.map((item) => <MovieCard key={item.id} item={item} type={item.media_type || type} priority={priority} />)}
                 </div>
             </div>
         </section>

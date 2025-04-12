@@ -1,6 +1,6 @@
 import Head from "next/head";
 
-export default function Anime() {
+export default function Manga() {
     return (
         <>
             <Head>
