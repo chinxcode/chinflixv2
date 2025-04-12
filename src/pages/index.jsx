@@ -33,6 +33,7 @@ export default function Home() {
                         <Suspense fallback={<div className="h-64 bg-gray-800 animate-pulse rounded" />}>
                             <CreateSection type="movie" endpoint="trending" priority />
                             <CreateSection type="tv" endpoint="trending" />
+                            <CreateSection type="anime" endpoint="trending" />
                         </Suspense>
                         <p className="text-left text-sm text-gray-400 p-4">
                             This site does not store any files on the server, we only linked to the media which is hosted on 3rd party

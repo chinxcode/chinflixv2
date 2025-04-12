@@ -291,9 +291,11 @@ const WatchPage = () => {
                                 isLoading={isChangingMedia}
                                 selectedServerIndex={selectedServerIndex}
                             />
-                            <div className="bg-gray-900 rounded-lg p-4">
-                                <RelationInfo title="Recommended" recommendations={formattedRecommendations} />
-                            </div>
+                            {type !== "anime" && (
+                                <div className="bg-gray-900 rounded-lg p-4">
+                                    <RelationInfo title="Recommended" recommendations={formattedRecommendations} />
+                                </div>
+                            )}
                             {type === "anime" && mediaData.relations && <AnimeRelations relations={mediaData.relations} />}
                             <p className="text-left py-4 text-sm text-gray-400 px-4">
                                 This site does not store any files on the server, we only linked to the media which is hosted on 3rd party
@@ -459,9 +461,11 @@ const WatchPage = () => {
                                         />
                                     </div>
                                 )}
-                                <div className="bg-gray-900 rounded-lg p-4">
-                                    <RelationInfo title="Recommended" recommendations={formattedRecommendations} />
-                                </div>
+                                {type !== "anime" && (
+                                    <div className="bg-gray-900 rounded-lg p-4">
+                                        <RelationInfo title="Recommended" recommendations={formattedRecommendations} />
+                                    </div>
+                                )}
                                 {type === "anime" && mediaData.relations && <AnimeRelations relations={mediaData.relations} />}
                             </div>
                         </div>

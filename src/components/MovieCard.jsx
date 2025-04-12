@@ -109,6 +109,7 @@ const MovieCard = ({ item, type }) => {
                         </AnimatePresence>
 
                         <div className="absolute inset-0">
+                            {/* Rating badge - right top */}
                             <motion.span
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -120,6 +121,19 @@ const MovieCard = ({ item, type }) => {
                                     {item.vote_average?.toFixed(1) || "N/A"}
                                 </span>
                             </motion.span>
+
+                            {type === "anime" && item.total_episodes > 0 && (
+                                <motion.span
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.2 }}
+                                    className="absolute left-1 top-1"
+                                >
+                                    <span className="bg-black/75 backdrop-blur-sm p-[.1rem] px-1 rounded-md flex items-center text-xs">
+                                        {item.total_episodes} EP
+                                    </span>
+                                </motion.span>
+                            )}
                         </div>
                     </Link>
                 </div>
@@ -131,13 +145,6 @@ const MovieCard = ({ item, type }) => {
                         <span>{getYear()}</span>
                     </div>
                     <div className="flex w-full text-[.82rem] sm:text-sm font-medium !line-clamp-2 tracking-wider">{getTitle()}</div>
-
-                    {/* Show episodes count for anime */}
-                    {type === "anime" && item.total_episodes > 0 && (
-                        <div className="text-xs text-gray-300">
-                            {item.total_episodes} Episode{item.total_episodes !== 1 ? "s" : ""}
-                        </div>
-                    )}
                 </Link>
             </motion.div>
         </motion.div>
