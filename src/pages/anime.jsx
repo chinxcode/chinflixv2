@@ -1,6 +1,7 @@
 import dynamic from "next/dynamic";
 import Head from "next/head";
 import { Suspense } from "react";
+import HistorySection from "@/components/HistorySection";
 
 const SearchContainer = dynamic(() => import("@/components/SearchContainer"), {
     loading: () => <div className="h-12 bg-gray-800 animate-pulse rounded" />,
@@ -26,6 +27,7 @@ export default function Anime() {
                     <Suspense fallback={<div className="h-64 bg-gray-800 animate-pulse rounded" />}>
                         <CreateSection type="anime" endpoint="popular" title="Popular Anime" />
                         <CreateSection type="anime" endpoint="top-rated" title="Top Rated Anime" />
+                        <HistorySection type="anime" showEpisodeInfo={true} allTime={true} title="Continue Watching" />
                     </Suspense>
                 </div>
                 <p className="text-left text-sm text-gray-400 p-4">

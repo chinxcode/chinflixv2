@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 import HistorySection from "@/components/HistorySection";
 
 const HeroSlider = dynamic(() => import("@/components/HeroSlider"), {
-    loading: () => <div className="aspect-[2.4/1] bg-gray-800 animate-pulse rounded" />,
+    loading: () => <div className="aspect-video bg-gray-800 animate-pulse rounded-lg" />,
 });
 
 const CreateSection = dynamic(() => import("@/components/CreateSection"), {
@@ -27,7 +27,7 @@ export default function Home() {
             </header>
             <main className="size-full flex flex-col min-h-screen bg-gradient-to-b from-gray-900 to-black gap-4 relative overflow-x-hidden overflow-y-auto py-16 lg:pt-0">
                 <div className="flex flex-col w-full z-0 relative px-3 2xl:px-5 py-6">
-                    <Suspense fallback={<div className="aspect-[2.4/1] bg-gray-800 animate-pulse rounded" />}>
+                    <Suspense fallback={<div className="aspect-video bg-gray-800 animate-pulse rounded-lg" />}>
                         <HeroSlider />
                     </Suspense>
                     <div className="flex flex-col">
