@@ -13,6 +13,7 @@ import {
     BookOpenIcon,
     GlobeAsiaAustraliaIcon,
     DocumentTextIcon,
+    ClockIcon,
 } from "@heroicons/react/24/outline";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -32,6 +33,7 @@ const BottomNav = ({ showMoreMenu, setShowMoreMenu }) => {
         { icon: BookOpenIcon, label: "Manga", path: "/manga" },
         { icon: GlobeAsiaAustraliaIcon, label: "K-Drama", path: "/drama" },
         { icon: HeartIcon, label: "Watchlist", path: "/watchlist" },
+        { icon: ClockIcon, label: "History", path: "/history" },
     ];
 
     const footerLinks = [

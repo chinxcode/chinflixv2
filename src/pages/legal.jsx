@@ -59,7 +59,7 @@ export default function Legal() {
             <Head>
                 <title>Legal Information | ChinFlix</title>
             </Head>
-            <main className="min-h-screen p-8 pb-16">
+            <main className="min-h-screen bg-gradient-to-b from-gray-900 to-black p-8 pb-16">
                 <div className="max-w-6xl mx-auto space-y-12">
                     <div className="relative overflow-hidden bg-black/40 backdrop-blur-xl p-8 rounded-2xl border border-white/10">
                         <div className="absolute inset-0 bg-gradient-to-br from-white/[0.05] to-transparent" />

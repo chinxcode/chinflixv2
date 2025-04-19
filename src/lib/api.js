@@ -1,4 +1,4 @@
-import { streamingSources } from "./streamingSources";
+import { streamingSources, animeStreamingSources } from "./streamingSources";
 
 // Base URLs for our APIs
 const TMDB_BASE_URL = "/api/tmdb";
@@ -253,7 +253,6 @@ export const getExternalIds = async (type, id) => {
 
 // Get streaming links for any media type
 export const getStreamingLinks = async (id, type, season, episode) => {
-    const dataSource = getDataSource(type);
     let externalIds = {};
 
     try {
@@ -263,36 +262,47 @@ export const getStreamingLinks = async (id, type, season, episode) => {
     }
 
     const imdbId = externalIds.imdb_id;
+    const malId = externalIds.mal_id;
 
-    return Object.entries(streamingSources)
-        .filter(([_, urls]) => {
-            // Filter sources based on media type
-            if (type === "anime") {
-                return urls.anime !== undefined;
-            } else {
-                return urls[type] !== undefined;
-            }
-        })
-        .map(([name, urls]) => {
-            let url;
+    // Use different source objects based on media type
+    if (type === "anime") {
+        console.log("Fetching streaming links for anime:", id, type, season, episode);
+        console.log("Anime streaming sources:", animeStreamingSources);
+        return Object.entries(animeStreamingSources)
+            .filter(([_, source]) => source.working)
+            .map(([name, source]) => {
+                let url = source.anime
+                    .replace("{id}", id)
+                    .replace("{episode}", episode || 1)
+                    .replace("{malId}", malId || id);
 
-            if (type === "anime") {
-                url = urls.anime.replace("{id}", id).replace("{episode}", episode || 1);
-            } else {
-                url = urls[type].replace("{id}", id).replace("{imdbId}", imdbId || id);
+                return {
+                    name,
+                    url,
+                    flag: source.flag,
+                    working: source.working,
+                    recommended: source.recommended,
+                };
+            });
+    } else {
+        return Object.entries(streamingSources)
+            .filter(([_, source]) => source[type] !== undefined && source.working)
+            .map(([name, source]) => {
+                let url = source[type].replace("{id}", id).replace("{imdbId}", imdbId || id);
+
                 if (type === "tv" && season && episode) {
                     url = url.replace("{season}", season.toString()).replace("{episode}", episode.toString());
                 }
-            }
 
-            return {
-                name,
-                url,
-                flag: urls.flag,
-                working: urls.working,
-                recommended: urls.recommended,
-            };
-        });
+                return {
+                    name,
+                    url,
+                    flag: source.flag,
+                    working: source.working,
+                    recommended: source.recommended,
+                };
+            });
+    }
 };
 
 // Normalize TMDB media items for consistent structure
@@ -377,9 +387,9 @@ const normalizeMediaDetails = (data, type) => {
 // Normalize detailed AniList data
 const normalizeAnimeDetails = (data) => {
     // Process relations (sequels, prequels, etc.)
-    const recommendations = {
-        results: (data.recommendations || []).map((item) => normalizeAnimeItem(item.media)),
-    };
+    // const recommendations = {
+    //     results: (data.recommendations || []).map((item) => normalizeAnimeItem(item.media)),
+    // };
 
     // Process cast/characters
     const cast = (data.characters?.nodes || []).map((char) => ({
@@ -474,7 +484,7 @@ const normalizeAnimeDetails = (data) => {
         staff: staff,
 
         // Recommendations
-        recommendations: recommendations,
+        // recommendations: recommendations,
 
         // External IDs (if available)
         external_ids: {

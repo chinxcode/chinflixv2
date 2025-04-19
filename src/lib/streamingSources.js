@@ -17,7 +17,6 @@ export const streamingSources = {
         flag: "https://flagcdn.com/w20/us.png",
         movie: "https://embed.su/embed/movie/{id}",
         tv: "https://embed.su/embed/tv/{id}/{season}/{episode}",
-        anime: "https://embed.su/embed/anilist/{id}/{episode}?color=ffffff",
         working: true,
         recommended: true,
     },
@@ -103,6 +102,39 @@ export const streamingSources = {
         flag: "https://flagcdn.com/w20/in.png",
         movie: "https://player.smashy.stream/movie/{id}",
         tv: "https://player.smashy.stream/tv/{id}?s={season}&e={episode}",
+        working: true,
+        recommended: false,
+    },
+};
+
+export const animeStreamingSources = {
+    embedsu: {
+        flag: "https://flagcdn.com/w20/us.png",
+        anime: "https://embed.su/embed/anilist/{id}/{episode}?color=ffffff",
+        working: true,
+        recommended: true,
+    },
+    vidpro: {
+        flag: "https://flagcdn.com/w20/us.png",
+        anime: "https://vidlink.pro/anime/{malId}/{episode}/sub?icons=vid&fallback=true",
+        working: true,
+        recommended: false,
+    },
+    vidcc: {
+        flag: "https://flagcdn.com/w20/gb.png",
+        anime: "https://vidsrc.cc/v2/embed/anime/ani{id}/{episode}/sub",
+        working: true,
+        recommended: false,
+    },
+    videasy: {
+        flag: "https://flagcdn.com/w20/gb.png",
+        anime: "https://player.videasy.net/anime/{id}/{episode}",
+        working: true,
+        recommended: false,
+    },
+    smashy: {
+        flag: "https://flagcdn.com/w20/in.png",
+        anime: "https://player.smashy.stream/anime?anilist={id}&e={episode}",
         working: true,
         recommended: false,
     },

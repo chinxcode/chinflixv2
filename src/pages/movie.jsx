@@ -16,7 +16,7 @@ export default function Movies() {
             <Head>
                 <title>Movies | ChinFlix</title>
             </Head>
-            <main className="p-8 pb-16">
+            <main className="min-h-screen bg-gradient-to-b from-gray-900 to-black p-8 pb-16">
                 <Suspense fallback={<div className="h-12 bg-gray-800 animate-pulse rounded" />}>
                     <SearchContainer type="movie" showDropdown={false} />
                 </Suspense>

@@ -17,7 +17,7 @@ export default function Anime() {
                 <title>Anime | ChinFlix</title>
                 <meta name="description" content="Watch your favorite anime series and movies with high quality streaming" />
             </Head>
-            <main className="p-8 pb-16">
+            <main className="min-h-screen bg-gradient-to-b from-gray-900 to-black p-8 pb-16">
                 <Suspense fallback={<div className="h-12 bg-gray-800 animate-pulse rounded" />}>
                     <SearchContainer type="anime" showDropdown={false} />
                 </Suspense>

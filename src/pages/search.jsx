@@ -25,7 +25,7 @@ export default function Search() {
             <Head>
                 <title>{`${getTitle()} Search | ChinFlix`}</title>
             </Head>
-            <main className="p-8">
+            <main className="min-h-screen bg-gradient-to-b from-gray-900 to-black p-8 pb-16">
                 <Suspense fallback={<div className="h-screen bg-gray-800 animate-pulse rounded" />}>
                     <SearchContainer type={type} showDropdown={true} isSearchPage={true} />
                 </Suspense>

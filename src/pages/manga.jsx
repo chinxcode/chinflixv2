@@ -6,7 +6,7 @@ export default function Manga() {
             <Head>
                 <title>Manga | ChinFlix</title>
             </Head>
-            <main className="p-8 pb-16">
+            <main className="min-h-screen bg-gradient-to-b from-gray-900 to-black p-8 pb-16">
                 <h1 className="text-4xl font-bold">Manga</h1>
                 <div className="flex items-center justify-center min-h-[40vh]">
                     <p className="text-gray-400 text-lg">
