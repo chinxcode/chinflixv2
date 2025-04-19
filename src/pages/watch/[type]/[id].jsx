@@ -21,7 +21,6 @@ const WatchPage = () => {
     const [isChangingMedia, setIsChangingMedia] = useState(false);
     const [isInfoPanelCollapsed, setIsInfoPanelCollapsed] = useState(false);
 
-    // Load initial data and handle cache
     useEffect(() => {
         if (!router.isReady || !type || !id) return;
 
@@ -34,7 +33,6 @@ const WatchPage = () => {
                 let initialEpisode = 1;
                 let initialServerName = "";
 
-                // Load cached preferences based on content type
                 if (type === "anime") {
                     const cachedServer = JSON.parse(localStorage.getItem("preferred_anime_server") || "null");
                     if (cachedServer && Date.now() - cachedServer.timestamp < 7 * 24 * 60 * 60 * 1000) {
@@ -47,7 +45,6 @@ const WatchPage = () => {
                     }
                 }
 
-                // Handle TV shows and anime episode selection
                 if (type === "tv" || type === "anime") {
                     const cachedEpisode = JSON.parse(localStorage.getItem(`${type}_${id}_episode`) || "null");
                     if (cachedEpisode && Date.now() - cachedEpisode.timestamp < 30 * 24 * 60 * 60 * 1000) {
@@ -55,7 +52,6 @@ const WatchPage = () => {
                         initialEpisode = cachedEpisode.episode;
                     }
 
-                    // Validate and apply URL parameters
                     if (s) {
                         const seasonNum = parseInt(s);
                         if (
@@ -85,14 +81,12 @@ const WatchPage = () => {
                 }
 
                 if (server) {
-                    // Use server name from URL if provided
                     initialServerName = server;
                 }
 
                 const links = await getStreamingLinks(id, type, initialSeason, initialEpisode);
                 setStreamingServers(links);
 
-                // Find server index based on server name
                 const serverIndex = links.findIndex((s) => s.name === initialServerName);
                 const selectedIndex = serverIndex !== -1 ? serverIndex : 0;
                 setSelectedServerIndex(selectedIndex);
@@ -101,7 +95,6 @@ const WatchPage = () => {
                 setCurrentSeason(initialSeason);
                 setCurrentEpisode(initialEpisode);
 
-                // Update URL with validated values
                 updateURL(initialSeason, initialEpisode, links[selectedIndex]?.name);
                 saveToCache(initialSeason, initialEpisode, links[selectedIndex]?.name);
             } catch (error) {
@@ -143,39 +136,35 @@ const WatchPage = () => {
                     timestamp: Date.now(),
                 })
             );
+        }
 
-            // Save to watch history
-            if (mediaData) {
-                const watchHistory = JSON.parse(localStorage.getItem("watch_history") || "[]");
-                const historyEntry = {
-                    id,
-                    type,
-                    title: mediaData.title || mediaData.name,
-                    poster_path: mediaData.poster_path,
-                    season: season,
-                    episode: episode,
-                    timestamp: Date.now(),
-                    // Additional useful metadata
-                    genres: mediaData.genres?.map((g) => g.name || g).slice(0, 3) || [],
-                    rating: mediaData.vote_average || 0,
-                };
+        if (mediaData) {
+            const watchHistory = JSON.parse(localStorage.getItem("watch_history") || "[]");
+            const historyEntry = {
+                id,
+                type,
+                title: mediaData.title || mediaData.name,
+                poster_path: mediaData.poster_path,
+                year: mediaData.release_date || mediaData.first_air_date,
+                timestamp: Date.now(),
+                ...(type === "tv" || type === "anime" ? { season, episode } : {}),
+                genres: mediaData.genres?.map((g) => g.name || g).slice(0, 3) || [],
+                rating: mediaData.vote_average || 0,
+            };
 
-                // Update or add the entry
-                const existingIndex = watchHistory.findIndex((item) => item.id === id && item.type === type);
-                if (existingIndex !== -1) {
-                    watchHistory[existingIndex] = historyEntry;
-                } else {
-                    watchHistory.unshift(historyEntry);
-                }
-
-                // Limit history length
-                const MAX_HISTORY = 100;
-                if (watchHistory.length > MAX_HISTORY) {
-                    watchHistory.splice(MAX_HISTORY);
-                }
-
-                localStorage.setItem("watch_history", JSON.stringify(watchHistory));
+            const existingIndex = watchHistory.findIndex((item) => item.id === id && item.type === type);
+            if (existingIndex !== -1) {
+                watchHistory[existingIndex] = historyEntry;
+            } else {
+                watchHistory.unshift(historyEntry);
             }
+
+            const MAX_HISTORY = 100;
+            if (watchHistory.length > MAX_HISTORY) {
+                watchHistory.splice(MAX_HISTORY);
+            }
+
+            localStorage.setItem("watch_history", JSON.stringify(watchHistory));
         }
     };
 
@@ -254,7 +243,6 @@ const WatchPage = () => {
         );
     }
 
-    // Format recommendations based on media type
     const formattedRecommendations =
         mediaData.recommendations?.results?.map((item) => ({
             link: `/watch/${item.media_type || type}/${item.id}`,
@@ -263,20 +251,17 @@ const WatchPage = () => {
             rating: item.vote_average,
         })) || [];
 
-    // Format cast information based on media type
     const formattedCast = (mediaData.credits?.cast || []).map((c) => ({
         name: c.character,
         actor: c.name,
         image: c.profile_path,
     }));
 
-    // Get seasons list based on media type
     const seasonsList =
         type === "anime"
             ? (mediaData.seasons || []).map((s, index) => s.name || `Season ${index + 1}`)
             : (mediaData.seasons || []).map((s) => s.name);
 
-    // Get production name based on media type
     const productionName =
         type === "anime"
             ? mediaData.studios?.nodes?.[0]?.name || mediaData.production_companies?.[0]?.name || "N/A"
@@ -321,7 +306,6 @@ const WatchPage = () => {
                                 <VideoPlayer src={currentServer} isLoading={isChangingMedia} />
                             </div>
                             <MediaActions
-                                viewCount={Number(mediaData.popularity?.toFixed(0)) || 0}
                                 type={type}
                                 id={id}
                                 currentSeason={currentSeason}

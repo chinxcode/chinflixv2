@@ -3,7 +3,7 @@ import { ShareIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import WatchlistButton from "@/components/WatchlistButton";
 
-const MediaActions = ({ viewCount, type, id, currentSeason, currentEpisode, episodes, onEpisodeChange, posterUrl, title }) => {
+const MediaActions = ({ type, id, currentSeason, currentEpisode, episodes, onEpisodeChange, posterUrl, title }) => {
     const handleShare = async () => {
         const pageTitle = document.title;
         const shareData = {
@@ -35,7 +35,7 @@ const MediaActions = ({ viewCount, type, id, currentSeason, currentEpisode, epis
 
     return (
         <div className="w-full flex flex-col gap-3">
-            {type === "tv" && episodes && (
+            {(type === "tv" || type === "anime") && episodes && (
                 <div className="flex flex-col">
                     <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
