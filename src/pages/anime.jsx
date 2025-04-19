@@ -24,7 +24,6 @@ export default function Anime() {
 
                 <div className="mt-12 space-y-12">
                     <Suspense fallback={<div className="h-64 bg-gray-800 animate-pulse rounded" />}>
-                        <CreateSection type="anime" endpoint="trending" title="Trending Anime" priority />
                         <CreateSection type="anime" endpoint="popular" title="Popular Anime" />
                         <CreateSection type="anime" endpoint="top-rated" title="Top Rated Anime" />
                     </Suspense>

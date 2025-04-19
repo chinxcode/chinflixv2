@@ -1,19 +1,10 @@
 import { useState, useEffect } from "react";
 import Head from "next/head";
-import Image from "next/image";
 import Link from "next/link";
-import {
-    BookmarkIcon,
-    EyeIcon,
-    PauseIcon,
-    XMarkIcon,
-    CheckIcon,
-    ClipboardDocumentListIcon,
-    PlayIcon,
-    TrashIcon,
-} from "@heroicons/react/24/outline";
+import { BookmarkIcon, EyeIcon, PauseIcon, XMarkIcon, CheckIcon, ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
 import { motion, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
+import MediaHistoryCard from "@/components/MediaHistoryCard";
 
 const CATEGORIES = [
     {
@@ -82,7 +73,10 @@ export default function Watchlist() {
         return matchesCategory && matchesType;
     });
 
-    const removeFromWatchlist = (id) => {
+    const removeFromWatchlist = (index) => {
+        if (index < 0 || index >= watchlist.length) return;
+
+        const id = watchlist[index].id;
         const watchlistData = JSON.parse(localStorage.getItem("watchlist") || "{}");
         delete watchlistData[id];
         localStorage.setItem("watchlist", JSON.stringify(watchlistData));
@@ -152,68 +146,17 @@ export default function Watchlist() {
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
-                                    className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-2 sm:gap-3"
+                                    className="flex gap-y-2 w-full flex-wrap justify-start smoothie mb-4"
                                 >
-                                    {filteredList.map((item) => (
-                                        <motion.div
+                                    {filteredList.map((item, index) => (
+                                        <MediaHistoryCard
                                             key={item.id}
-                                            layout
-                                            initial={{ scale: 0.9, opacity: 0 }}
-                                            animate={{ scale: 1, opacity: 1 }}
-                                            exit={{ scale: 0.9, opacity: 0 }}
-                                            className="flex flex-col gap-1.5"
-                                        >
-                                            <motion.div
-                                                whileHover={{ scale: 1.03 }}
-                                                className="relative aspect-[2/3] rounded-lg overflow-hidden bg-white/5 group"
-                                            >
-                                                <Image
-                                                    src={item.image}
-                                                    alt={item.title}
-                                                    fill
-                                                    className="object-cover transition-transform duration-300 group-hover:scale-105"
-                                                />
-
-                                                {/* Play Icon Animation */}
-                                                <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
-                                                    <motion.div
-                                                        initial={{ scale: 0, rotate: -180 }}
-                                                        whileHover={{ scale: 1.1 }}
-                                                        animate={{ scale: 1, rotate: 0 }}
-                                                        exit={{ scale: 0, rotate: 180 }}
-                                                        transition={{
-                                                            type: "spring",
-                                                            stiffness: 200,
-                                                            damping: 15,
-                                                        }}
-                                                        className="bg-white/25 backdrop-blur-sm p-3 rounded-full hover:bg-white/30 transition-colors"
-                                                    >
-                                                        <Link href={`/watch/${item.type}/${item.id}`}>
-                                                            <PlayIcon className="w-6 h-6 text-white drop-shadow-lg" />
-                                                        </Link>
-                                                    </motion.div>
-                                                </div>
-
-                                                {/* Top Status Bar */}
-                                                <div className="absolute top-0 inset-x-0 p-1.5 flex justify-between items-center bg-gradient-to-b from-black/70 to-transparent">
-                                                    <span className="text-[10px] px-1.5 py-0.5 bg-black/50 backdrop-blur-sm rounded">
-                                                        {item.type.toUpperCase()}
-                                                    </span>
-                                                    <motion.button
-                                                        whileHover={{ scale: 1.1 }}
-                                                        whileTap={{ scale: 0.9 }}
-                                                        onClick={() => removeFromWatchlist(item.id)}
-                                                        className="p-1.5 bg-red-500/20 hover:bg-red-500/30 rounded-full backdrop-blur-sm"
-                                                    >
-                                                        <TrashIcon className="w-3.5 h-3.5" />
-                                                    </motion.button>
-                                                </div>
-                                            </motion.div>
-                                            <div className="flex flex-col px-0.5">
-                                                <span className="font-medium text-xs line-clamp-1">{item.title}</span>
-                                                <span className="text-[10px] text-white/50 capitalize">{item.status}</span>
-                                            </div>
-                                        </motion.div>
+                                            item={item}
+                                            index={watchlist.findIndex((w) => w.id === item.id)}
+                                            onRemove={removeFromWatchlist}
+                                            isWatchlist={true}
+                                            showRating={false}
+                                        />
                                     ))}
                                 </motion.div>
                             ) : (

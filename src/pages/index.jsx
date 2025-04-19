@@ -3,6 +3,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
 import dynamic from "next/dynamic";
+import HistorySection from "@/components/HistorySection";
 
 const HeroSlider = dynamic(() => import("@/components/HeroSlider"), {
     loading: () => <div className="aspect-[2.4/1] bg-gray-800 animate-pulse rounded" />,
@@ -31,6 +32,7 @@ export default function Home() {
                     </Suspense>
                     <div className="flex flex-col">
                         <Suspense fallback={<div className="h-64 bg-gray-800 animate-pulse rounded" />}>
+                            <HistorySection type={"all"} showEpisodeInfo={true} allTime={true} title={"Continue Watching"} />
                             <CreateSection type="movie" endpoint="trending" priority />
                             <CreateSection type="tv" endpoint="trending" />
                             <CreateSection type="anime" endpoint="trending" />
