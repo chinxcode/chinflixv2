@@ -39,7 +39,6 @@ const BottomNav = ({ showMoreMenu, setShowMoreMenu }) => {
     const footerLinks = [
         { icon: DocumentTextIcon, label: "Legal", path: "/legal" },
         { icon: GlobeAltIcon, label: "Old ChinFlix", path: "https://chinflix-old.vercel.app", external: true },
-        { icon: GlobeAltIcon, label: "AnimeFlix", path: "https://ani-dl.vercel.app", external: true },
     ];
 
     const isActive = (path) => router.pathname === path;

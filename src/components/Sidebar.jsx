@@ -38,7 +38,6 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
     const footerLinks = [
         { icon: DocumentTextIcon, label: "Legal", path: "/legal", external: false },
         { icon: GlobeAltIcon, label: "Old ChinFlix", path: "https://chinflix-old.vercel.app", external: true },
-        { icon: GlobeAltIcon, label: "AnimeFlix", path: "https://ani-dl.vercel.app", external: true },
     ];
 
     const isActive = (path) => {
