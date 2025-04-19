@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, memo, useMemo } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowLeftIcon, ArrowRightIcon, ClockIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftIcon, ArrowRightIcon, ArrowUpRightIcon } from "@heroicons/react/24/outline";
 import Skeleton from "./Skeleton";
 import MediaHistoryCard from "./MediaHistoryCard";
 
@@ -133,7 +134,14 @@ const HistorySection = memo(({ type = "all", title, onRemove, isWatchlist = fals
         return (
             <section className="mt-8 px-4 lg:px-0 relative">
                 <div className="w-full flex items-center justify-between mb-4">
-                    <h2 className="text-[1.35rem] font-medium px-1">{getSectionTitle(sectionTitle)}</h2>
+                    <div className="flex items-center gap-2">
+                        <h2 className="text-[1.35rem] font-medium px-1">{getSectionTitle(sectionTitle)}</h2>
+                        {allTime && (
+                            <Link href="/history">
+                                <ArrowUpRightIcon className="size-5" />
+                            </Link>
+                        )}
+                    </div>
                     <div className="flex items-center rounded-xl overflow-hidden justify-center gap-[1px]">
                         <button
                             onClick={() => scroll("left", sectionRef)}
