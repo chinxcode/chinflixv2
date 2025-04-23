@@ -32,15 +32,6 @@ export default function History() {
         }
     };
 
-    const removeFromHistory = (index) => {
-        if (index < 0 || index >= watchHistory.length) return;
-
-        const newHistory = [...watchHistory];
-        newHistory.splice(index, 1);
-        localStorage.setItem("watch_history", JSON.stringify(newHistory));
-        setWatchHistory(newHistory);
-    };
-
     return (
         <>
             <Head>
@@ -97,7 +88,7 @@ export default function History() {
                                     exit={{ opacity: 0 }}
                                     className="space-y-6"
                                 >
-                                    <HistorySection type={activeType} onRemove={removeFromHistory} showEpisodeInfo={true} />
+                                    <HistorySection type={activeType} showEpisodeInfo={true} />
                                 </motion.div>
                             ) : (
                                 <motion.div

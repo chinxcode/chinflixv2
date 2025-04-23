@@ -37,7 +37,7 @@ const getDayCategory = (timestamp) => {
     return 2;
 };
 
-const HistorySection = memo(({ type = "all", title, onRemove, isWatchlist = false, showEpisodeInfo = true, allTime = false }) => {
+const HistorySection = memo(({ type = "all", title, isWatchlist = false, showEpisodeInfo = true, allTime = false }) => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const scrollContainerRef = useRef(null);
@@ -59,6 +59,18 @@ const HistorySection = memo(({ type = "all", title, onRemove, isWatchlist = fals
 
         fetchData();
     }, []);
+
+    // Handle removing an item from history
+    const handleRemoveItem = (index) => {
+        const newItems = [...items];
+        newItems.splice(index, 1);
+
+        // Update localStorage
+        localStorage.setItem("watch_history", JSON.stringify(newItems));
+
+        // Update state
+        setItems(newItems);
+    };
 
     // Filter and organize history items
     const organizedHistory = useMemo(() => {
@@ -177,7 +189,7 @@ const HistorySection = memo(({ type = "all", title, onRemove, isWatchlist = fals
                                       key={`${item.id}-${item.type}-${index}`}
                                       item={item}
                                       index={items.findIndex((i) => i.id === item.id && i.type === item.type)}
-                                      onRemove={onRemove}
+                                      onRemove={handleRemoveItem}
                                       showEpisodeInfo={showEpisodeInfo}
                                       showRating={true}
                                       showDate={!isWatchlist}

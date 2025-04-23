@@ -114,7 +114,7 @@ const MovieCard = ({ item, type }) => {
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.2 }}
-                                className="absolute right-1 top-1"
+                                className="absolute left-1 top-1"
                             >
                                 <span className="bg-black/75 backdrop-blur-sm p-[.1rem] px-1 gap-1 rounded-md flex items-center text-xs">
                                     <StarIcon className="w-3 h-3 text-yellow-400" />
@@ -127,7 +127,7 @@ const MovieCard = ({ item, type }) => {
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.2 }}
-                                    className="absolute left-1 top-1"
+                                    className="absolute right-1 bottom-1"
                                 >
                                     <span className="bg-black/75 backdrop-blur-sm p-[.1rem] px-1 rounded-md flex items-center text-xs">
                                         {item.total_episodes} EP

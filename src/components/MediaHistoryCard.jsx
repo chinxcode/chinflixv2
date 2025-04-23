@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { StarIcon, PlayIcon } from "@heroicons/react/24/solid";
-import { TrashIcon, EyeIcon } from "@heroicons/react/24/solid";
+import { StarIcon, PlayIcon, XMarkIcon, EyeIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { motion, AnimatePresence } from "framer-motion";
@@ -133,7 +132,7 @@ const MediaHistoryCard = ({
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.2 }}
-                                    className="absolute right-1 top-1"
+                                    className="absolute left-1 top-1"
                                 >
                                     <span className="bg-black/75 backdrop-blur-sm p-[.1rem] px-1 gap-1 rounded-md flex items-center text-xs">
                                         <StarIcon className="w-3 h-3 text-yellow-400" />
@@ -146,18 +145,16 @@ const MediaHistoryCard = ({
                             <motion.button
                                 initial={{ opacity: 0, scale: 0.5 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                whileHover={{ scale: 1.1 }}
+                                whileHover={{ scale: 1.3 }}
                                 whileTap={{ scale: 0.9 }}
-                                transition={{ delay: 0.2 }}
                                 onClick={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
                                     onRemove(index);
                                 }}
-                                className="absolute right-1 top-1 bg-red-500/20 hover:bg-red-500/30 p-1.5 rounded-full backdrop-blur-sm z-10"
-                                style={{ top: showRating && (item.rating > 0 || item.vote_average > 0) ? "30px" : "8px" }}
+                                className="absolute right-1 top-1 p-1 bg-black/25  hover:bg-black/50 rounded-full backdrop-blur-sm z-10"
                             >
-                                <TrashIcon className="w-3.5 h-3.5" />
+                                <XMarkIcon className="w-4 h-4" />
                             </motion.button>
 
                             {/* Episode info badge - bottom left */}
