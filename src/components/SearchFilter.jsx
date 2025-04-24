@@ -49,6 +49,7 @@ const SearchFilter = memo(({ onSearch, onTypeChange, type, initialQuery, showDro
                     >
                         <option value="movie">Movies</option>
                         <option value="tv">TV Shows</option>
+                        <option value="anime">Anime</option>
                     </select>
                 )}
             </div>
