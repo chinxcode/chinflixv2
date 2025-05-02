@@ -16,16 +16,12 @@ const formatDate = (timestamp) => {
         return "Today";
     } else if (diffDays === 1) {
         return "Yesterday";
-    } else if (diffDays < 7) {
-        return `${diffDays} days ago`;
-    } else if (diffDays < 30) {
-        return `${Math.floor(diffDays / 7)} week${Math.floor(diffDays / 7) !== 1 ? "s" : ""} ago`;
     } else {
-        return date.toLocaleDateString();
+        return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
     }
 };
 
-// Get day category based on timestamp (0=today, 1=yesterday, 2+=days ago)
+// Get day category based on timestamp (0=today, 1=yesterday, 2+=specific date)
 const getDayCategory = (timestamp) => {
     const date = new Date(timestamp);
     const now = new Date();
@@ -34,7 +30,7 @@ const getDayCategory = (timestamp) => {
 
     if (diffDays === 0) return 0;
     if (diffDays === 1) return 1;
-    return 2;
+    return date.toLocaleDateString("en-US", { day: "numeric", month: "long", year: "numeric" });
 };
 
 const HistorySection = memo(({ type = "all", title, isWatchlist = false, showEpisodeInfo = true, allTime = false }) => {
@@ -84,7 +80,7 @@ const HistorySection = memo(({ type = "all", title, isWatchlist = false, showEpi
         // Organize by date
         const today = [];
         const yesterday = [];
-        const daysAgo = [];
+        const daysAgo = {};
 
         filteredItems.forEach((item) => {
             const category = getDayCategory(item.timestamp);
@@ -94,7 +90,10 @@ const HistorySection = memo(({ type = "all", title, isWatchlist = false, showEpi
             } else if (category === 1) {
                 yesterday.push(item);
             } else {
-                daysAgo.push(item);
+                if (!daysAgo[category]) {
+                    daysAgo[category] = [];
+                }
+                daysAgo[category].push(item);
             }
         });
 
@@ -211,7 +210,7 @@ const HistorySection = memo(({ type = "all", title, isWatchlist = false, showEpi
                 <>
                     {renderTimeSection("Today", organizedHistory.today)}
                     {renderTimeSection("Yesterday", organizedHistory.yesterday)}
-                    {renderTimeSection("Earlier", organizedHistory.daysAgo)}
+                    {Object.entries(organizedHistory.daysAgo).map(([date, items]) => renderTimeSection(date, items))}
                 </>
             )}
         </motion.div>
