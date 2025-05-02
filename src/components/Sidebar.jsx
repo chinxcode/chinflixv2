@@ -30,7 +30,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
         { icon: TvIcon, label: "TV Shows", path: "/tv" },
         { icon: SparklesIcon, label: "Anime", path: "/anime" },
         { icon: BookOpenIcon, label: "Manga", path: "/manga" },
-        { icon: GlobeAsiaAustraliaIcon, label: "K-Drama", path: "/drama" },
+        // { icon: GlobeAsiaAustraliaIcon, label: "K-Drama", path: "/drama" },
         { icon: HeartIcon, label: "Watchlist", path: "/watchlist" },
         { icon: ClockIcon, label: "History", path: "/history" },
     ];

@@ -229,8 +229,8 @@ const WatchPage = () => {
 
     if (loading) {
         return (
-            <div className="p-2 h-screen">
-                <Skeleton className="w-full h-full rounded-lg" withLoader />
+            <div className="min-h-screen bg-black flex items-center justify-center">
+                <div className="animate-pulse text-xl">Loading...</div>
             </div>
         );
     }
