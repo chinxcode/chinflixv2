@@ -2,6 +2,9 @@ import { memo } from "react";
 import { PlayIcon } from "@heroicons/react/24/solid";
 
 const SeasonEpisode = memo(({ seasons, episodes, currentSeason, currentEpisode, onSeasonChange, onEpisodeChange, isLoading }) => {
+    console.log("SeasonEpisode rendered");
+    console.log("sesons :", seasons);
+    console.log("episodes :", episodes);
     return (
         <div className="w-full min-h-[50%] max-h-[70%] shrink-0 rounded-lg overflow-hidden flex flex-col gap-4">
             <div className="flex w-full gap-1 h-9 items-center bg-white/5 shrink-0">
@@ -12,7 +15,7 @@ const SeasonEpisode = memo(({ seasons, episodes, currentSeason, currentEpisode, 
                         onChange={(e) => !isLoading && onSeasonChange(Number(e.target.value))}
                     >
                         {seasons
-                            .filter((season) => season.startsWith("Season"))
+                            .filter((season) => !season.startsWith("Specials"))
                             .map((season, index) => (
                                 <option key={index} value={index + 1}>
                                     {season}
