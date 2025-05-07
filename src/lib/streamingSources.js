@@ -42,13 +42,6 @@ export const streamingSources = {
         working: true,
         recommended: true,
     },
-    videasy: {
-        flag: "https://flagcdn.com/w20/gb.png",
-        movie: "https://player.videasy.net/movie/{id}",
-        tv: "https://player.videasy.net/tv/{id}/{season}/{episode}",
-        working: true,
-        recommended: true,
-    },
     flicky: {
         flag: "https://flagcdn.com/w20/in.png",
         movie: "https://flicky.host/embed/movie/?id={id}",
@@ -60,6 +53,13 @@ export const streamingSources = {
         flag: "https://flagcdn.com/w20/in.png",
         movie: "https://moviesapi.club/movie/{id}",
         tv: "https://moviesapi.club/tv/{id}-{season}-{episode}",
+        working: true,
+        recommended: true,
+    },
+    videasy: {
+        flag: "https://flagcdn.com/w20/gb.png",
+        movie: "https://player.videasy.net/movie/{id}",
+        tv: "https://player.videasy.net/tv/{id}/{season}/{episode}",
         working: true,
         recommended: false,
     },

@@ -266,8 +266,6 @@ export const getStreamingLinks = async (id, type, season, episode) => {
 
     // Use different source objects based on media type
     if (type === "anime") {
-        console.log("Fetching streaming links for anime:", id, type, season, episode);
-        console.log("Anime streaming sources:", animeStreamingSources);
         return Object.entries(animeStreamingSources)
             .filter(([_, source]) => source.working)
             .map(([name, source]) => {
