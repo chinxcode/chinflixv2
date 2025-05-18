@@ -1,2 +1,21 @@
+# https://chinflix.vercel.app robots.txt
 User-agent: *
-Disallow: /
+Allow: /
+Allow: /movie
+Allow: /tv
+Allow: /anime
+Allow: /drama
+Allow: /search
+Allow: /legal
+
+# Disallow private and API routes
+Disallow: /api/
+Disallow: /history
+Disallow: /watchlist
+Disallow: /_next/
+
+# Crawl delay
+Crawl-delay: 10
+
+# Sitemap
+Sitemap: https://chinflix.vercel.app/sitemap.xml

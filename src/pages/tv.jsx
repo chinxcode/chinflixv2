@@ -16,6 +16,35 @@ export default function TVShows() {
         <>
             <Head>
                 <title>TV Shows | ChinFlix</title>
+                <meta
+                    name="description"
+                    content="Stream your favorite TV series and shows in high quality. Watch popular TV shows, top-rated series, and trending releases instantly."
+                />
+                <meta property="og:title" content="TV Shows | ChinFlix" />
+                <meta
+                    property="og:description"
+                    content="Stream your favorite TV series and shows in high quality. Watch popular TV shows, top-rated series, and trending releases instantly."
+                />
+                <meta property="og:type" content="website" />
+                <meta property="og:image" content="https://chinflix.vercel.app/icon.png" />
+                <meta
+                    name="keywords"
+                    content="tv shows, tv series, watch tv online, free tv shows, streaming series, popular shows, top rated series"
+                />
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "CollectionPage",
+                        name: "TV Shows on ChinFlix",
+                        description: "Stream your favorite TV series and shows in high quality",
+                        url: "https://chinflix.vercel.app/tv",
+                        provider: {
+                            "@type": "Organization",
+                            name: "ChinFlix",
+                            logo: "https://chinflix.vercel.app/icon.png",
+                        },
+                    })}
+                </script>
             </Head>
             <main className="min-h-screen bg-gradient-to-b from-gray-900 to-black p-8 pb-16">
                 <Suspense fallback={<div className="h-12 bg-gray-800 animate-pulse rounded" />}>

@@ -14,8 +14,14 @@ export default function App({ Component, pageProps }) {
     return (
         <>
             <Head>
-                <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+                <meta charSet="utf-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+                <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+                <meta name="theme-color" content="#121212" />
+                <meta property="og:site_name" content="ChinFlix" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="robots" content="index, follow" />
+                <link rel="canonical" href={`https://chinflix.vercel.app${router.asPath}`} />
             </Head>
             <Script
                 src="https://cloud.umami.is/script.js"

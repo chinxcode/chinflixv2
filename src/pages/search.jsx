@@ -24,6 +24,22 @@ export default function Search() {
         <>
             <Head>
                 <title>{`${getTitle()} Search | ChinFlix`}</title>
+                <meta
+                    name="description"
+                    content={`Search and discover ${getTitle().toLowerCase()}. Find your favorite content in our extensive library of movies, TV shows, and anime.`}
+                />
+                <meta property="og:title" content={`${getTitle()} Search | ChinFlix`} />
+                <meta
+                    property="og:description"
+                    content={`Search and discover ${getTitle().toLowerCase()}. Find your favorite content in our extensive library of movies, TV shows, and anime.`}
+                />
+                <meta property="og:type" content="website" />
+                <meta property="og:image" content="https://chinflix.vercel.app/icon.png" />
+                <meta
+                    name="keywords"
+                    content={`search ${getTitle().toLowerCase()}, find content, discover ${getTitle().toLowerCase()}, streaming content, online entertainment`}
+                />
+                <meta name="robots" content="noindex, follow" />
             </Head>
             <main className="min-h-screen bg-gradient-to-b from-gray-900 to-black p-8 pb-16">
                 <Suspense fallback={<div className="h-screen bg-gray-800 animate-pulse rounded" />}>

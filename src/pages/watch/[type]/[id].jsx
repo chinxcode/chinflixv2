@@ -272,6 +272,37 @@ const WatchPage = () => {
             <Head>
                 <title>{`${mediaData.title || mediaData.name} | ChinFlix`}</title>
                 <meta name="description" content={mediaData.overview?.substring(0, 160) || `Watch ${mediaData.title || mediaData.name}`} />
+                <meta property="og:title" content={`${mediaData.title || mediaData.name} | ChinFlix`} />
+                <meta
+                    property="og:description"
+                    content={mediaData.overview?.substring(0, 160) || `Watch ${mediaData.title || mediaData.name}`}
+                />
+                <meta property="og:type" content="video.movie" />
+                <meta property="og:image" content={`https://image.tmdb.org/t/p/w500${mediaData.poster_path}`} />
+                {mediaData.genres && (
+                    <meta
+                        name="keywords"
+                        content={`${mediaData.title || mediaData.name}, ${type}, ${mediaData.genres
+                            .map((g) => g.name || g)
+                            .join(", ")}, watch online, streaming`}
+                    />
+                )}
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": type === "movie" ? "Movie" : "TVSeries",
+                        name: mediaData.title || mediaData.name,
+                        description: mediaData.overview,
+                        image: `https://image.tmdb.org/t/p/w500${mediaData.poster_path}`,
+                        datePublished: mediaData.release_date || mediaData.first_air_date,
+                        aggregateRating: {
+                            "@type": "AggregateRating",
+                            ratingValue: mediaData.vote_average,
+                            ratingCount: mediaData.vote_count,
+                        },
+                        genre: mediaData.genres?.map((g) => g.name || g),
+                    })}
+                </script>
             </Head>
             <div className="lg:flex lg:flex-row lg:gap-2 lg:h-screen overflow-hidden">
                 {/* Large screen layout */}

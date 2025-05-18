@@ -36,6 +36,19 @@ export default function History() {
         <>
             <Head>
                 <title>Watch History | ChinFlix</title>
+                <meta
+                    name="description"
+                    content="Track your viewing history on ChinFlix. Resume watching where you left off and manage your watched content."
+                />
+                <meta property="og:title" content="Watch History | ChinFlix" />
+                <meta
+                    property="og:description"
+                    content="Track your viewing history on ChinFlix. Resume watching where you left off and manage your watched content."
+                />
+                <meta property="og:type" content="website" />
+                <meta property="og:image" content="https://chinflix.vercel.app/icon.png" />
+                <meta name="keywords" content="watch history, continue watching, viewing history, resume watching" />
+                <meta name="robots" content="noindex, nofollow" />
             </Head>
             <main className="min-h-screen bg-gradient-to-b from-gray-900 to-black">
                 <div className="max-w-[1920px] mx-auto p-8 space-y-6">

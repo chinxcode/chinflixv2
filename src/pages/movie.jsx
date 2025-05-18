@@ -16,6 +16,35 @@ export default function Movies() {
         <>
             <Head>
                 <title>Movies | ChinFlix</title>
+                <meta
+                    name="description"
+                    content="Watch the latest and greatest movies in HD quality. Stream popular movies, top-rated films, and trending releases for free."
+                />
+                <meta property="og:title" content="Movies | ChinFlix" />
+                <meta
+                    property="og:description"
+                    content="Watch the latest and greatest movies in HD quality. Stream popular movies, top-rated films, and trending releases for free."
+                />
+                <meta property="og:type" content="website" />
+                <meta property="og:image" content="https://chinflix.vercel.app/icon.png" />
+                <meta
+                    name="keywords"
+                    content="movies, watch movies online, free movies, streaming movies, popular movies, top rated movies"
+                />
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "CollectionPage",
+                        name: "Movies on ChinFlix",
+                        description: "Watch the latest and greatest movies in HD quality",
+                        url: "https://chinflix.vercel.app/movie",
+                        provider: {
+                            "@type": "Organization",
+                            name: "ChinFlix",
+                            logo: "https://chinflix.vercel.app/icon.png",
+                        },
+                    })}
+                </script>
             </Head>
             <main className="min-h-screen bg-gradient-to-b from-gray-900 to-black p-8 pb-16">
                 <Suspense fallback={<div className="h-12 bg-gray-800 animate-pulse rounded" />}>

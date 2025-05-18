@@ -16,7 +16,35 @@ export default function Anime() {
         <>
             <Head>
                 <title>Anime | ChinFlix</title>
-                <meta name="description" content="Watch your favorite anime series and movies with high quality streaming" />
+                <meta
+                    name="description"
+                    content="Watch your favorite anime series and movies with high quality streaming. Access a vast collection of subbed and dubbed anime content."
+                />
+                <meta property="og:title" content="Anime | ChinFlix" />
+                <meta
+                    property="og:description"
+                    content="Watch your favorite anime series and movies with high quality streaming. Access a vast collection of subbed and dubbed anime content."
+                />
+                <meta property="og:type" content="website" />
+                <meta property="og:image" content="https://chinflix.vercel.app/icon.png" />
+                <meta
+                    name="keywords"
+                    content="anime, watch anime online, anime streaming, subbed anime, dubbed anime, anime series, anime movies"
+                />
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "CollectionPage",
+                        name: "Anime on ChinFlix",
+                        description: "Watch your favorite anime series and movies with high quality streaming",
+                        url: "https://chinflix.vercel.app/anime",
+                        provider: {
+                            "@type": "Organization",
+                            name: "ChinFlix",
+                            logo: "https://chinflix.vercel.app/icon.png",
+                        },
+                    })}
+                </script>
             </Head>
             <main className="min-h-screen bg-gradient-to-b from-gray-900 to-black p-8 pb-16">
                 <Suspense fallback={<div className="h-12 bg-gray-800 animate-pulse rounded" />}>

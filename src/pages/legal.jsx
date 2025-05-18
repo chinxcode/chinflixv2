@@ -58,6 +58,31 @@ export default function Legal() {
         <>
             <Head>
                 <title>Legal Information | ChinFlix</title>
+                <meta
+                    name="description"
+                    content="Legal information and disclaimers for ChinFlix. Learn about our educational purpose, DMCA compliance, and content usage policies."
+                />
+                <meta property="og:title" content="Legal Information | ChinFlix" />
+                <meta
+                    property="og:description"
+                    content="Legal information and disclaimers for ChinFlix. Learn about our educational purpose, DMCA compliance, and content usage policies."
+                />
+                <meta property="og:type" content="website" />
+                <meta property="og:image" content="https://chinflix.vercel.app/icon.png" />
+                <meta name="keywords" content="legal information, terms of use, privacy policy, DMCA, disclaimer, student project" />
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "WebPage",
+                        name: "Legal Information - ChinFlix",
+                        description: "Legal information and disclaimers for ChinFlix",
+                        publisher: {
+                            "@type": "Organization",
+                            name: "ChinFlix",
+                            logo: "https://chinflix.vercel.app/icon.png",
+                        },
+                    })}
+                </script>
             </Head>
             <main className="min-h-screen bg-gradient-to-b from-gray-900 to-black p-8 pb-16">
                 <div className="max-w-6xl mx-auto space-y-12">

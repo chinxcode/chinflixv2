@@ -87,6 +87,19 @@ export default function Watchlist() {
         <>
             <Head>
                 <title>Watchlist | ChinFlix</title>
+                <meta
+                    name="description"
+                    content="Manage your personal watchlist on ChinFlix. Keep track of movies, TV shows, and anime you want to watch."
+                />
+                <meta property="og:title" content="Watchlist | ChinFlix" />
+                <meta
+                    property="og:description"
+                    content="Manage your personal watchlist on ChinFlix. Keep track of movies, TV shows, and anime you want to watch."
+                />
+                <meta property="og:type" content="website" />
+                <meta property="og:image" content="https://chinflix.vercel.app/icon.png" />
+                <meta name="keywords" content="watchlist, plan to watch, my list, saved content, watch later" />
+                <meta name="robots" content="noindex, nofollow" />
             </Head>
             <main className="min-h-screen bg-gradient-to-b from-gray-900 to-black">
                 <div className="max-w-[1920px] mx-auto p-8 pb-16 space-y-6">
