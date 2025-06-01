@@ -24,11 +24,7 @@ const MediaActions = ({ type, id, currentSeason, currentEpisode, episodes, onEpi
     };
 
     const getDownloadUrl = () => {
-        if (type === "movie") {
-            return `https://dl.vidsrc.vip/movie/${id}`;
-        } else {
-            return `https://dl.vidsrc.vip/tv/${id}/${currentSeason}/${currentEpisode}`;
-        }
+        return "https://chinloader.vercel.app/?q=" + encodeURIComponent(title);
     };
 
     const currentEpisodeData = episodes?.find((ep, index) => index + 1 === currentEpisode);
