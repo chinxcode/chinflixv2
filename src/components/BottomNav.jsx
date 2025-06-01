@@ -14,6 +14,7 @@ import {
     GlobeAsiaAustraliaIcon,
     DocumentTextIcon,
     ClockIcon,
+    ArrowDownOnSquareIcon,
 } from "@heroicons/react/24/outline";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -38,6 +39,7 @@ const BottomNav = ({ showMoreMenu, setShowMoreMenu }) => {
 
     const footerLinks = [
         { icon: DocumentTextIcon, label: "Legal", path: "/legal" },
+        { icon: ArrowDownOnSquareIcon, label: "Downloader", path: "https://chinfetcher.vercel.app", external: true },
         { icon: GlobeAltIcon, label: "Old ChinFlix", path: "https://chinflix-old.vercel.app", external: true },
     ];
 

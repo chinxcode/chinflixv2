@@ -11,10 +11,10 @@ import {
     SparklesIcon,
     BookOpenIcon,
     DocumentTextIcon,
-    GlobeAsiaAustraliaIcon,
     ChevronLeftIcon,
     ChevronRightIcon,
     ClockIcon,
+    ArrowDownOnSquareIcon,
 } from "@heroicons/react/24/outline";
 
 const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
@@ -37,6 +37,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
 
     const footerLinks = [
         { icon: DocumentTextIcon, label: "Legal", path: "/legal", external: false },
+        { icon: ArrowDownOnSquareIcon, label: "Downloader", path: "https://chinfetcher.vercel.app", external: true },
         { icon: GlobeAltIcon, label: "Old ChinFlix", path: "https://chinflix-old.vercel.app", external: true },
     ];
 
