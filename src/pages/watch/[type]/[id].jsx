@@ -345,6 +345,7 @@ const WatchPage = () => {
                                 onEpisodeChange={handleEpisodeChange}
                                 posterUrl={mediaData.poster_path}
                                 title={mediaData.title || mediaData.name}
+                                mediaData={mediaData}
                             />
                             <StreamingServers
                                 servers={streamingServers}
@@ -468,6 +469,7 @@ const WatchPage = () => {
                                     onEpisodeChange={handleEpisodeChange}
                                     posterUrl={mediaData.poster_path}
                                     title={mediaData.title || mediaData.name}
+                                    mediaData={mediaData}
                                 />
                                 <StreamingServers
                                     servers={streamingServers}
