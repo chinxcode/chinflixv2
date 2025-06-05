@@ -52,6 +52,9 @@ const DownloadModal = ({ isOpen, onClose, mediaData, type, currentSeason, curren
         return `https://hlsforge.com/?${params.toString()}`;
     };
 
+    // Helper function to proxy URLs
+    const proxyUrl = (url) => `/api/proxy?url=${encodeURIComponent(url)}`;
+
     const fetchRiveStreamSources = async () => {
         if (!mediaData?.id) return;
         setIsLoading(true);
@@ -63,8 +66,8 @@ const DownloadModal = ({ isOpen, onClose, mediaData, type, currentSeason, curren
             const season = type === "tv" || type === "anime" ? currentSeason : null;
             const episode = type === "tv" || type === "anime" ? currentEpisode : null;
 
-            // Get source list
-            const sourceApiUrl = `${RiveStreamAPI}/api/backendfetch?requestID=VideoProviderServices&secretKey=rive`;
+            // Get source list using proxy
+            const sourceApiUrl = proxyUrl(`${RiveStreamAPI}/api/backendfetch?requestID=VideoProviderServices&secretKey=rive`);
             const sourceList = await retry(async () => {
                 const res = await axios.get(sourceApiUrl, { headers });
                 return res.data;
@@ -75,7 +78,7 @@ const DownloadModal = ({ isOpen, onClose, mediaData, type, currentSeason, curren
             }
 
             const docHtml = await retry(async () => {
-                const res = await axios.get(RiveStreamAPI, { headers, timeout: 20000 });
+                const res = await axios.get(proxyUrl(RiveStreamAPI), { headers, timeout: 20000 });
                 return res.data;
             });
             const parser = new DOMParser();
@@ -95,7 +98,7 @@ const DownloadModal = ({ isOpen, onClose, mediaData, type, currentSeason, curren
             }
 
             const js = await retry(async () => {
-                const res = await axios.get(`${RiveStreamAPI}${appScriptSrc}`);
+                const res = await axios.get(proxyUrl(`${RiveStreamAPI}${appScriptSrc}`));
                 return res.data;
             });
 
@@ -105,7 +108,7 @@ const DownloadModal = ({ isOpen, onClose, mediaData, type, currentSeason, curren
             const keyList = arrayText ? Array.from(arrayText.matchAll(/"([^"]+)"/g), (m) => m[1]) : [];
 
             const secretKey = await retry(async () => {
-                const res = await axios.get(`https://rivestream.supe2372.workers.dev/?input=${id}&cList=${keyList.join(",")}`);
+                const res = await axios.get(proxyUrl(`https://rivestream.supe2372.workers.dev/?input=${id}&cList=${keyList.join(",")}`));
                 return res.data;
             });
 
@@ -117,10 +120,11 @@ const DownloadModal = ({ isOpen, onClose, mediaData, type, currentSeason, curren
                     setCurrentServerIndex(index + 1);
                     setProcessedServers((prev) => [...prev, source]);
 
-                    const sourceStreamLink =
+                    const sourceStreamLink = proxyUrl(
                         season == null
                             ? `${RiveStreamAPI}/api/backendfetch?requestID=movieVideoProvider&id=${id}&service=${source}&secretKey=${secretKey}`
-                            : `${RiveStreamAPI}/api/backendfetch?requestID=tvVideoProvider&id=${id}&season=${season}&episode=${episode}&service=${source}&secretKey=${secretKey}`;
+                            : `${RiveStreamAPI}/api/backendfetch?requestID=tvVideoProvider&id=${id}&season=${season}&episode=${episode}&service=${source}&secretKey=${secretKey}`
+                    );
 
                     const sourceJson = await retry(async () => {
                         const res = await axios.get(sourceStreamLink, { headers, timeout: 10000 });
@@ -176,19 +180,6 @@ const DownloadModal = ({ isOpen, onClose, mediaData, type, currentSeason, curren
 
     const getExternalDownloadUrl = () => {
         return "https://chinfetcher.vercel.app/?q=" + encodeURIComponent(title);
-    };
-
-    const handleDownload = (url, filename) => {
-        const link = document.createElement("a");
-        link.href = url;
-        link.target = "_blank";
-        link.rel = "noopener noreferrer";
-        if (filename) {
-            link.download = filename;
-        }
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
     };
 
     useEffect(() => {

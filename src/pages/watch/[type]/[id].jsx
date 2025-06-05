@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Head from "next/head";
 import { getMediaDetails, getSeasonDetails, getStreamingLinks } from "@/lib/api";
 import { VideoPlayer, RelationInfo, MediaInfo, SeasonEpisode, CastInfo, MediaActions, AnimeRelations } from "@/components/MediaComponents";
@@ -20,6 +20,20 @@ const WatchPage = () => {
     const [selectedServerIndex, setSelectedServerIndex] = useState(0);
     const [isChangingMedia, setIsChangingMedia] = useState(false);
     const [isInfoPanelCollapsed, setIsInfoPanelCollapsed] = useState(false);
+
+    const resetAllScrolls = useCallback(() => {
+        // Reset main page scroll
+        window.scrollTo({ top: 0, behavior: "smooth" });
+
+        // Reset all scrollable containers
+        document.querySelectorAll(".overflow-y-auto").forEach((container) => {
+            container.scrollTo({ top: 0, behavior: "smooth" });
+        });
+    }, []);
+
+    useEffect(() => {
+        resetAllScrolls();
+    }, [id, resetAllScrolls]);
 
     useEffect(() => {
         if (!router.isReady || !type || !id) return;
@@ -181,6 +195,7 @@ const WatchPage = () => {
     const handleSeasonChange = async (season) => {
         if (season === currentSeason) return;
         setIsChangingMedia(true);
+        resetAllScrolls();
         try {
             const seasonDetails = await getSeasonDetails(id, season, type);
             const links = await getStreamingLinks(id, type, season, 1);
@@ -203,6 +218,7 @@ const WatchPage = () => {
     const handleEpisodeChange = async (episode) => {
         if (episode === currentEpisode) return;
         setIsChangingMedia(true);
+        resetAllScrolls();
         try {
             const links = await getStreamingLinks(id, type, currentSeason, episode);
             setCurrentEpisode(episode);
@@ -220,6 +236,7 @@ const WatchPage = () => {
 
     const handleServerChange = (url, index) => {
         if (!isChangingMedia && index !== selectedServerIndex) {
+            resetAllScrolls();
             setCurrentServer(url);
             setSelectedServerIndex(index);
             updateURL(currentSeason, currentEpisode, streamingServers[index]?.name);
