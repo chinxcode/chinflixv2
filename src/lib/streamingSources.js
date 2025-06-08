@@ -46,6 +46,7 @@ export const streamingSources = {
         flag: "https://flagcdn.com/w20/in.png",
         movie: "https://flicky.host/embed/movie/?id={id}",
         tv: "https://flicky.host/embed/tv/?id={id}/{season}/{episode}",
+        // https://letsembed.cc/
         working: true,
         recommended: true,
     },
@@ -120,9 +121,15 @@ export const animeStreamingSources = {
         working: true,
         recommended: false,
     },
-    vidcc: {
+    "vidcc-sub": {
         flag: "https://flagcdn.com/w20/gb.png",
         anime: "https://vidsrc.cc/v2/embed/anime/ani{id}/{episode}/sub",
+        working: true,
+        recommended: false,
+    },
+    "vidcc-dub": {
+        flag: "https://flagcdn.com/w20/gb.png",
+        anime: "https://vidsrc.cc/v2/embed/anime/ani{id}/{episode}/dub",
         working: true,
         recommended: false,
     },

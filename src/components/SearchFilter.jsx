@@ -1,7 +1,7 @@
 import { useState, useEffect, memo } from "react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
-const SearchFilter = memo(({ onSearch, onTypeChange, type, initialQuery, showDropdown = true }) => {
+const SearchFilter = memo(({ onSearch, onTypeChange, type, initialQuery, showDropdown = true, autoFocus = true }) => {
     const [query, setQuery] = useState(initialQuery || "");
 
     useEffect(() => {
@@ -13,6 +13,15 @@ const SearchFilter = memo(({ onSearch, onTypeChange, type, initialQuery, showDro
         setQuery(newQuery);
         onSearch(newQuery);
     };
+
+    useEffect(() => {
+        if (autoFocus) {
+            const input = document.querySelector("input[type='text']");
+            if (input) {
+                input.focus();
+            }
+        }
+    }, [autoFocus]);
 
     const getPlaceholderText = () =>
         ({
