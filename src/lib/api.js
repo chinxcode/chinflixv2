@@ -167,7 +167,7 @@ export const getMediaDetails = async (type, id) => {
         let response, data;
 
         if (dataSource === "tmdb") {
-            response = await fetch(`${TMDB_BASE_URL}/${type}/${id}?append_to_response=credits,recommendations,external_ids`);
+            response = await fetch(`${TMDB_BASE_URL}/${type}/${id}?append_to_response=credits,recommendations,external_ids,videos`);
             data = await handleApiResponse(response);
 
             return normalizeMediaDetails(data, type);
@@ -377,6 +377,19 @@ const normalizeMediaDetails = (data, type) => {
 
         // External IDs
         external_ids: data.external_ids || {},
+
+        videos: (data.videos.results || [])
+            .map((video, index) =>
+                video.type === "Trailer"
+                    ? {
+                          id: video.id,
+                          type: video.type,
+                          key: video.key,
+                          name: video.name || `Trailer ${index + 1}`,
+                      }
+                    : null
+            )
+            .filter(Boolean),
     };
 
     return result;

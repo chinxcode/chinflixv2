@@ -42,6 +42,7 @@ const WatchPage = () => {
             try {
                 const data = await getMediaDetails(type, id);
                 setMediaData(data);
+                console.log("Media data loaded:", data);
 
                 let initialSeason = 1;
                 let initialEpisode = 1;
@@ -424,6 +425,13 @@ const WatchPage = () => {
                                     aired={mediaData.release_date || mediaData.first_air_date || "N/A"}
                                     description={mediaData.overview}
                                     genres={mediaData.genres?.map((g) => g.name || g) || []}
+                                    videos={mediaData.videos || []}
+                                    setTrailer={(trailer) => {
+                                        if (trailer) {
+                                            setCurrentServer(trailer);
+                                            setSelectedServerIndex(99);
+                                        }
+                                    }}
                                 />
                             </div>
                             {formattedCast.length > 0 && (
@@ -522,6 +530,13 @@ const WatchPage = () => {
                                         aired={mediaData.release_date || mediaData.first_air_date || "N/A"}
                                         description={mediaData.overview}
                                         genres={mediaData.genres?.map((g) => g.name || g) || []}
+                                        videos={mediaData.videos || []}
+                                        setTrailer={(trailer) => {
+                                            if (trailer) {
+                                                setCurrentServer(trailer);
+                                                setSelectedServerIndex(99);
+                                            }
+                                        }}
                                     />
                                 </div>
                                 {formattedCast.length > 0 && (

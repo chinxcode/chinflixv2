@@ -1,8 +1,9 @@
 import { memo } from "react";
 import { StarIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
+import { PlayIcon } from "@heroicons/react/24/outline";
 
-const MediaInfo = memo(({ title, poster, rating, status, production, aired, description, genres }) => {
+const MediaInfo = memo(({ title, poster, rating, status, production, aired, description, genres, videos, setTrailer }) => {
     return (
         <div className="flex flex-col w-full gap-5">
             <div className="flex gap-3 w-full">
@@ -55,6 +56,26 @@ const MediaInfo = memo(({ title, poster, rating, status, production, aired, desc
                             ))}
                         </div>
                     </div>
+
+                    {videos.length > 0 && (
+                        <>
+                            <span className="xl:text-[1.33rem] mt-4 pl-1 font-semibold tracking-wide text-white !leading-tight">
+                                Trailers
+                            </span>
+                            <div className=" grid grid-cols-1 md:grid-cols-2 gap-2">
+                                {videos.map((video, index) => (
+                                    <button
+                                        key={index}
+                                        className="flex items-center justify-between rounded-lg p-3 hover:bg-white/10 bg-white/5 smoothie group"
+                                        onClick={() => setTrailer("https://www.youtube.com/embed/" + video.key)}
+                                    >
+                                        <span className="text-sm text-white line-clamp-1">{video.name}</span>
+                                        <PlayIcon className="h-5 w-5 text-white" />
+                                    </button>
+                                ))}
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
         </div>
