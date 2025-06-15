@@ -21,6 +21,7 @@ import { motion, AnimatePresence } from "framer-motion";
 const BottomNav = ({ showMoreMenu, setShowMoreMenu }) => {
     const router = useRouter();
     const menuRef = useRef(null);
+    const buttonRef = useRef(null);
 
     const mainNavItems = [
         { icon: HomeIcon, label: "Home", path: "/" },
@@ -47,7 +48,7 @@ const BottomNav = ({ showMoreMenu, setShowMoreMenu }) => {
 
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (menuRef.current && !menuRef.current.contains(event.target)) {
+            if (menuRef.current && !menuRef.current.contains(event.target) && !buttonRef.current.contains(event.target)) {
                 setShowMoreMenu(false);
             }
         };
@@ -63,6 +64,7 @@ const BottomNav = ({ showMoreMenu, setShowMoreMenu }) => {
                     <NavItem key={item.path} href={item.path} icon={item.icon} label={item.label} isActive={isActive(item.path)} />
                 ))}
                 <button
+                    ref={buttonRef}
                     onClick={() => setShowMoreMenu(!showMoreMenu)}
                     className={`flex flex-col items-center ${showMoreMenu ? "text-[#FF4D4D]" : ""}`}
                 >
