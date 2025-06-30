@@ -39,9 +39,7 @@ const CastInfo = memo(({ cast }) => {
                                 />
                             </div>
                             <div className="flex flex-col p-2 py-3">
-                                <span className="tracking-wider font-medium text-sm 2xl:text-base text-gray-200 !leading-tight">
-                                    {character.name}
-                                </span>
+                                <span className="tracking-wider font-medium text-sm 2xl:text-base!leading-tight">{character.name}</span>
                                 <span className="tracking-wider text-gray-300 my-auto text-sm !line-clamp-3">{character.actor}</span>
                             </div>
                         </div>

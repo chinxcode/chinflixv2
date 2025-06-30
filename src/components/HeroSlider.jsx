@@ -94,7 +94,7 @@ const HeroSlider = memo(({ type = "movie" }) => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.7, delay: 0.2 }}
-                        className="text-[#E0E0E0] text-xs sm:text-sm md:text-base line-clamp-2 sm:line-clamp-3 lg:line-clamp-4"
+                        className="text-[#e0e0e0a7] text-xs sm:text-sm md:text-base line-clamp-2 font-normal"
                     >
                         {item.overview}
                     </motion.p>
