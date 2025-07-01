@@ -22,6 +22,7 @@ const DownloadModal = ({ isOpen, onClose, mediaData, type, currentSeason, curren
     const [processedServers, setProcessedServers] = useState([]);
     const [error, setError] = useState(null);
     const [showHls, setShowHls] = useState(false);
+    const [hasFetched, setHasFetched] = useState(false);
 
     // RiveStream API configuration
     const RiveStreamAPI = "https://rivestream.org";
@@ -60,6 +61,7 @@ const DownloadModal = ({ isOpen, onClose, mediaData, type, currentSeason, curren
         setIsLoading(true);
         setError(null);
         setRiveStreamLinks([]);
+        setHasFetched(true);
 
         try {
             const id = mediaData.id.toString();
@@ -210,7 +212,11 @@ const DownloadModal = ({ isOpen, onClose, mediaData, type, currentSeason, curren
 
     useEffect(() => {
         if (isOpen) {
-            fetchRiveStreamSources();
+            // Reset state when modal opens
+            setRiveStreamLinks([]);
+            setError(null);
+            setHasFetched(false);
+            setIsLoading(false);
         }
     }, [isOpen, mediaData?.id, currentSeason, currentEpisode]);
 
@@ -289,29 +295,35 @@ const DownloadModal = ({ isOpen, onClose, mediaData, type, currentSeason, curren
                                 {/* Content area */}
                                 <div className="flex-1 overflow-y-auto max-h-[calc(85vh-8rem)]">
                                     <div className="p-6 space-y-6">
-                                        {/* ChinFetcher Card */}
-                                        <Link
-                                            href={getExternalDownloadUrl()}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="block p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all duration-200"
-                                        >
-                                            <div className="flex flex-col justify-between sm:flex-row items-start sm:items-center gap-4">
-                                                <div className="flex items-center gap-4 w-full sm:w-auto">
-                                                    <div className="p-3 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-lg">
-                                                        <SparklesIcon className="w-6 h-6 text-blue-400" />
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <h3 className="text-lg font-medium text-white">Search on ChinFetcher</h3>
-                                                        <p className="text-xs text-white/50">Find more download options</p>
-                                                    </div>
-                                                </div>
-                                                <div className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-white/10 to-white/5 hover:from-white/20 hover:to-white/10 rounded-lg text-white/90 text-sm transition-all duration-200 flex items-center justify-center gap-2">
-                                                    <span>Search</span>
-                                                    <MagnifyingGlassIcon className="w-4 h-4 opacity-50" />
-                                                </div>
+                                        <div className="space-y-4">
+                                            <div className="flex items-center gap-2">
+                                                <SparklesIcon className="w-5 h-5 text-white/70" />
+                                                <h3 className="text-lg font-medium text-white">Recommended</h3>
                                             </div>
-                                        </Link>
+                                            {/* ChinFetcher Card */}
+                                            <Link
+                                                href={getExternalDownloadUrl()}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="block p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all duration-200"
+                                            >
+                                                <div className="flex flex-col justify-between sm:flex-row items-start sm:items-center gap-4">
+                                                    <div className="flex items-center gap-4 w-full sm:w-auto">
+                                                        <div className="p-3 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-lg">
+                                                            <SparklesIcon className="w-6 h-6 text-blue-400" />
+                                                        </div>
+                                                        <div className="flex-1">
+                                                            <h3 className="text-lg font-medium text-white">Search on ChinFetcher</h3>
+                                                            <p className="text-xs text-white/50">Find more download options</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-white/10 to-white/5 hover:from-white/20 hover:to-white/10 rounded-lg text-white/90 text-sm transition-all duration-200 flex items-center justify-center gap-2">
+                                                        <span>Search</span>
+                                                        <MagnifyingGlassIcon className="w-4 h-4 opacity-50" />
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        </div>
 
                                         {/* RiveStream Section */}
                                         <div className="space-y-4">
@@ -338,6 +350,30 @@ const DownloadModal = ({ isOpen, onClose, mediaData, type, currentSeason, curren
                                                     <span className="text-xs text-white/50">Show HLS</span>
                                                 </div>
                                             </div>
+
+                                            {/* Fetch RiveStream Button */}
+                                            {!hasFetched && !isLoading && (
+                                                <button
+                                                    onClick={fetchRiveStreamSources}
+                                                    className="w-full p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all duration-200"
+                                                >
+                                                    <div className="flex flex-col justify-between sm:flex-row items-start sm:items-center gap-4">
+                                                        <div className="flex items-center gap-4 w-full sm:w-auto">
+                                                            <div className="p-3 bg-gradient-to-br from-green-500/20 to-blue-500/20 rounded-lg">
+                                                                <ServerIcon className="w-6 h-6 text-green-400" />
+                                                            </div>
+                                                            <div className="flex-1">
+                                                                <h3 className="text-lg font-medium text-white">Fetch from RiveStream</h3>
+                                                                <p className="text-xs text-white/50">Get direct download links</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-white/10 to-white/5 hover:from-white/20 hover:to-white/10 rounded-lg text-white/90 text-sm transition-all duration-200 flex items-center justify-center gap-2">
+                                                            <span>Fetch Links</span>
+                                                            <ArrowDownTrayIcon className="w-4 h-4 opacity-50" />
+                                                        </div>
+                                                    </div>
+                                                </button>
+                                            )}
 
                                             {error && (
                                                 <div className="flex items-center gap-3 p-4 bg-white/10 border border-white/10 rounded-lg">
@@ -392,7 +428,7 @@ const DownloadModal = ({ isOpen, onClose, mediaData, type, currentSeason, curren
                                                 </div>
                                             )}
 
-                                            {!error && Object.entries(serverGroups).length === 0 && (
+                                            {!error && Object.entries(serverGroups).length === 0 && hasFetched && (
                                                 <div className="text-center py-8 px-4 bg-white/5 rounded-xl border border-white/10">
                                                     <ServerIcon className="w-12 h-12 text-white/30 mx-auto mb-3" />
                                                     <p className="text-white/50 mb-3">
