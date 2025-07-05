@@ -55,6 +55,7 @@ const DownloadModal = ({ isOpen, onClose, mediaData, type, currentSeason, curren
 
     // Helper function to proxy URLs
     const proxyUrl = (url) => `/api/proxy?url=${encodeURIComponent(url)}`;
+    // const proxyUrl = (url) => `https://cors-anywhere.com/${url}`;
 
     const fetchRiveStreamSources = async () => {
         if (!mediaData?.id) return;
@@ -326,7 +327,7 @@ const DownloadModal = ({ isOpen, onClose, mediaData, type, currentSeason, curren
                                         </div>
 
                                         {/* RiveStream Section */}
-                                        <div className="space-y-4">
+                                        {/* <div className="space-y-4">
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-2">
                                                     <ServerIcon className="w-5 h-5 text-white/70" />
@@ -351,7 +352,6 @@ const DownloadModal = ({ isOpen, onClose, mediaData, type, currentSeason, curren
                                                 </div>
                                             </div>
 
-                                            {/* Fetch RiveStream Button */}
                                             {!hasFetched && !isLoading && (
                                                 <button
                                                     onClick={fetchRiveStreamSources}
@@ -385,7 +385,6 @@ const DownloadModal = ({ isOpen, onClose, mediaData, type, currentSeason, curren
                                                 </div>
                                             )}
 
-                                            {/* Modified Server List */}
                                             {Object.entries(filteredServerGroups).length > 0 && (
                                                 <div className="space-y-2">
                                                     {Object.entries(filteredServerGroups).map(([server, links]) => (
@@ -436,7 +435,7 @@ const DownloadModal = ({ isOpen, onClose, mediaData, type, currentSeason, curren
                                                     </p>
                                                 </div>
                                             )}
-                                        </div>
+                                        </div> */}
                                     </div>
                                 </div>
 

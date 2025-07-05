@@ -13,7 +13,8 @@ const Layout = ({ children }) => {
 
         // Preload on page load
         if (typeof window !== "undefined") {
-            requestIdleCallback(() => {
+            const requestIdle = window.requestIdleCallback || ((cb) => setTimeout(() => cb({ timeRemaining: () => true }), 1));
+            requestIdle(() => {
                 preloadRoutes.forEach((route) => {
                     router.prefetch(route);
                 });
