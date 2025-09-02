@@ -13,14 +13,6 @@ export const streamingSources = {
         working: true,
         recommended: true,
     },
-    embedsu: {
-        flag: "https://flagcdn.com/w20/us.png",
-        movie: "https://embed.su/embed/movie/{id}",
-        tv: "https://embed.su/embed/tv/{id}/{season}/{episode}",
-        working: true,
-        recommended: true,
-    },
-
     onexbet: {
         flag: "https://flagcdn.com/w20/in.png",
         movie: "https://vd.1xplayer.com/play/{imdbId}",
@@ -37,23 +29,8 @@ export const streamingSources = {
     },
     rive: {
         flag: "https://flagcdn.com/w20/us.png",
-        movie: "https://rivestream.org/embed?type=movie&id={id}",
-        tv: "https://rivestream.org/embed?type=tv&id={id}&season={season}&episode={episode}",
-        working: true,
-        recommended: true,
-    },
-    flicky: {
-        flag: "https://flagcdn.com/w20/in.png",
-        movie: "https://flicky.host/embed/movie/?id={id}",
-        tv: "https://flicky.host/embed/tv/?id={id}/{season}/{episode}",
-        // https://letsembed.cc/
-        working: true,
-        recommended: true,
-    },
-    movieclub: {
-        flag: "https://flagcdn.com/w20/in.png",
-        movie: "https://moviesapi.club/movie/{id}",
-        tv: "https://moviesapi.club/tv/{id}-{season}-{episode}",
+        movie: "https://watch.rivestream.app/embed?type=movie&id={id}",
+        tv: "https://watch.rivestream.app/embed?type=tv&id={id}&season={season}&episode={episode}",
         working: true,
         recommended: true,
     },
@@ -71,13 +48,6 @@ export const streamingSources = {
         working: true,
         recommended: false,
     },
-    vidvip: {
-        flag: "https://flagcdn.com/w20/in.png",
-        movie: "https://vidsrc.vip/embed/movie/{id}",
-        tv: "https://vidsrc.vip/embed/tv/{id}/{season}/{episode}",
-        working: true,
-        recommended: false,
-    },
     embedcc: {
         flag: "https://flagcdn.com/w20/us.png",
         movie: "https://www.2embed.cc/embed/{id}",
@@ -92,35 +62,52 @@ export const streamingSources = {
         working: true,
         recommended: false,
     },
-    multimov: {
-        flag: "https://flagcdn.com/w20/us.png",
-        movie: "https://multiembed.mov/?video_id={id}&tmdb=1",
-        tv: "https://multiembed.mov/?video_id={id}&tmdb={season}&s=1&e={episode}",
-        working: true,
-        recommended: false,
-    },
-    smashy: {
-        flag: "https://flagcdn.com/w20/in.png",
-        movie: "https://player.smashy.stream/movie/{id}",
-        tv: "https://player.smashy.stream/tv/{id}?s={season}&e={episode}",
-        working: true,
-        recommended: false,
-    },
+    // embedsu: {
+    //     flag: "https://flagcdn.com/w20/us.png",
+    //     movie: "https://embed.su/embed/movie/{id}",
+    //     tv: "https://embed.su/embed/tv/{id}/{season}/{episode}",
+    //     working: true,
+    //     recommended: true,
+    // },
+    // vidvip: {
+    //     flag: "https://flagcdn.com/w20/in.png",
+    //     movie: "https://vidsrc.vip/embed/movie/{id}",
+    //     tv: "https://vidsrc.vip/embed/tv/{id}/{season}/{episode}",
+    //     working: true,
+    //     recommended: false,
+    // },
+    // multimov: {
+    //     flag: "https://flagcdn.com/w20/us.png",
+    //     movie: "https://multiembed.mov/?video_id={id}&tmdb=1",
+    //     tv: "https://multiembed.mov/?video_id={id}&tmdb={season}&s=1&e={episode}",
+    //     working: true,
+    //     recommended: false,
+    // },
+    // flicky: {
+    //     flag: "https://flagcdn.com/w20/in.png",
+    //     movie: "https://flicky.host/embed/movie/?id={id}",
+    //     tv: "https://flicky.host/embed/tv/?id={id}/{season}/{episode}",
+    //     // https://letsembed.cc/
+    //     working: true,
+    //     recommended: true,
+    // },
+    // movieclub: {
+    //     flag: "https://flagcdn.com/w20/in.png",
+    //     movie: "https://moviesapi.club/movie/{id}",
+    //     tv: "https://moviesapi.club/tv/{id}-{season}-{episode}",
+    //     working: true,
+    //     recommended: true,
+    // },
+    // smashy: {
+    //     flag: "https://flagcdn.com/w20/in.png",
+    //     movie: "https://player.smashy.stream/movie/{id}",
+    //     tv: "https://player.smashy.stream/tv/{id}?s={season}&e={episode}",
+    //     working: true,
+    //     recommended: false,
+    // },
 };
 
 export const animeStreamingSources = {
-    embedsu: {
-        flag: "https://flagcdn.com/w20/us.png",
-        anime: "https://embed.su/embed/anilist/{id}/{episode}?color=ffffff",
-        working: true,
-        recommended: true,
-    },
-    vidpro: {
-        flag: "https://flagcdn.com/w20/us.png",
-        anime: "https://vidlink.pro/anime/{malId}/{episode}/sub?icons=vid&fallback=true",
-        working: true,
-        recommended: false,
-    },
     "vidcc-sub": {
         flag: "https://flagcdn.com/w20/gb.png",
         anime: "https://vidsrc.cc/v2/embed/anime/ani{id}/{episode}/sub",
@@ -130,6 +117,18 @@ export const animeStreamingSources = {
     "vidcc-dub": {
         flag: "https://flagcdn.com/w20/gb.png",
         anime: "https://vidsrc.cc/v2/embed/anime/ani{id}/{episode}/dub",
+        working: true,
+        recommended: false,
+    },
+    embedsu: {
+        flag: "https://flagcdn.com/w20/us.png",
+        anime: "https://embed.su/embed/anilist/{id}/{episode}?color=ffffff",
+        working: true,
+        recommended: true,
+    },
+    vidpro: {
+        flag: "https://flagcdn.com/w20/us.png",
+        anime: "https://vidlink.pro/anime/{malId}/{episode}/sub?icons=vid&fallback=true",
         working: true,
         recommended: false,
     },

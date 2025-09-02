@@ -15,13 +15,21 @@ export default function App({ Component, pageProps }) {
         <>
             <Head>
                 <meta charSet="utf-8" />
-                <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+                <meta
+                    name="viewport"
+                    content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no"
+                />
                 <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
                 <meta name="theme-color" content="#121212" />
                 <meta property="og:site_name" content="ChinFlix" />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="robots" content="index, follow" />
                 <link rel="canonical" href={`https://chinflix.vercel.app${router.asPath}`} />
+                <link rel="manifest" href="/manifest.json" />
+                <link rel="apple-touch-icon" href="/apple-icon-180.png" />
+                <meta name="apple-mobile-web-app-capable" content="yes" />
+                <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+                <meta name="apple-mobile-web-app-title" content="ChinFlix" />
             </Head>
             <Script
                 src="https://cloud.umami.is/script.js"
