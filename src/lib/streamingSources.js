@@ -1,15 +1,22 @@
 export const streamingSources = {
-    vidxyz: {
-        flag: "https://flagcdn.com/w20/us.png",
-        movie: "https://vidsrc.xyz/embed/movie?tmdb={id}",
-        tv: "https://vidsrc.xyz/embed/tv?tmdb={id}&season={season}&episode={episode}",
+    vidcc: {
+        flag: "https://flagcdn.com/w20/gb.png",
+        movie: "https://vidsrc.cc/v2/embed/movie/{id}",
+        tv: "https://vidsrc.cc/v2/embed/tv/{id}/{season}/{episode}",
         working: true,
-        recommended: true,
+        recommended: false,
     },
     vidpro: {
         flag: "https://flagcdn.com/w20/us.png",
         movie: "https://vidlink.pro/movie/{id}?icons=vid",
         tv: "https://vidlink.pro/tv/{id}/{season}/{episode}?icons=vid&nextbutton=true",
+        working: true,
+        recommended: true,
+    },
+    vidking: {
+        flag: "https://flagcdn.com/w20/gb.png",
+        movie: "https://vidking.net/embed/movie/{id}?color=e50914&autoPlay=true",
+        tv: "https://vidking.net/embed/tv/{id}/{season}/{episode}?color=e50914&autoPlay=true",
         working: true,
         recommended: true,
     },
@@ -20,12 +27,12 @@ export const streamingSources = {
         working: true,
         recommended: true,
     },
-    vidcc: {
-        flag: "https://flagcdn.com/w20/gb.png",
-        movie: "https://vidsrc.cc/v2/embed/movie/{id}",
-        tv: "https://vidsrc.cc/v2/embed/tv/{id}/{season}/{episode}",
+    vidxyz: {
+        flag: "https://flagcdn.com/w20/us.png",
+        movie: "https://vidsrc.xyz/embed/movie?tmdb={id}",
+        tv: "https://vidsrc.xyz/embed/tv?tmdb={id}&season={season}&episode={episode}",
         working: true,
-        recommended: false,
+        recommended: true,
     },
     rive: {
         flag: "https://flagcdn.com/w20/us.png",
@@ -33,6 +40,13 @@ export const streamingSources = {
         tv: "https://watch.rivestream.app/embed?type=tv&id={id}&season={season}&episode={episode}",
         working: true,
         recommended: true,
+    },
+    onemovies: {
+        flag: "https://flagcdn.com/w20/in.png",
+        movie: "https://111movies.com/movie/{id}?autoplay=1&theme=23ddc36c",
+        tv: "https://111movies.com/tv/{id}/{season}/{episode}?autoplay=1&theme=23ddc36c",
+        working: true,
+        recommended: false,
     },
     videasy: {
         flag: "https://flagcdn.com/w20/gb.png",

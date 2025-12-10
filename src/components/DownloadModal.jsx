@@ -25,7 +25,7 @@ const DownloadModal = ({ isOpen, onClose, mediaData, type, currentSeason, curren
     const [hasFetched, setHasFetched] = useState(false);
 
     // RiveStream API configuration
-    const RiveStreamAPI = "https://rivestream.org";
+    const RiveStreamAPI = "https://watch.rivestream.app";
     const headers = {};
 
     // Retry helper
@@ -327,7 +327,7 @@ const DownloadModal = ({ isOpen, onClose, mediaData, type, currentSeason, curren
                                         </div>
 
                                         {/* RiveStream Section */}
-                                        {/* <div className="space-y-4">
+                                        <div className="space-y-4">
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-2">
                                                     <ServerIcon className="w-5 h-5 text-white/70" />
@@ -435,7 +435,7 @@ const DownloadModal = ({ isOpen, onClose, mediaData, type, currentSeason, curren
                                                     </p>
                                                 </div>
                                             )}
-                                        </div> */}
+                                        </div>
                                     </div>
                                 </div>
 

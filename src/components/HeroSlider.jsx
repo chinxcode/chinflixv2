@@ -67,7 +67,7 @@ const HeroSlider = memo(({ type = "movie" }) => {
                     className="absolute inset-0"
                 >
                     <Image
-                        src={`https://image.tmdb.org/t/p/original${item.backdrop_path}`}
+                        src={item.backdrop_path}
                         alt={item.title || item.name}
                         layout="fill"
                         priority
@@ -120,7 +120,7 @@ const HeroSlider = memo(({ type = "movie" }) => {
                             mediaId={item.id}
                             mediaType={type}
                             title={item.title || item.name}
-                            image={`https://image.tmdb.org/t/p/w500${item.backdrop_path}`}
+                            image={item.backdrop_path}
                             className="bg-white/10 backdrop-blur-sm rounded-full overflow-hidden hover:bg-white/20 p-1.5 sm:p-2 transition-all duration-200 shadow-lg "
                         />
                     </motion.div>
