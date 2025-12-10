@@ -223,8 +223,10 @@ const DownloadModal = ({ isOpen, onClose, mediaData, type, currentSeason, curren
 
     const qualityOrder = ["2160p", "1440p", "1080p", "720p", "480p", "360p", "240p"];
     const sortedRiveStreamLinks = riveStreamLinks.sort((a, b) => {
-        const aIndex = qualityOrder.findIndex((q) => a.quality?.includes(q));
-        const bIndex = qualityOrder.findIndex((q) => b.quality?.includes(q));
+        const aQuality = String(a.quality || "");
+        const bQuality = String(b.quality || "");
+        const aIndex = qualityOrder.findIndex((q) => aQuality.includes(q));
+        const bIndex = qualityOrder.findIndex((q) => bQuality.includes(q));
         return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex);
     });
 
