@@ -16,10 +16,16 @@ const WatchPage = () => {
     const [currentSeason, setCurrentSeason] = useState(1);
     const [currentEpisode, setCurrentEpisode] = useState(1);
     const [streamingServers, setStreamingServers] = useState([]);
-    const [currentServer, setCurrentServer] = useState("");
-    const [selectedServerIndex, setSelectedServerIndex] = useState(0);
+    const [currentServerName, setCurrentServerName] = useState("");
+    const [trailerUrl, setTrailerUrl] = useState("");
+    const [isPlayingTrailer, setIsPlayingTrailer] = useState(false);
     const [isChangingMedia, setIsChangingMedia] = useState(false);
     const [isInfoPanelCollapsed, setIsInfoPanelCollapsed] = useState(false);
+
+    // Derive current server URL
+    const currentServer = isPlayingTrailer
+        ? trailerUrl
+        : streamingServers.find((s) => s.name === currentServerName)?.url || streamingServers[0]?.url || "";
 
     const resetAllScrolls = useCallback(() => {
         // Reset main page scroll
@@ -102,16 +108,16 @@ const WatchPage = () => {
                 const links = await getStreamingLinks(id, type, initialSeason, initialEpisode);
                 setStreamingServers(links);
 
-                const serverIndex = links.findIndex((s) => s.name === initialServerName);
-                const selectedIndex = serverIndex !== -1 ? serverIndex : 0;
-                setSelectedServerIndex(selectedIndex);
-                setCurrentServer(links[selectedIndex]?.url || links[0]?.url || "");
+                // Find preferred server or use first one
+                const preferredServer = links.find((s) => s.name === initialServerName);
+                const serverToUse = preferredServer ? initialServerName : links[0]?.name || "";
 
+                setCurrentServerName(serverToUse);
                 setCurrentSeason(initialSeason);
                 setCurrentEpisode(initialEpisode);
 
-                updateURL(initialSeason, initialEpisode, links[selectedIndex]?.name);
-                saveToCache(initialSeason, initialEpisode, links[selectedIndex]?.name);
+                updateURL(initialSeason, initialEpisode, serverToUse);
+                saveToCache(initialSeason, initialEpisode, serverToUse);
             } catch (error) {
                 console.error("Failed to load initial data:", error);
             }
@@ -196,6 +202,7 @@ const WatchPage = () => {
     const handleSeasonChange = async (season) => {
         if (season === currentSeason) return;
         setIsChangingMedia(true);
+        setIsPlayingTrailer(false);
         resetAllScrolls();
         try {
             const seasonDetails = await getSeasonDetails(id, season, type);
@@ -205,10 +212,14 @@ const WatchPage = () => {
             setCurrentSeason(season);
             setCurrentEpisode(1);
             setStreamingServers(links);
-            setCurrentServer(links[selectedServerIndex]?.url || links[0]?.url || "");
 
-            updateURL(season, 1, links[selectedServerIndex]?.name);
-            saveToCache(season, 1, links[selectedServerIndex]?.name);
+            // Try to keep the same server if it exists, otherwise use first
+            const sameServer = links.find((s) => s.name === currentServerName);
+            const serverToUse = sameServer ? currentServerName : links[0]?.name || "";
+            setCurrentServerName(serverToUse);
+
+            updateURL(season, 1, serverToUse);
+            saveToCache(season, 1, serverToUse);
         } catch (error) {
             console.error("Failed to change season:", error);
         } finally {
@@ -219,15 +230,20 @@ const WatchPage = () => {
     const handleEpisodeChange = async (episode) => {
         if (episode === currentEpisode) return;
         setIsChangingMedia(true);
+        setIsPlayingTrailer(false);
         resetAllScrolls();
         try {
             const links = await getStreamingLinks(id, type, currentSeason, episode);
             setCurrentEpisode(episode);
             setStreamingServers(links);
-            setCurrentServer(links[selectedServerIndex]?.url || links[0]?.url || "");
 
-            updateURL(currentSeason, episode, links[selectedServerIndex]?.name);
-            saveToCache(currentSeason, episode, links[selectedServerIndex]?.name);
+            // Try to keep the same server if it exists, otherwise use first
+            const sameServer = links.find((s) => s.name === currentServerName);
+            const serverToUse = sameServer ? currentServerName : links[0]?.name || "";
+            setCurrentServerName(serverToUse);
+
+            updateURL(currentSeason, episode, serverToUse);
+            saveToCache(currentSeason, episode, serverToUse);
         } catch (error) {
             console.error("Failed to change episode:", error);
         } finally {
@@ -235,13 +251,13 @@ const WatchPage = () => {
         }
     };
 
-    const handleServerChange = (url, index) => {
-        if (!isChangingMedia && index !== selectedServerIndex) {
+    const handleServerChange = (serverName) => {
+        if (!isChangingMedia && serverName !== currentServerName) {
             resetAllScrolls();
-            setCurrentServer(url);
-            setSelectedServerIndex(index);
-            updateURL(currentSeason, currentEpisode, streamingServers[index]?.name);
-            saveToCache(currentSeason, currentEpisode, streamingServers[index]?.name);
+            setCurrentServerName(serverName);
+            setIsPlayingTrailer(false);
+            updateURL(currentSeason, currentEpisode, serverName);
+            saveToCache(currentSeason, currentEpisode, serverName);
         }
     };
 
@@ -369,7 +385,7 @@ const WatchPage = () => {
                                 servers={streamingServers}
                                 onServerChange={handleServerChange}
                                 isLoading={isChangingMedia}
-                                selectedServerIndex={selectedServerIndex}
+                                selectedServerName={currentServerName}
                             />
                             {type !== "anime" && (
                                 <div className="bg-gray-900 rounded-lg p-4">
@@ -426,10 +442,10 @@ const WatchPage = () => {
                                     description={mediaData.overview}
                                     genres={mediaData.genres?.map((g) => g.name || g) || []}
                                     videos={mediaData.videos || []}
-                                    setTrailer={(trailer) => {
-                                        if (trailer) {
-                                            setCurrentServer(trailer);
-                                            setSelectedServerIndex(99);
+                                    setTrailer={(url) => {
+                                        if (url) {
+                                            setTrailerUrl(url);
+                                            setIsPlayingTrailer(true);
                                         }
                                     }}
                                 />
@@ -500,7 +516,7 @@ const WatchPage = () => {
                                     servers={streamingServers}
                                     onServerChange={handleServerChange}
                                     isLoading={isChangingMedia}
-                                    selectedServerIndex={selectedServerIndex}
+                                    selectedServerName={currentServerName}
                                 />
                             </div>
                         </div>
@@ -531,10 +547,10 @@ const WatchPage = () => {
                                         description={mediaData.overview}
                                         genres={mediaData.genres?.map((g) => g.name || g) || []}
                                         videos={mediaData.videos || []}
-                                        setTrailer={(trailer) => {
-                                            if (trailer) {
-                                                setCurrentServer(trailer);
-                                                setSelectedServerIndex(99);
+                                        setTrailer={(url) => {
+                                            if (url) {
+                                                setTrailerUrl(url);
+                                                setIsPlayingTrailer(true);
                                             }
                                         }}
                                     />

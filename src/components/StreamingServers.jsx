@@ -2,7 +2,7 @@ import { memo } from "react";
 import Image from "next/image";
 import { SparklesIcon } from "@heroicons/react/20/solid";
 
-const StreamingServers = memo(({ servers, onServerChange, selectedServerIndex, isLoading }) => {
+const StreamingServers = memo(({ servers, onServerChange, selectedServerName, isLoading }) => {
     return (
         <>
             <p className="text-left text-sm text-gray-400 px-4">
@@ -13,9 +13,9 @@ const StreamingServers = memo(({ servers, onServerChange, selectedServerIndex, i
                     <button
                         key={index}
                         className={`group relative flex items-center justify-center px-2 py-2 rounded-lg transition-all duration-200 ${
-                            selectedServerIndex === index ? "bg-white/30 ring-2 ring-white/20" : "bg-gray-700 hover:bg-gray-600"
+                            selectedServerName === server.name ? "bg-white/30 ring-2 ring-white/20" : "bg-gray-700 hover:bg-gray-600"
                         }`}
-                        onClick={() => !isLoading && onServerChange(server.url, index)}
+                        onClick={() => !isLoading && onServerChange(server.name)}
                     >
                         {server.recommended && (
                             <div className="absolute top-1 left-1">
@@ -23,7 +23,11 @@ const StreamingServers = memo(({ servers, onServerChange, selectedServerIndex, i
                             </div>
                         )}
                         <div className="relative w-4 h-3 mr-2">
-                            <Image src={server.flag} alt={`${server.name} flag`} layout="fill" objectFit="cover" />
+                            {typeof server.flag === "string" && server.flag.startsWith("http") ? (
+                                <Image src={server.flag} alt={`${server.name} flag`} layout="fill" objectFit="cover" />
+                            ) : (
+                                <span className="text-sm">{server.flag || "🌐"}</span>
+                            )}
                         </div>
                         <span>{server.name}</span>
                         {server.working ? (
