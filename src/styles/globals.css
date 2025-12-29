@@ -72,3 +72,49 @@ body {
         transform: rotate(360deg);
     }
 }
+
+/* Artplayer Custom Styles */
+.art-setting-item {
+    cursor: pointer !important;
+    padding: 10px 15px !important;
+    border-radius: 6px !important;
+    transition: all 0.2s ease !important;
+}
+
+.art-setting-item:hover {
+    background-color: rgba(255, 77, 77, 0.15) !important;
+    transform: translateX(3px) !important;
+}
+
+.art-setting-item.art-current {
+    background-color: rgba(255, 77, 77, 0.25) !important;
+    border-left: 3px solid #ff4d4d !important;
+    font-weight: 600 !important;
+}
+
+/* Remove checkmark icon from selected items */
+.art-setting-item.art-current::after {
+    display: none !important;
+}
+
+/* Style the selector panels */
+.art-selector {
+    background-color: rgba(30, 30, 30, 0.98) !important;
+    backdrop-filter: blur(10px) !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Style subtitle toggle specifically */
+.art-subtitle-show .art-icon {
+    color: #ff4d4d !important;
+}
+
+/* Improve clickable appearance */
+.art-setting-item {
+    user-select: none !important;
+}
+
+.art-setting-item:active {
+    transform: scale(0.98) !important;
+}

@@ -92,10 +92,14 @@ export default async function handler(req, res) {
             }
         });
 
+        // Extract captions if available
+        const captions = sourceJson.data.captions || [];
+
         return res.status(200).json({
             success: true,
             server: server,
             links: links,
+            captions: captions,
         });
     } catch (error) {
         console.error(`Error fetching from server ${server}:`, error.message);

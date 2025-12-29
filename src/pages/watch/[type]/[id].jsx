@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import Head from "next/head";
 import { getMediaDetails, getSeasonDetails, getStreamingLinks } from "@/lib/api";
 import { VideoPlayer, RelationInfo, MediaInfo, SeasonEpisode, CastInfo, MediaActions, AnimeRelations } from "@/components/MediaComponents";
@@ -22,10 +22,18 @@ const WatchPage = () => {
     const [isChangingMedia, setIsChangingMedia] = useState(false);
     const [isInfoPanelCollapsed, setIsInfoPanelCollapsed] = useState(false);
 
-    // Derive current server URL
-    const currentServer = isPlayingTrailer
-        ? trailerUrl
-        : streamingServers.find((s) => s.name === currentServerName)?.url || streamingServers[0]?.url || "";
+    // Custom player states
+    const [customPlayerData, setCustomPlayerData] = useState(null);
+    const [isLoadingCustomPlayer, setIsLoadingCustomPlayer] = useState(false);
+    const [customPlayerError, setCustomPlayerError] = useState(null);
+    const [customLoadingProgress, setCustomLoadingProgress] = useState({ loaded: 0, total: 0 });
+
+    // Track if user has manually changed server (to prevent auto-switch)
+    const hasUserChangedServerRef = useRef(false);
+    const initialServerNameRef = useRef("");
+    const firstCustomServerLoadedRef = useRef(false); // Derive current server URL and data
+    const currentServerData = streamingServers.find((s) => s.name === currentServerName);
+    const currentServer = isPlayingTrailer ? trailerUrl : currentServerData?.url || streamingServers[0]?.url || "";
 
     const resetAllScrolls = useCallback(() => {
         // Reset main page scroll
@@ -37,12 +45,174 @@ const WatchPage = () => {
         });
     }, []);
 
+    // Fetch custom player download links with progressive loading
+    const fetchCustomPlayerLinks = async (mediaId, mediaType, season, episode, shouldAutoSwitch = false) => {
+        setIsLoadingCustomPlayer(true);
+        setCustomPlayerError(null);
+        firstCustomServerLoadedRef.current = false;
+
+        try {
+            const params = {
+                id: mediaId.toString(),
+                type: mediaType,
+                title: mediaData?.title || mediaData?.name || "Untitled",
+            };
+
+            if (mediaType === "tv" || mediaType === "anime") {
+                params.season = season;
+                params.episode = episode;
+            }
+
+            const response = await fetch(`/api/download/init?${new URLSearchParams({ id: params.id })}`);
+            const initData = await response.json();
+
+            if (!initData.success || !initData.sourceList || initData.sourceList.length === 0) {
+                throw new Error("No sources available");
+            }
+
+            const totalServers = initData.sourceList.length;
+            setCustomLoadingProgress({ loaded: 0, total: totalServers });
+
+            const captionsMap = new Map();
+            let loadedCount = 0;
+            let firstServerReturned = false;
+
+            // Fetch first server immediately, then others in background
+            const fetchServer = async (server, index) => {
+                try {
+                    const serverParams = {
+                        ...params,
+                        server,
+                        secretKey: initData.secretKey,
+                    };
+
+                    const serverResponse = await fetch(`/api/download/server?${new URLSearchParams(serverParams)}`);
+                    const serverData = await serverResponse.json();
+
+                    loadedCount++;
+                    setCustomLoadingProgress({ loaded: loadedCount, total: totalServers });
+
+                    if (serverData.success && serverData.links && serverData.links.length > 0) {
+                        if (serverData.captions && serverData.captions.length > 0) {
+                            serverData.captions.forEach((caption) => {
+                                if (caption.file && !captionsMap.has(caption.file)) {
+                                    captionsMap.set(caption.file, {
+                                        label: caption.label,
+                                        file: caption.file,
+                                    });
+                                }
+                            });
+                        }
+
+                        // Sort this server's links by quality
+                        const sortedLinks = serverData.links.sort((a, b) => {
+                            const qualityOrder = ["2160p", "1440p", "1080p", "720p", "480p", "360p", "240p"];
+                            const aQuality = String(a.quality || "");
+                            const bQuality = String(b.quality || "");
+                            const aIndex = qualityOrder.findIndex((q) => aQuality.includes(q));
+                            const bIndex = qualityOrder.findIndex((q) => bQuality.includes(q));
+                            return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex);
+                        });
+
+                        const defaultLink = sortedLinks[0];
+                        const allCaptions = Array.from(captionsMap.values());
+
+                        const newServer = {
+                            name: serverData.server,
+                            url: defaultLink.url,
+                            format: defaultLink.type,
+                            quality: defaultLink.quality,
+                            flag: "⭐",
+                            working: true,
+                            recommended: !firstCustomServerLoadedRef.current,
+                            isCustomPlayer: true,
+                            playerData: {
+                                sources: sortedLinks,
+                                captions: allCaptions,
+                            },
+                        };
+
+                        // Add server immediately as it loads
+                        setStreamingServers((prev) => {
+                            const filtered = prev.filter((s) => s.name !== newServer.name);
+                            const customServers = filtered.filter((s) => s.isCustomPlayer);
+                            const externalServers = filtered.filter((s) => !s.isCustomPlayer);
+                            return [...customServers, newServer, ...externalServers];
+                        });
+
+                        // Mark first server loaded
+                        const isFirstServer = !firstCustomServerLoadedRef.current;
+                        if (isFirstServer) {
+                            firstCustomServerLoadedRef.current = true;
+                        }
+
+                        return { server: newServer, isFirst: isFirstServer };
+                    }
+                    return null;
+                } catch (error) {
+                    loadedCount++;
+                    setCustomLoadingProgress({ loaded: loadedCount, total: totalServers });
+                    console.error(`Failed to fetch from ${server}:`, error);
+                    return null;
+                }
+            };
+
+            // Fetch first server and wait for it
+            const firstResult = await fetchServer(initData.sourceList[0], 0);
+
+            // If we got first server and should auto-switch, return it immediately
+            if (firstResult && shouldAutoSwitch && !hasUserChangedServerRef.current) {
+                firstServerReturned = true;
+
+                // Continue loading other servers in background
+                const remainingPromises = initData.sourceList.slice(1).map((server, index) => fetchServer(server, index + 1));
+
+                Promise.allSettled(remainingPromises).then(() => {
+                    setIsLoadingCustomPlayer(false);
+                });
+
+                return firstResult.server;
+            }
+
+            // If not auto-switching, fetch all servers in parallel (old behavior)
+            const remainingPromises = initData.sourceList.slice(1).map((server, index) => fetchServer(server, index + 1));
+
+            await Promise.allSettled(remainingPromises);
+            setIsLoadingCustomPlayer(false);
+
+            return firstResult ? firstResult.server : null;
+        } catch (error) {
+            console.error("Error fetching custom player links:", error);
+            setCustomPlayerError(error.message || "Failed to load custom player");
+            setIsLoadingCustomPlayer(false);
+        }
+        return null;
+    };
+
     useEffect(() => {
         resetAllScrolls();
     }, [id, resetAllScrolls]);
 
+    // Track previous values to prevent unnecessary reloads
+    const prevValuesRef = useRef({ type: null, id: null, s: null, e: null });
+
     useEffect(() => {
         if (!router.isReady || !type || !id) return;
+
+        // Check if only server param changed (don't reload for server-only changes)
+        const currentValues = { type, id, s, e };
+        const prevValues = prevValuesRef.current;
+
+        const onlyServerChanged = prevValues.type === type && prevValues.id === id && prevValues.s === s && prevValues.e === e;
+
+        // If only server changed, don't reload everything
+        if (onlyServerChanged && prevValues.type !== null) {
+            console.log("Only server changed, skipping reload");
+            return;
+        }
+
+        // Update previous values
+        prevValuesRef.current = currentValues;
 
         const loadInitialState = async () => {
             try {
@@ -105,19 +275,69 @@ const WatchPage = () => {
                     initialServerName = server;
                 }
 
+                // Store initial server name for auto-switch check
+                initialServerNameRef.current = initialServerName;
+                hasUserChangedServerRef.current = false;
+
+                // Load external servers immediately for fast page load
                 const links = await getStreamingLinks(id, type, initialSeason, initialEpisode);
                 setStreamingServers(links);
 
-                // Find preferred server or use first one
-                const preferredServer = links.find((s) => s.name === initialServerName);
-                const serverToUse = preferredServer ? initialServerName : links[0]?.name || "";
+                // Find preferred server in external servers only (custom servers will load later)
+                let serverToUse = "";
+                let isPreferredCustom = false;
+
+                if (initialServerName) {
+                    // Check if preferred server is "Custom" (generic custom player preference)
+                    if (initialServerName === "custom") {
+                        isPreferredCustom = true;
+                        console.log("User prefers custom servers, will auto-switch when they load");
+                    } else {
+                        // Try to find specific external server
+                        const preferredServer = links.find((s) => s.name === initialServerName);
+                        if (preferredServer) {
+                            serverToUse = initialServerName;
+                            console.log("Found preferred external server:", serverToUse);
+                        }
+                    }
+                }
+
+                // If no preferred server found or is custom, use first external server temporarily
+                if (!serverToUse) {
+                    serverToUse = links[0]?.name || "";
+                }
 
                 setCurrentServerName(serverToUse);
                 setCurrentSeason(initialSeason);
                 setCurrentEpisode(initialEpisode);
-
                 updateURL(initialSeason, initialEpisode, serverToUse);
-                saveToCache(initialSeason, initialEpisode, serverToUse);
+                if (!isPreferredCustom) {
+                    saveToCache(initialSeason, initialEpisode, serverToUse);
+                }
+
+                // Fetch custom player links - behavior depends on preference
+                if (isPreferredCustom) {
+                    // If custom is preferred, fetch first server and switch immediately
+                    console.log("Custom server preferred - fetching first server and auto-switching");
+                    fetchCustomPlayerLinks(id, type, initialSeason, initialEpisode, true)
+                        .then((firstCustomServer) => {
+                            if (firstCustomServer && !hasUserChangedServerRef.current) {
+                                console.log("Auto-switching to first custom server:", firstCustomServer.name);
+                                setCurrentServerName(firstCustomServer.name);
+                                updateURL(initialSeason, initialEpisode, "custom");
+                                saveToCache(initialSeason, initialEpisode, "custom");
+                            }
+                        })
+                        .catch((error) => {
+                            console.error("Error loading custom servers:", error);
+                        });
+                } else {
+                    // If custom is NOT preferred, fetch all custom servers in background without switching
+                    console.log("External server preferred - fetching custom servers in background");
+                    fetchCustomPlayerLinks(id, type, initialSeason, initialEpisode, false).catch((error) => {
+                        console.error("Error loading custom servers:", error);
+                    });
+                }
             } catch (error) {
                 console.error("Failed to load initial data:", error);
             }
@@ -204,6 +424,13 @@ const WatchPage = () => {
         setIsChangingMedia(true);
         setIsPlayingTrailer(false);
         resetAllScrolls();
+
+        // Reset manual change flag for new season
+        hasUserChangedServerRef.current = false;
+
+        // Check if current server is custom player before changing
+        const wasCustomPlayer = streamingServers.find((s) => s.name === currentServerName)?.isCustomPlayer;
+
         try {
             const seasonDetails = await getSeasonDetails(id, season, type);
             const links = await getStreamingLinks(id, type, season, 1);
@@ -211,15 +438,34 @@ const WatchPage = () => {
             setSeasonData(seasonDetails);
             setCurrentSeason(season);
             setCurrentEpisode(1);
-            setStreamingServers(links);
 
-            // Try to keep the same server if it exists, otherwise use first
-            const sameServer = links.find((s) => s.name === currentServerName);
-            const serverToUse = sameServer ? currentServerName : links[0]?.name || "";
+            // Remove old Custom server before adding new links
+            const filteredLinks = links.filter((s) => !s.isCustomPlayer);
+            setStreamingServers(filteredLinks);
+
+            // Try to keep the same server if it exists (excluding Custom), otherwise use first
+            const sameServer = filteredLinks.find((s) => s.name === currentServerName);
+            const serverToUse = sameServer ? currentServerName : filteredLinks[0]?.name || "";
             setCurrentServerName(serverToUse);
 
-            updateURL(season, 1, serverToUse);
-            saveToCache(season, 1, serverToUse);
+            // Save "Custom" if previous was custom player, otherwise save actual server name
+            const serverNameToSave = wasCustomPlayer ? "custom" : serverToUse;
+            updateURL(season, 1, serverNameToSave);
+            saveToCache(season, 1, serverNameToSave);
+
+            // Refetch custom player links for new season
+            // If user was on custom player, auto-switch to first custom server when ready
+            if (wasCustomPlayer) {
+                fetchCustomPlayerLinks(id, type, season, 1, true).then((firstCustomServer) => {
+                    if (firstCustomServer && !hasUserChangedServerRef.current) {
+                        setCurrentServerName(firstCustomServer.name);
+                        updateURL(season, 1, "custom");
+                    }
+                });
+            } else {
+                // Otherwise just load in background
+                fetchCustomPlayerLinks(id, type, season, 1, false);
+            }
         } catch (error) {
             console.error("Failed to change season:", error);
         } finally {
@@ -232,18 +478,44 @@ const WatchPage = () => {
         setIsChangingMedia(true);
         setIsPlayingTrailer(false);
         resetAllScrolls();
+
+        // Reset manual change flag for new episode
+        hasUserChangedServerRef.current = false;
+
+        // Check if current server is custom player before changing
+        const wasCustomPlayer = streamingServers.find((s) => s.name === currentServerName)?.isCustomPlayer;
+
         try {
             const links = await getStreamingLinks(id, type, currentSeason, episode);
             setCurrentEpisode(episode);
-            setStreamingServers(links);
 
-            // Try to keep the same server if it exists, otherwise use first
-            const sameServer = links.find((s) => s.name === currentServerName);
-            const serverToUse = sameServer ? currentServerName : links[0]?.name || "";
+            // Remove old Custom server before adding new links
+            const filteredLinks = links.filter((s) => !s.isCustomPlayer);
+            setStreamingServers(filteredLinks);
+
+            // Try to keep the same server if it exists (excluding Custom), otherwise use first
+            const sameServer = filteredLinks.find((s) => s.name === currentServerName);
+            const serverToUse = sameServer ? currentServerName : filteredLinks[0]?.name || "";
             setCurrentServerName(serverToUse);
 
-            updateURL(currentSeason, episode, serverToUse);
-            saveToCache(currentSeason, episode, serverToUse);
+            // Save "Custom" if previous was custom player, otherwise save actual server name
+            const serverNameToSave = wasCustomPlayer ? "custom" : serverToUse;
+            updateURL(currentSeason, episode, serverNameToSave);
+            saveToCache(currentSeason, episode, serverNameToSave);
+
+            // Refetch custom player links for new episode
+            // If user was on custom player, auto-switch to first custom server when ready
+            if (wasCustomPlayer) {
+                fetchCustomPlayerLinks(id, type, currentSeason, episode, true).then((firstCustomServer) => {
+                    if (firstCustomServer && !hasUserChangedServerRef.current) {
+                        setCurrentServerName(firstCustomServer.name);
+                        updateURL(currentSeason, episode, "custom");
+                    }
+                });
+            } else {
+                // Otherwise just load in background
+                fetchCustomPlayerLinks(id, type, currentSeason, episode, false);
+            }
         } catch (error) {
             console.error("Failed to change episode:", error);
         } finally {
@@ -253,11 +525,20 @@ const WatchPage = () => {
 
     const handleServerChange = (serverName) => {
         if (!isChangingMedia && serverName !== currentServerName) {
+            // Mark that user has manually changed server (prevent auto-switch)
+            hasUserChangedServerRef.current = true;
+
             resetAllScrolls();
             setCurrentServerName(serverName);
             setIsPlayingTrailer(false);
-            updateURL(currentSeason, currentEpisode, serverName);
-            saveToCache(currentSeason, currentEpisode, serverName);
+
+            // Save "Custom" if it's a custom player, otherwise save actual server name
+            const selectedServer = streamingServers.find((s) => s.name === serverName);
+            const serverNameToSave = selectedServer?.isCustomPlayer ? "custom" : serverName;
+
+            // Update URL and cache with "Custom" for custom players
+            updateURL(currentSeason, currentEpisode, serverNameToSave);
+            saveToCache(currentSeason, currentEpisode, serverNameToSave);
         }
     };
 
@@ -368,7 +649,12 @@ const WatchPage = () => {
                         </div>
                         <div className="h-full max-h-full overflow-y-auto p-4 space-y-4">
                             <div className="bg-gray-800 rounded-lg overflow-hidden flex flex-col">
-                                <VideoPlayer src={currentServer} isLoading={isChangingMedia} />
+                                <VideoPlayer
+                                    src={currentServer}
+                                    isLoading={isChangingMedia}
+                                    useCustomPlayer={currentServerData?.isCustomPlayer}
+                                    playerData={currentServerData?.playerData}
+                                />
                             </div>
                             <MediaActions
                                 type={type}
@@ -386,6 +672,9 @@ const WatchPage = () => {
                                 onServerChange={handleServerChange}
                                 isLoading={isChangingMedia}
                                 selectedServerName={currentServerName}
+                                isLoadingCustom={isLoadingCustomPlayer}
+                                customError={customPlayerError}
+                                loadingProgress={customLoadingProgress}
                             />
                             {type !== "anime" && (
                                 <div className="bg-gray-900 rounded-lg p-4">
@@ -498,7 +787,12 @@ const WatchPage = () => {
                         <div className="rounded-lg overflow-hidden border border-gray-700 flex flex-col">
                             <div className="max-h-full overflow-y-auto p-4 space-y-4">
                                 <div className="bg-gray-800 rounded-lg overflow-hidden flex flex-col">
-                                    <VideoPlayer src={currentServer} isLoading={isChangingMedia} />
+                                    <VideoPlayer
+                                        src={currentServer}
+                                        isLoading={isChangingMedia}
+                                        useCustomPlayer={currentServerData?.isCustomPlayer}
+                                        playerData={currentServerData?.playerData}
+                                    />
                                 </div>
                                 <MediaActions
                                     viewCount={Number(mediaData.popularity?.toFixed(0)) || 0}
@@ -517,6 +811,9 @@ const WatchPage = () => {
                                     onServerChange={handleServerChange}
                                     isLoading={isChangingMedia}
                                     selectedServerName={currentServerName}
+                                    isLoadingCustom={isLoadingCustomPlayer}
+                                    customError={customPlayerError}
+                                    loadingProgress={customLoadingProgress}
                                 />
                             </div>
                         </div>
