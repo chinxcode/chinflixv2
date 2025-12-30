@@ -4,7 +4,7 @@ import Head from "next/head";
 import { getMediaDetails, getSeasonDetails, getStreamingLinks } from "@/lib/api";
 import { VideoPlayer, RelationInfo, MediaInfo, SeasonEpisode, CastInfo, MediaActions, AnimeRelations } from "@/components/MediaComponents";
 import StreamingServers from "@/components/StreamingServers";
-import Skeleton from "@/components/Skeleton";
+// import Skeleton from "@/components/Skeleton";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
 const WatchPage = () => {
@@ -50,6 +50,30 @@ const WatchPage = () => {
         setIsLoadingCustomPlayer(true);
         setCustomPlayerError(null);
         firstCustomServerLoadedRef.current = false;
+
+        // Helper function to format HLS URLs
+        const formatHlsUrl = (url) => {
+            // if url starts with "https://hlsforge.com" then remove it
+            if (url.startsWith("https://hlsforge.com")) {
+                return decodeURIComponent(url.replace("https://hlsforge.com/?url=", ""));
+            }
+            return url;
+        };
+
+        // Helper function to extract headers from MP4 URLs
+        const extractHeadersfrommp4 = (url) => {
+            // decode headers from url if exists
+            if (url.includes("&headers=")) {
+                const headersString = url.split("&headers=")[1];
+                try {
+                    return JSON.parse(decodeURIComponent(headersString));
+                } catch (e) {
+                    console.error("Failed to parse headers:", e);
+                    return null;
+                }
+            }
+            return null;
+        };
 
         try {
             const params = {
@@ -104,8 +128,26 @@ const WatchPage = () => {
                             });
                         }
 
+                        // Process links: format URLs and extract headers
+                        const processedLinks = serverData.links.map((link) => {
+                            const processedLink = { ...link };
+
+                            if (link.type === "m3u8") {
+                                // Format HLS URLs
+                                processedLink.url = formatHlsUrl(link.url);
+                            } else if (link.type === "mp4") {
+                                // Extract headers from MP4 URLs
+                                const headers = extractHeadersfrommp4(link.url);
+                                if (headers) {
+                                    processedLink.headers = headers;
+                                }
+                            }
+
+                            return processedLink;
+                        });
+
                         // Sort this server's links by quality
-                        const sortedLinks = serverData.links.sort((a, b) => {
+                        const sortedLinks = processedLinks.sort((a, b) => {
                             const qualityOrder = ["2160p", "1440p", "1080p", "720p", "480p", "360p", "240p"];
                             const aQuality = String(a.quality || "");
                             const bQuality = String(b.quality || "");
@@ -122,6 +164,7 @@ const WatchPage = () => {
                             url: defaultLink.url,
                             format: defaultLink.type,
                             quality: defaultLink.quality,
+                            headers: defaultLink.headers,
                             flag: "⭐",
                             working: true,
                             recommended: !firstCustomServerLoadedRef.current,
@@ -131,6 +174,8 @@ const WatchPage = () => {
                                 captions: allCaptions,
                             },
                         };
+
+                        console.log("Loaded custom server:", newServer);
 
                         // Add server immediately as it loads
                         setStreamingServers((prev) => {
@@ -233,6 +278,8 @@ const WatchPage = () => {
                     const cachedServer = JSON.parse(localStorage.getItem("preferred_regular_server") || "null");
                     if (cachedServer && Date.now() - cachedServer.timestamp < 7 * 24 * 60 * 60 * 1000) {
                         initialServerName = cachedServer.serverName;
+                    } else {
+                        initialServerName = "custom";
                     }
                 }
 

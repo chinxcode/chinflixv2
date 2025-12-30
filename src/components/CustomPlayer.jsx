@@ -3,7 +3,7 @@ import Artplayer from "artplayer";
 import artplayerPluginHlsQuality from "artplayer-plugin-hls-quality";
 import Hls from "hls.js";
 
-export default function CustomPlayer({ option, captions, getInstance, format, sources, ...rest }) {
+export default function CustomPlayer({ option, captions, getInstance, format, sources, headers, ...rest }) {
     const artRef = useRef(null);
     const [currentSource, setCurrentSource] = useState(option);
     const artInstanceRef = useRef(null);
@@ -11,7 +11,17 @@ export default function CustomPlayer({ option, captions, getInstance, format, so
     function playM3u8(video, url, art) {
         if (Hls.isSupported()) {
             if (art.hls) art.hls.destroy();
-            const hls = new Hls();
+            const hlsConfig = {
+                xhrSetup: function (xhr, url) {
+                    // Add custom headers if provided
+                    if (headers && typeof headers === "object") {
+                        Object.keys(headers).forEach((key) => {
+                            xhr.setRequestHeader(key, headers[key]);
+                        });
+                    }
+                },
+            };
+            const hls = new Hls(hlsConfig);
             hls.loadSource(url);
             hls.attachMedia(video);
             art.hls = hls;
@@ -97,6 +107,11 @@ export default function CustomPlayer({ option, captions, getInstance, format, so
             setting: true,
             fullscreen: true,
             autoOrientation: true,
+            // autoSize: true,
+            loop: false,
+            isLive: false,
+            autoPlayback: true,
+            autoMini: true,
             flip: true,
             pip: true,
             playbackRate: true,
@@ -107,9 +122,15 @@ export default function CustomPlayer({ option, captions, getInstance, format, so
             mutex: true,
             subtitleOffset: true,
             miniProgressBar: true,
-            autoplay: true,
+            autoplay: false,
             hotkey: true,
-            screenshot: true,
+            // Add custom headers to video element if provided and format is mp4
+            ...(headers &&
+                format !== "hls" && {
+                    moreVideoAttr: {
+                        crossOrigin: "anonymous",
+                    },
+                }),
             customType:
                 format === "hls"
                     ? {
@@ -267,56 +288,13 @@ export default function CustomPlayer({ option, captions, getInstance, format, so
             getInstance(art);
         }
 
-        art.on("ready", () => {
-            art.notice.show = "Video Ready To Play";
-            // Ensure video and audio are in sync
-            const video = art.video;
-            if (video) {
-                video.onplay = () => {
-                    // Ensure audio plays when video plays
-                    if (video.muted) {
-                        video.muted = false;
-                    }
-                };
-                video.onpause = () => {
-                    // Force proper pause behavior
-                    video.pause();
-                    video.muted = true;
-                };
-            }
-        });
-
-        art.on("error", (error, reconnectTime) => {
-            art.notice.show = "Video Load Error";
-            console.info(error, reconnectTime);
-        });
-
-        // Handle pause event to ensure video and audio pause together
-        art.on("pause", () => {
-            const video = art.video;
-            if (video && !video.paused) {
-                video.pause();
-                video.muted = true;
-            }
-        });
-
-        // Handle play event to ensure video and audio play together
-        art.on("play", () => {
-            const video = art.video;
-            if (video && video.paused) {
-                video.play().catch((err) => {
-                    console.error("Play error:", err);
-                });
-            }
-        });
-
         return () => {
             if (art && art.destroy) {
                 art.destroy(false);
             }
             artInstanceRef.current = null;
         };
-    }, [currentSource.url, captions, format, sources]);
+    }, [currentSource.url, captions, format, sources, headers]);
 
     return <div ref={artRef} {...rest} style={{ width: "100%", height: "100%", aspectRatio: "16/9" }}></div>;
 }

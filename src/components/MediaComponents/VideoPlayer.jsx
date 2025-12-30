@@ -9,6 +9,9 @@ const VideoPlayer = memo(({ src, useCustomPlayer, playerData, isLoading }) => {
         const firstSource = playerData.sources[0];
         const format = firstSource?.type === "m3u8" ? "hls" : "mp4";
 
+        // Extract headers from first source if available
+        const headers = firstSource?.headers || null;
+
         // Use custom player with direct sources
         return (
             <div className="w-full relative aspect-video bg-black/90">
@@ -24,6 +27,7 @@ const VideoPlayer = memo(({ src, useCustomPlayer, playerData, isLoading }) => {
                     captions={playerData.captions || []}
                     format={format}
                     sources={playerData.sources || []}
+                    headers={headers}
                 />
             </div>
         );
