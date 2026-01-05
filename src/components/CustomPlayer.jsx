@@ -11,17 +11,20 @@ export default function CustomPlayer({ option, captions, getInstance, format, so
     function playM3u8(video, url, art) {
         if (Hls.isSupported()) {
             if (art.hls) art.hls.destroy();
-            const hlsConfig = {
-                xhrSetup: function (xhr, url) {
-                    // Add custom headers if provided
-                    if (headers && typeof headers === "object") {
-                        Object.keys(headers).forEach((key) => {
-                            xhr.setRequestHeader(key, headers[key]);
-                        });
-                    }
-                },
-            };
-            const hls = new Hls(hlsConfig);
+
+            //if format is mp4 only then headers exist
+
+            // const hlsConfig = {
+            //     xhrSetup: function (xhr, url) {
+            //         // Add custom headers if provided
+            //         if (headers && typeof headers === "object") {
+            //             Object.keys(headers).forEach((key) => {
+            //                 xhr.setRequestHeader(key, headers[key]);
+            //             });
+            //         }
+            //     },
+            // };
+            const hls = new Hls();
             hls.loadSource(url);
             hls.attachMedia(video);
             art.hls = hls;

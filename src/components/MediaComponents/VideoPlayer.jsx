@@ -7,6 +7,7 @@ const VideoPlayer = memo(({ src, useCustomPlayer, playerData, isLoading }) => {
     if (useCustomPlayer && playerData) {
         // Determine format from the first source
         const firstSource = playerData.sources[0];
+        console.log("First source for custom player:", firstSource);
         const format = firstSource?.type === "m3u8" ? "hls" : "mp4";
 
         // Extract headers from first source if available

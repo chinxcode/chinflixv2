@@ -55,7 +55,12 @@ const WatchPage = () => {
         const formatHlsUrl = (url) => {
             // if url starts with "https://hlsforge.com" then remove it
             if (url.startsWith("https://hlsforge.com")) {
-                return decodeURIComponent(url.replace("https://hlsforge.com/?url=", ""));
+                url = decodeURIComponent(url.replace("https://hlsforge.com/?url=", ""));
+            }
+
+            //if url has &id= remove it and keep only url before it
+            if (url.includes("&id=")) {
+                url = url.split("&id=")[0];
             }
             return url;
         };
@@ -159,39 +164,51 @@ const WatchPage = () => {
                         const defaultLink = sortedLinks[0];
                         const allCaptions = Array.from(captionsMap.values());
 
-                        const newServer = {
-                            name: serverData.server,
-                            url: defaultLink.url,
-                            format: defaultLink.type,
-                            quality: defaultLink.quality,
-                            headers: defaultLink.headers,
-                            flag: "⭐",
-                            working: true,
-                            recommended: !firstCustomServerLoadedRef.current,
-                            isCustomPlayer: true,
-                            playerData: {
-                                sources: sortedLinks,
-                                captions: allCaptions,
-                            },
-                        };
-
-                        console.log("Loaded custom server:", newServer);
-
-                        // Add server immediately as it loads
-                        setStreamingServers((prev) => {
-                            const filtered = prev.filter((s) => s.name !== newServer.name);
-                            const customServers = filtered.filter((s) => s.isCustomPlayer);
-                            const externalServers = filtered.filter((s) => !s.isCustomPlayer);
-                            return [...customServers, newServer, ...externalServers];
+                        // Instead of bundling all links as a single playerData entry,
+                        // create an individual streaming server entry for each returned link
+                        // so all links appear in the main server list.
+                        const newServers = sortedLinks.map((link, idx) => {
+                            const name = `${serverData.server} - ${link.quality || `link${idx + 1}`}`;
+                            return {
+                                name,
+                                url: link.url,
+                                format: link.type,
+                                quality: link.quality,
+                                headers: link.headers,
+                                flag: "⭐",
+                                working: true,
+                                // mark the first custom server loaded overall as recommended
+                                recommended: !firstCustomServerLoadedRef.current && idx === 0,
+                                isCustomPlayer: true,
+                                // keep playerData minimal and per-entry (single source),
+                                // this prevents grouping all links under one server
+                                playerData: {
+                                    sources: [link],
+                                    captions: allCaptions,
+                                },
+                            };
                         });
 
-                        // Mark first server loaded
-                        const isFirstServer = !firstCustomServerLoadedRef.current;
+                        console.log("Loaded custom servers:", newServers);
+
+                        // Add new server entries to the main streaming servers list,
+                        // preserving ordering: existing custom servers first, then new ones, then external servers.
+                        const newNames = newServers.map((s) => s.name);
+                        setStreamingServers((prev) => {
+                            const filtered = prev.filter((s) => !newNames.includes(s.name));
+                            const existingCustom = filtered.filter((s) => s.isCustomPlayer);
+                            const externalServers = filtered.filter((s) => !s.isCustomPlayer);
+                            return [...existingCustom, ...newServers, ...externalServers];
+                        });
+
+                        // If this is the very first custom server batch loaded, mark ref
+                        const isFirstServer = !firstCustomServerLoadedRef.current && newServers.length > 0;
                         if (isFirstServer) {
                             firstCustomServerLoadedRef.current = true;
                         }
 
-                        return { server: newServer, isFirst: isFirstServer };
+                        // Return the first new server entry (used by auto-switch logic)
+                        return { server: newServers[0], isFirst: isFirstServer };
                     }
                     return null;
                 } catch (error) {
@@ -263,7 +280,7 @@ const WatchPage = () => {
             try {
                 const data = await getMediaDetails(type, id);
                 setMediaData(data);
-                console.log("Media data loaded:", data);
+                // console.log("Media data loaded:", data);
 
                 let initialSeason = 1;
                 let initialEpisode = 1;
