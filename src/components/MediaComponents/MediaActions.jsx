@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { ShareIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import WatchlistButton from "@/components/WatchlistButton";
-import DownloadModal from "@/components/DownloadModal";
+// import DownloadModal from "@/components/DownloadModal";
 
 const MediaActions = ({ type, id, currentSeason, currentEpisode, episodes, onEpisodeChange, posterUrl, title, mediaData }) => {
-    const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
+    // const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
 
     const handleShare = async () => {
         const pageTitle = document.title;
@@ -72,12 +72,15 @@ const MediaActions = ({ type, id, currentSeason, currentEpisode, episodes, onEpi
                                         <button onClick={handleShare} className="bg-white/10 p-2 rounded-lg">
                                             <ShareIcon className="w-5 h-5" />
                                         </button>
-                                        <button
+                                        {/* <button
                                             onClick={() => setIsDownloadModalOpen(true)}
                                             className="bg-white/10 p-2 rounded-lg hover:bg-white/20 transition-colors"
                                         >
                                             <ArrowDownTrayIcon className="w-5 h-5" />
-                                        </button>
+                                        </button> */}
+                                        <a href={getDownloadUrl()} target="_blank" className="bg-white/10 p-2 rounded-lg">
+                                            <ArrowDownTrayIcon className="w-5 h-5" />
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -119,18 +122,21 @@ const MediaActions = ({ type, id, currentSeason, currentEpisode, episodes, onEpi
                             <button onClick={handleShare} className="bg-white/10 p-2 rounded-lg">
                                 <ShareIcon className="w-5 h-5" />
                             </button>
-                            <button
+                            {/* <button
                                 onClick={() => setIsDownloadModalOpen(true)}
                                 className="bg-white/10 p-2 rounded-lg hover:bg-white/20 transition-colors"
                             >
                                 <ArrowDownTrayIcon className="w-5 h-5" />
-                            </button>
+                            </button> */}
+                            <a href={getDownloadUrl()} target="_blank" rel="noopener noreferrer" className="bg-white/10 p-2 rounded-lg">
+                                <ArrowDownTrayIcon className="w-5 h-5" />
+                            </a>
                         </div>
                     </div>
                 )}
             </div>
 
-            <DownloadModal
+            {/* <DownloadModal
                 isOpen={isDownloadModalOpen}
                 onClose={() => setIsDownloadModalOpen(false)}
                 mediaData={{ id, ...mediaData }}
@@ -138,7 +144,7 @@ const MediaActions = ({ type, id, currentSeason, currentEpisode, episodes, onEpi
                 currentSeason={currentSeason}
                 currentEpisode={currentEpisode}
                 title={title}
-            />
+            /> */}
         </>
     );
 };
