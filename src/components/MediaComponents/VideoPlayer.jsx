@@ -1,19 +1,32 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import dynamic from "next/dynamic";
 
-const CustomPlayer = dynamic(() => import("../CustomPlayer"), { ssr: false });
+// const CustomPlayer = dynamic(() => import("../CustomPlayer"), { ssr: false });
+const SimplePlayer = dynamic(() => import("../SimplePlayer"), { ssr: false });
 
 const VideoPlayer = memo(({ src, useCustomPlayer, playerData, isLoading }) => {
-    if (useCustomPlayer && playerData) {
-        // Determine format from the first source
+    // Memoize the props to pass to SimplePlayer to ensure re-render when data changes
+    const playerProps = useMemo(() => {
+        if (!playerData || !playerData.sources || playerData.sources.length === 0) return null;
+
         const firstSource = playerData.sources[0];
-        console.log("First source for custom player:", firstSource);
+        // console.log("First source for player:", firstSource);
         const format = firstSource?.type === "m3u8" ? "hls" : "mp4";
 
-        // Extract headers from first source if available
-        const headers = firstSource?.headers || null;
+        // console.log("captions:", playerData.captions);
 
-        // Use custom player with direct sources
+        return {
+            option: {
+                url: firstSource.url,
+            },
+            captions: playerData.captions || [],
+            format,
+            sources: playerData.sources || [],
+        };
+    }, [playerData]);
+
+    if (useCustomPlayer && playerProps) {
+        // Use simple custom player
         return (
             <div className="w-full relative aspect-video bg-black/90">
                 {isLoading && (
@@ -21,15 +34,7 @@ const VideoPlayer = memo(({ src, useCustomPlayer, playerData, isLoading }) => {
                         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
                     </div>
                 )}
-                <CustomPlayer
-                    option={{
-                        url: firstSource.url,
-                    }}
-                    captions={playerData.captions || []}
-                    format={format}
-                    sources={playerData.sources || []}
-                    headers={headers}
-                />
+                <SimplePlayer key={playerProps.option.url} {...playerProps} />
             </div>
         );
     }

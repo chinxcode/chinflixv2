@@ -1,40 +1,34 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import Artplayer from "artplayer";
-import artplayerPluginHlsQuality from "artplayer-plugin-hls-quality";
 import Hls from "hls.js";
 
 export default function CustomPlayer({ option, captions, getInstance, format, sources, headers, ...rest }) {
     const artRef = useRef(null);
-    const [currentSource, setCurrentSource] = useState(option);
     const artInstanceRef = useRef(null);
+    const previousUrlRef = useRef(null);
 
-    function playM3u8(video, url, art) {
-        if (Hls.isSupported()) {
-            if (art.hls) art.hls.destroy();
+    const playVideo = useCallback((video, url, art) => {
+        console.log("playVideo called with URL:", url);
+        // Check if URL is an HLS stream
+        if (url.includes(".m3u8")) {
+            if (Hls.isSupported()) {
+                if (art.hls) art.hls.destroy();
 
-            //if format is mp4 only then headers exist
-
-            // const hlsConfig = {
-            //     xhrSetup: function (xhr, url) {
-            //         // Add custom headers if provided
-            //         if (headers && typeof headers === "object") {
-            //             Object.keys(headers).forEach((key) => {
-            //                 xhr.setRequestHeader(key, headers[key]);
-            //             });
-            //         }
-            //     },
-            // };
-            const hls = new Hls();
-            hls.loadSource(url);
-            hls.attachMedia(video);
-            art.hls = hls;
-            art.on("destroy", () => hls.destroy());
-        } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-            video.src = url;
+                const hls = new Hls();
+                hls.loadSource(url);
+                hls.attachMedia(video);
+                art.hls = hls;
+                art.on("destroy", () => hls.destroy());
+            } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+                video.src = url;
+            } else {
+                art.notice.show = "Unsupported playback format: m3u8";
+            }
         } else {
-            art.notice.show = "Unsupported playback format: m3u8";
+            // For MP4 and other formats, just set the source
+            video.src = url;
         }
-    }
+    }, []);
 
     useEffect(() => {
         const subtitles =
@@ -85,7 +79,7 @@ export default function CustomPlayer({ option, captions, getInstance, format, so
                         url: source.url,
                         type: "mp4",
                         quality: source.quality,
-                        default: index === 0 && currentSource.url === source.url,
+                        default: index === 0 && option.url === source.url,
                     });
                 });
             }
@@ -98,48 +92,51 @@ export default function CustomPlayer({ option, captions, getInstance, format, so
                         url: source.url,
                         type: "m3u8",
                         quality: source.quality,
-                        default: currentSource.url === source.url,
+                        default: option.url === source.url,
                     });
                 });
             }
         }
 
         const art = new Artplayer({
-            ...currentSource,
+            url: option.url,
             container: artRef.current,
-            setting: true,
+            autoplay: false,
+            autoSize: false,
+            autoMini: true,
+            loop: false,
+            playbackRate: true,
             fullscreen: true,
             autoOrientation: true,
-            // autoSize: true,
-            loop: false,
-            isLive: false,
-            autoPlayback: true,
-            autoMini: true,
-            flip: true,
-            pip: true,
-            playbackRate: true,
             aspectRatio: true,
-            type: format === "hls" ? "m3u8" : "mp4",
-            ...(defaultSubtitle && { subtitle: { url: defaultSubtitle.url, type: "srt", style: { color: "#fff" } } }),
+            autoPlayback: true,
+            setting: true,
+            screenshot: true,
+            miniProgressBar: true,
+            hotkey: true,
+            pip: true,
             airplay: true,
+            lock: true,
+            isLive: false,
+            flip: true,
             mutex: true,
             subtitleOffset: true,
-            miniProgressBar: true,
-            autoplay: false,
-            hotkey: true,
-            // Add custom headers to video element if provided and format is mp4
-            ...(headers &&
-                format !== "hls" && {
-                    moreVideoAttr: {
-                        crossOrigin: "anonymous",
+            ...(defaultSubtitle && { subtitle: { url: defaultSubtitle.url, type: "srt", style: { color: "#fff" } } }),
+            customType: {
+                m3u8: playVideo,
+                flv: playVideo,
+                mp4: playVideo,
+            },
+            controls: [
+                {
+                    name: "skip-85",
+                    position: "right",
+                    html: "<button>+85s</button>",
+                    click: function () {
+                        art.seek = art.currentTime + 85;
                     },
-                }),
-            customType:
-                format === "hls"
-                    ? {
-                          m3u8: playM3u8,
-                      }
-                    : {},
+                },
+            ],
             settings: [
                 {
                     html: "Subtitle",
@@ -207,11 +204,11 @@ export default function CustomPlayer({ option, captions, getInstance, format, so
                     selector: [
                         {
                             html: "watchparty.me",
-                            url: "https://www.watchparty.me/create?video=" + currentSource?.url,
+                            url: "https://www.watchparty.me/create?video=" + option.url,
                         },
                     ],
                     onSelect: function (item) {
-                        let url = `https://www.watchparty.me/create?video=${currentSource.url}`;
+                        let url = `https://www.watchparty.me/create?video=${option.url}`;
                         window.open(url, "_blank");
                         art.notice.show = "Opening Watch Party...";
                     },
@@ -226,44 +223,44 @@ export default function CustomPlayer({ option, captions, getInstance, format, so
                             ? [
                                   {
                                       html: "Download HLS (Recommended)",
-                                      url: currentSource.url,
+                                      url: option.url,
                                       opt: 1,
                                   },
                                   {
                                       html: "Download HLS (mediatools)",
-                                      url: currentSource.url,
+                                      url: option.url,
                                       opt: 2,
                                   },
                                   {
                                       html: "Download HLS (thetuhin)",
-                                      url: currentSource.url,
+                                      url: option.url,
                                       opt: 3,
                                   },
                               ]
                             : [
                                   {
                                       html: "Download mp4",
-                                      url: currentSource.url,
+                                      url: option.url,
                                       opt: 4,
                                   },
                               ],
                     onSelect: function (item) {
                         if (item.opt === 1) {
-                            let url = `https://hlsdownload.vidbinge.com/?url=${currentSource.url}`;
+                            let url = `https://hlsdownload.vidbinge.com/?url=${option.url}`;
                             window.open(url, "_blank");
                         }
                         if (item.opt === 2) {
-                            let url = `https://mediatools.cc/hlsDownloader?query=${currentSource.url}`;
+                            let url = `https://mediatools.cc/hlsDownloader?query=${option.url}`;
                             window.open(url, "_blank");
                         }
                         if (item.opt === 3) {
-                            navigator?.clipboard?.writeText(currentSource.url);
-                            let url = `https://hlsdownloader.thetuhin.com/?text=${currentSource.url}`;
+                            navigator?.clipboard?.writeText(option.url);
+                            let url = `https://hlsdownloader.thetuhin.com/?text=${option.url}`;
                             window.open(url, "_blank");
                         }
                         if (item.opt === 4) {
-                            navigator?.clipboard?.writeText(currentSource.url);
-                            let url = `${currentSource.url}`;
+                            navigator?.clipboard?.writeText(option.url);
+                            let url = `${option.url}`;
                             window.open(url, "_blank");
                         }
                         // Don't return item.html to avoid showing check mark
@@ -271,21 +268,11 @@ export default function CustomPlayer({ option, captions, getInstance, format, so
                     },
                 },
             ],
-            plugins:
-                format === "hls"
-                    ? [
-                          artplayerPluginHlsQuality({
-                              setting: true,
-                              getResolution: (level) => level.height + "P",
-                              title: "Quality",
-                              auto: "Auto",
-                          }),
-                      ]
-                    : [],
         });
 
         // Store instance reference
         artInstanceRef.current = art;
+        previousUrlRef.current = option.url;
 
         if (getInstance && typeof getInstance === "function") {
             getInstance(art);
@@ -296,8 +283,22 @@ export default function CustomPlayer({ option, captions, getInstance, format, so
                 art.destroy(false);
             }
             artInstanceRef.current = null;
+            previousUrlRef.current = null;
         };
-    }, [currentSource.url, captions, format, sources, headers]);
+    }, [captions, format, sources, headers, playVideo]);
+
+    // Separate effect to handle URL changes without recreating the player
+    useEffect(() => {
+        const art = artInstanceRef.current;
+
+        if (art && previousUrlRef.current && option.url && option.url !== previousUrlRef.current) {
+            console.log("Switching URL from", previousUrlRef.current, "to", option.url);
+
+            // Switch URL using Artplayer's built-in method
+            art.switchUrl(option.url);
+            previousUrlRef.current = option.url;
+        }
+    }, [option.url]);
 
     return <div ref={artRef} {...rest} style={{ width: "100%", height: "100%", aspectRatio: "16/9" }}></div>;
 }
