@@ -4,6 +4,7 @@ import {
     XMarkIcon,
     ArrowDownTrayIcon,
     ServerIcon,
+    CheckCircleIcon,
     ExclamationTriangleIcon,
     SparklesIcon,
     ClockIcon,
@@ -17,76 +18,164 @@ const DownloadModal = ({ isOpen, onClose, mediaData, type, currentSeason, curren
     const modalRef = useRef(null);
     const [riveStreamLinks, setRiveStreamLinks] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [currentServerIndex, setCurrentServerIndex] = useState(0);
     const [processedServers, setProcessedServers] = useState([]);
-    const [totalServers, setTotalServers] = useState(0);
     const [error, setError] = useState(null);
-    const [showHls, setShowHls] = useState(true);
+    const [showHls, setShowHls] = useState(false);
     const [hasFetched, setHasFetched] = useState(false);
+
+    // RiveStream API configuration
+    const RiveStreamAPI = "https://watch.rivestream.app";
+    const headers = {};
+
+    // Retry helper
+    const retry = async (fn, attempts = 3) => {
+        let error;
+        for (let i = 0; i < attempts; i++) {
+            try {
+                return await fn();
+            } catch (err) {
+                error = err;
+            }
+        }
+        throw error;
+    };
+
+    const formatHlsUrl = (url) => {
+        const params = new URLSearchParams({
+            url: url,
+            id: mediaData?.id || "",
+            season: currentSeason || "",
+            episode: currentEpisode || "",
+            title: title || "",
+            downloadTitle: `${title}${currentSeason ? `-${currentSeason}-${currentEpisode}` : ""}`,
+        });
+        return `https://hlsforge.com/?${params.toString()}`;
+    };
+
+    // Helper function to proxy URLs
+    const proxyUrl = (url) => `/api/proxy?url=${encodeURIComponent(url)}`;
+    // const proxyUrl = (url) => `https://cors-anywhere.com/${url}`;
 
     const fetchRiveStreamSources = async () => {
         if (!mediaData?.id) return;
         setIsLoading(true);
         setError(null);
         setRiveStreamLinks([]);
-        setProcessedServers([]);
-        setTotalServers(0);
         setHasFetched(true);
 
         try {
-            // Step 1: Initialize - get source list and secret key (fast!)
-            const initResponse = await axios.get("/api/download/init", {
-                params: { id: mediaData.id.toString() },
+            const id = mediaData.id.toString();
+            const season = type === "tv" || type === "anime" ? currentSeason : null;
+            const episode = type === "tv" || type === "anime" ? currentEpisode : null;
+
+            // Get source list using proxy
+            const sourceApiUrl = proxyUrl(`${RiveStreamAPI}/api/backendfetch?requestID=VideoProviderServices&secretKey=rive`);
+            const sourceList = await retry(async () => {
+                const res = await axios.get(sourceApiUrl, { headers });
+                return res.data;
             });
 
-            if (!initResponse.data.success) {
-                throw new Error(initResponse.data.error || "Failed to initialize download");
+            if (!sourceList?.data) {
+                throw new Error("No sources available");
             }
 
-            const { sourceList, secretKey, totalServers: total } = initResponse.data;
-            setTotalServers(total);
+            const docHtml = await retry(async () => {
+                const res = await axios.get(proxyUrl(RiveStreamAPI), { headers, timeout: 20000 });
+                return res.data;
+            });
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(docHtml, "text/html");
+            const scripts = doc.querySelectorAll("script");
+            let appScriptSrc = null;
 
-            // Step 2: Fetch from each server in parallel (progressive results!)
-            const baseParams = {
-                id: mediaData.id.toString(),
-                type: type,
-                title: title,
-                secretKey: secretKey,
-            };
-
-            // Add season and episode for TV shows and anime
-            if (type === "tv" || type === "anime") {
-                baseParams.season = currentSeason;
-                baseParams.episode = currentEpisode;
-            }
-
-            // Create promises for all servers
-            const serverPromises = sourceList.map(async (server) => {
-                try {
-                    const response = await axios.get("/api/download/server", {
-                        params: { ...baseParams, server },
-                        timeout: 12000,
-                    });
-
-                    // Update state immediately when this server responds
-                    if (response.data.success && response.data.links.length > 0) {
-                        setRiveStreamLinks((prev) => [...prev, ...response.data.links]);
-                    }
-
-                    setProcessedServers((prev) => [...prev, server]);
-
-                    return response.data;
-                } catch (error) {
-                    console.error(`Failed to fetch from ${server}:`, error.message);
-                    setProcessedServers((prev) => [...prev, server]);
-                    return { success: false, server, links: [] };
+            scripts.forEach((script) => {
+                const src = script.getAttribute("src");
+                if (src && src.includes("_app")) {
+                    appScriptSrc = src;
                 }
             });
 
-            // Wait for all servers to complete
-            await Promise.allSettled(serverPromises);
+            if (!appScriptSrc) {
+                throw new Error("Could not find app script");
+            }
+
+            const js = await retry(async () => {
+                const res = await axios.get(proxyUrl(`${RiveStreamAPI}${appScriptSrc}`));
+                return res.data;
+            });
+
+            const regex = /let\s+c\s*=\s*(\[[^\]]*])/;
+            const match = js.match(regex);
+            const arrayText = match?.[1];
+            const keyList = arrayText ? Array.from(arrayText.matchAll(/"([^"]+)"/g), (m) => m[1]) : [];
+
+            const secretKey = await retry(async () => {
+                const res = await axios.get(proxyUrl(`https://rivestream.supe2372.workers.dev/?input=${id}&cList=${keyList.join(",")}`));
+                return res.data;
+            });
+
+            const allLinks = [];
+
+            // Process each server
+            for (const [index, source] of sourceList.data.entries()) {
+                try {
+                    setCurrentServerIndex(index + 1);
+                    setProcessedServers((prev) => [...prev, source]);
+
+                    const sourceStreamLink = proxyUrl(
+                        season == null
+                            ? `${RiveStreamAPI}/api/backendfetch?requestID=movieVideoProvider&id=${id}&service=${source}&secretKey=${secretKey}`
+                            : `${RiveStreamAPI}/api/backendfetch?requestID=tvVideoProvider&id=${id}&season=${season}&episode=${episode}&service=${source}&secretKey=${secretKey}`
+                    );
+
+                    const sourceJson = await retry(async () => {
+                        const res = await axios.get(sourceStreamLink, { headers, timeout: 10000 });
+                        return res.data;
+                    });
+
+                    if (sourceJson?.data?.sources) {
+                        const newLinks = sourceJson.data.sources.map((src) => {
+                            if (src.url.includes("m3u8-proxy?url")) {
+                                const href = decodeURIComponent(src.url.split("m3u8-proxy?url=")[1].split("&headers=")[0]);
+                                return {
+                                    id: `${source}-${src.quality}-${Date.now()}`,
+                                    name: `${src.source} ${src.quality}`,
+                                    url: formatHlsUrl(href),
+                                    type: "m3u8",
+                                    server: source,
+                                    quality: src.quality,
+                                    referer: "https://megacloud.store/",
+                                };
+                            } else {
+                                const type = src.url.toLowerCase().includes(".m3u8") ? "m3u8" : "mp4";
+                                return {
+                                    id: `${source}-${src.quality}-${Date.now()}`,
+                                    name: `${src.source} ${src.quality}`,
+                                    url: type === "m3u8" ? formatHlsUrl(src.url) : src.url,
+                                    type,
+                                    server: source,
+                                    quality: src.quality,
+                                    referer: "",
+                                };
+                            }
+                        });
+
+                        allLinks.push(...newLinks);
+                        // Update links immediately when found for each server
+                        setRiveStreamLinks((prev) => [...prev, ...newLinks]);
+                    }
+                } catch (e) {
+                    console.error(`Failed to process source: ${source}`, e.message);
+                }
+            }
+
+            if (allLinks.length === 0) {
+                setError("No download links found from any server");
+            }
         } catch (error) {
-            console.error("Error fetching download sources:", error);
-            setError(error.response?.data?.error || error.message || "Failed to fetch download links");
+            console.error("Error fetching RiveStream sources:", error);
+            setError(error.message);
         } finally {
             setIsLoading(false);
         }
@@ -129,8 +218,6 @@ const DownloadModal = ({ isOpen, onClose, mediaData, type, currentSeason, curren
             setError(null);
             setHasFetched(false);
             setIsLoading(false);
-            setProcessedServers([]);
-            setTotalServers(0);
         }
     }, [isOpen, mediaData?.id, currentSeason, currentEpisode]);
 
@@ -242,7 +329,7 @@ const DownloadModal = ({ isOpen, onClose, mediaData, type, currentSeason, curren
                                         </div>
 
                                         {/* RiveStream Section */}
-                                        <div className="space-y-4">
+                                        {/* <div className="space-y-4">
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-2">
                                                     <ServerIcon className="w-5 h-5 text-white/70" />
@@ -335,31 +422,22 @@ const DownloadModal = ({ isOpen, onClose, mediaData, type, currentSeason, curren
                                                         <div className="text-center py-2">
                                                             <span className="text-sm text-white/50 flex items-center gap-2 justify-center">
                                                                 <ClockIcon className="w-4 h-4 animate-spin" />
-                                                                Checking servers... ({processedServers.length}/{totalServers})
+                                                                Checking more servers...
                                                             </span>
                                                         </div>
                                                     )}
                                                 </div>
                                             )}
 
-                                            {!error && Object.entries(serverGroups).length === 0 && hasFetched && !isLoading && (
+                                            {!error && Object.entries(serverGroups).length === 0 && hasFetched && (
                                                 <div className="text-center py-8 px-4 bg-white/5 rounded-xl border border-white/10">
                                                     <ServerIcon className="w-12 h-12 text-white/30 mx-auto mb-3" />
-                                                    <p className="text-white/50 mb-3">No download links available</p>
-                                                    <p className="text-xs text-white/40">Checked {processedServers.length} servers</p>
-                                                </div>
-                                            )}
-
-                                            {isLoading && Object.entries(serverGroups).length === 0 && (
-                                                <div className="text-center py-8 px-4 bg-white/5 rounded-xl border border-white/10">
-                                                    <ClockIcon className="w-12 h-12 text-white/30 mx-auto mb-3 animate-spin" />
-                                                    <p className="text-white/50 mb-2">Finding download links...</p>
-                                                    <p className="text-xs text-white/40">
-                                                        Checking servers: {processedServers.length}/{totalServers}
+                                                    <p className="text-white/50 mb-3">
+                                                        {isLoading ? "Finding download links..." : "No download links available"}
                                                     </p>
                                                 </div>
                                             )}
-                                        </div>
+                                        </div> */}
                                     </div>
                                 </div>
 
